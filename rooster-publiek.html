@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TC Group — Rooster</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#F7F6F2;--surface:#fff;--border:#E5E3DB;--text:#1A1917;--muted:#888580;--radius:10px;--font:'DM Sans',sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-size:15px;font-weight:600;letter-spacing:-.02em}
+.logo span{color:var(--muted);font-weight:400}
+.vbadge{font-size:11px;background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;border-radius:20px;padding:3px 10px;font-weight:500}
+.layout{display:grid;grid-template-columns:240px 1fr;height:calc(100vh - 56px)}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:1.25rem;overflow-y:auto}
+.main{padding:1.5rem;overflow-y:auto}
+.slabel{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem}
+.wh{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px}
+.wh span{font-size:9px;color:var(--muted);text-align:center;font-weight:500}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cd{border-radius:8px;padding:4px 2px;text-align:center;border:1px solid transparent;background:var(--bg);min-height:34px}
+.cd.today{background:#EFF6FF;border-color:#BFDBFE}
+.cd.today .dn{color:#1E40AF;font-weight:600}
+.cd.has-klus .dr{display:flex;justify-content:center;gap:2px;margin-top:2px}
+.dn{font-size:11px;color:var(--text)}
+.dot{width:4px;height:4px;border-radius:50%}
+.wdiv{grid-column:1/-1;border-top:1px solid var(--border);margin:4px 0}
+.lgd{margin-top:1rem;display:flex;flex-direction:column;gap:5px}
+.lgr{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.ls{width:10px;height:10px;border-radius:3px}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.25rem}
+.st{font-size:13px;font-weight:600;margin-bottom:1rem}
+.tl-hdr{display:grid;grid-template-columns:80px 1fr;gap:8px;margin-bottom:4px}
+.tl-dates{display:grid;grid-template-columns:repeat(14,1fr);gap:3px}
+.td{font-size:9px;color:var(--muted);text-align:center;font-weight:500}
+.td.tod{color:#1E40AF}
+.tl-rows{display:flex;flex-direction:column;gap:4px}
+.tl-row{display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center}
+.tl-name{font-size:11px;color:var(--muted);text-align:right;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-cells{display:grid;grid-template-columns:repeat(14,1fr);gap:3px}
+.tc{height:24px;border-radius:4px;border:1px solid var(--border);background:var(--bg)}
+.tc.busy{border-width:1px}
+.tc.tod-col{outline:2px solid rgba(37,99,235,.25);outline-offset:-1px}
+.kl{display:flex;flex-direction:column;gap:8px}
+.kc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.875rem 1rem}
+.kdate{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
+.ktrucks{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:.3rem}
+.bdg{display:inline-flex;font-size:10px;padding:3px 8px;border-radius:5px;font-weight:500}
+.kmeta{font-size:11px;color:var(--muted)}
+.kmeta strong{color:var(--text)}
+.conflict{background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--radius);padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:#991B1B;display:none}
+.conflict.show{display:block}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:3rem 0}
+.spin{text-align:center;color:var(--muted);font-size:13px;padding:2rem 0}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">TC Group <span>/ Rooster</span></div>
+  <div class="vbadge">Alleen bekijken</div>
+</header>
+<div class="layout">
+  <div class="sidebar">
+    <div class="slabel">Agenda</div>
+    <div class="wh"><span>Ma</span><span>Di</span><span>Wo</span><span>Do</span><span>Vr</span><span>Za</span><span>Zo</span></div>
+    <div class="cg" id="calGrid"><div class="spin">Laden...</div></div>
+    <div class="lgd" id="legenda"></div>
+  </div>
+  <div class="main">
+    <div class="conflict" id="conflictBanner"></div>
+    <div class="sc">
+      <div class="st">Truckbeschikbaarheid — 2 weken</div>
+      <div class="tl-hdr"><div></div><div class="tl-dates" id="tlDates"></div></div>
+      <div class="tl-rows" id="tlRows"><div class="spin">Laden...</div></div>
+    </div>
+    <div class="sc">
+      <div class="st">Alle klussen</div>
+      <div class="kl" id="klusList"><div class="spin">Laden...</div></div>
+    </div>
+  </div>
+</div>
+<script>
+const URL_BASE='https://rxfrdocioodfxrnjtipa.supabase.co/rest/v1/';
+const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4ZnJkb2Npb29kZnhybmp0aXBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MjM1MDQsImV4cCI6MjA5MzM5OTUwNH0.dvTDgvVSQQILHdgm0FI_FW8WmALTZI06VTqabLrwu1E';
+const H={'apikey':KEY,'Authorization':'Bearer '+KEY};
+const today=new Date();
+const todayStr=fmt(today);
+
+function fmt(d){return d.toISOString().split('T')[0]}
+function getWeekDates(){
+  const s=new Date(today);s.setDate(s.getDate()-s.getDay()+1);
+  return Array.from({length:14},(_,i)=>{const d=new Date(s);d.setDate(s.getDate()+i);return d});
+}
+async function get(path){const r=await fetch(URL_BASE+path,{headers:H});return r.json()}
+function hbg(hex){return hex+'18'}
+
+async function init(){
+  try{
+    const [trucks,personeel,klussen,klusTrucks,klusPersoneel,klusPdfs]=await Promise.all([
+      get('trucks?select=*&order=volgorde'),
+      get('personeel?select=*&order=naam'),
+      get('klussen?select=*&order=datum'),
+      get('klus_trucks?select=*'),
+      get('klus_personeel?select=*'),
+      get('klus_pdfs?select=*'),
+    ]);
+    const tMap=Object.fromEntries(trucks.map(t=>[t.id,t]));
+    const pMap=Object.fromEntries(personeel.map(p=>[p.id,p]));
+    const enriched=klussen.map(k=>({
+      ...k,
+      trucks:klusTrucks.filter(x=>x.klus_id===k.id).map(x=>tMap[x.truck_id]).filter(Boolean),
+      personeel:klusPersoneel.filter(x=>x.klus_id===k.id).map(x=>pMap[x.personeel_id]).filter(Boolean),
+      pdfs:klusPdfs.filter(x=>x.klus_id===k.id),
+    }));
+    render(trucks,enriched);
+  }catch(e){
+    document.getElementById('klusList').innerHTML='<div class="empty">Fout bij laden. Controleer verbinding.</div>';
+  }
+}
+
+function render(trucks,klussen){
+  const days=getWeekDates();
+  const busyMap={};
+  klussen.forEach(k=>{if(!busyMap[k.datum])busyMap[k.datum]=new Set();k.trucks.forEach(t=>busyMap[k.datum].add(t.id));});
+
+  document.getElementById('legenda').innerHTML=`<div class="slabel" style="margin-top:.5rem">Trucks</div>`+trucks.map(t=>`<div class="lgr"><div class="ls" style="background:${t.color}"></div>${t.label}</div>`).join('');
+
+  document.getElementById('calGrid').innerHTML=days.map((d,i)=>{
+    const ds=fmt(d);const dots=[...(busyMap[ds]||[])];
+    return(i===7?'<div class="wdiv"></div>':'')+
+      `<div class="cd${ds===todayStr?' today':''}${dots.length?' has-klus':''}">
+        <div class="dn">${d.getDate()}</div>
+        ${dots.length?`<div class="dr">${dots.map(tid=>{const t=trucks.find(x=>x.id===tid);return t?`<div class="dot" style="background:${t.color}"></div>`:''}).join('')}</div>`:''}
+      </div>`;
+  }).join('');
+
+  document.getElementById('tlDates').innerHTML=days.map(d=>`<div class="td${fmt(d)===todayStr?' tod':''}">${d.getDate()}</div>`).join('');
+  document.getElementById('tlRows').innerHTML=trucks.map(tr=>`<div class="tl-row">
+    <div class="tl-name" title="${tr.label}">${tr.label}</div>
+    <div class="tl-cells">${days.map(d=>{
+      const ds=fmt(d);const busy=klussen.some(k=>k.datum===ds&&k.trucks.some(t=>t.id===tr.id));
+      return`<div class="tc${busy?' busy':''}${ds===todayStr?' tod-col':''}" style="${busy?`background:${hbg(tr.color)};border-color:${tr.color}`:''}" title="${tr.label} — ${busy?'bezet':'vrij'}"></div>`;
+    }).join('')}</div>
+  </div>`).join('');
+
+  const seen=new Set();const conflicts=[];
+  trucks.forEach(tr=>{
+    const bd={};klussen.forEach(k=>{if(k.trucks.some(t=>t.id===tr.id)){bd[k.datum]=(bd[k.datum]||0)+1;}});
+    Object.entries(bd).forEach(([d,c])=>{if(c>1){const key=d+tr.id;if(!seen.has(key)){seen.add(key);conflicts.push(`${new Date(d).toLocaleDateString('nl-NL',{day:'numeric',month:'short'})}: ${tr.label} dubbel ingepland`);}}});
+  });
+  const cb=document.getElementById('conflictBanner');
+  if(conflicts.length){cb.className='conflict show';cb.innerHTML='⚠ Conflict: '+conflicts.join(' — ');}
+
+  const sorted=[...klussen].sort((a,b)=>a.datum.localeCompare(b.datum));
+  document.getElementById('klusList').innerHTML=sorted.length===0?'<div class="empty">Geen klussen gepland</div>':sorted.map(k=>{
+    const ds=new Date(k.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});
+    const tB=k.trucks.map(t=>`<span class="bdg" style="background:${hbg(t.color)};color:${t.color}">${t.label}</span>`).join('');
+    return`<div class="kc">
+      <div class="kdate">${ds}</div>
+      <div class="ktrucks">${tB}<span class="bdg" style="background:#F5F3FF;color:#4C1D95">${k.food}</span></div>
+      <div class="kmeta"><strong>${k.personen} personen</strong>${k.personeel.length?' &nbsp;·&nbsp; '+k.personeel.map(p=>p.naam).join(', '):''}</div>
+      ${k.notitie?`<div class="kmeta" style="font-style:italic;margin-top:3px">${k.notitie}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+init();
+</script>
+</body>
+</html>

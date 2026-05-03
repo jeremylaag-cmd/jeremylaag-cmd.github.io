@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TC Group — Backend</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#F7F6F2;--surface:#fff;--border:#E5E3DB;--text:#1A1917;--muted:#888580;--radius:10px;--font:'DM Sans',sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:2rem;width:320px}
+.login-title{font-size:18px;font-weight:600;margin-bottom:.25rem}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+.login-box input{width:100%;font-size:14px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);margin-bottom:.75rem;background:var(--surface);color:var(--text)}
+.login-box input:focus{outline:none;border-color:var(--text)}
+.login-box button{width:100%;background:var(--text);color:#fff;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font)}
+.login-err{font-size:12px;color:#DC2626;margin-top:.5rem;display:none}
+
+/* APP */
+.app{display:none}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-size:15px;font-weight:600;letter-spacing:-.02em}
+.logo span{color:var(--muted);font-weight:400}
+.abadge{font-size:11px;background:#FFF7ED;color:#9A3412;border:1px solid #FED7AA;border-radius:20px;padding:3px 10px;font-weight:500}
+.header-right{display:flex;align-items:center;gap:1rem}
+.htabs{display:flex;height:56px}
+.htab{padding:0 1.25rem;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;height:100%;font-family:var(--font)}
+.htab.active{color:var(--text);border-bottom-color:var(--text)}
+.logout-btn{font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:var(--font)}
+.logout-btn:hover{color:var(--text)}
+
+.page{display:none}
+.page.active{display:block}
+
+/* ROOSTER */
+.layout{display:grid;grid-template-columns:240px 1fr;height:calc(100vh - 56px)}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:1.25rem;overflow-y:auto}
+.main{padding:1.5rem;overflow-y:auto}
+.slabel{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem}
+.wh{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px}
+.wh span{font-size:9px;color:var(--muted);text-align:center;font-weight:500}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cd{border-radius:8px;padding:4px 2px;text-align:center;border:1px solid transparent;background:var(--bg);min-height:34px;cursor:pointer;transition:.1s}
+.cd:hover{border-color:var(--border);background:#fff}
+.cd.today{background:#EFF6FF;border-color:#BFDBFE}
+.cd.today .dn{color:#1E40AF;font-weight:600}
+.cd.sel{border-color:var(--text);background:#fff}
+.cd.has-klus .dr{display:flex;justify-content:center;gap:2px;margin-top:2px}
+.dn{font-size:11px;color:var(--text)}
+.dot{width:4px;height:4px;border-radius:50%}
+.wdiv{grid-column:1/-1;border-top:1px solid var(--border);margin:4px 0}
+.lgd{margin-top:1rem;display:flex;flex-direction:column;gap:5px}
+.lgr{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.ls{width:10px;height:10px;border-radius:3px}
+.btn-add{background:var(--text);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;width:100%;margin-top:.875rem;font-family:var(--font)}
+.btn-add:hover{opacity:.85}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.25rem}
+.sc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.st{font-size:13px;font-weight:600}
+.btn-ghost{background:transparent;border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:var(--font);color:var(--text)}
+.btn-ghost:hover{background:var(--bg)}
+.tl-hdr{display:grid;grid-template-columns:80px 1fr;gap:8px;margin-bottom:4px}
+.tl-dates{display:grid;grid-template-columns:repeat(14,1fr);gap:3px}
+.td{font-size:9px;color:var(--muted);text-align:center;font-weight:500}
+.td.tod{color:#1E40AF}
+.tl-rows{display:flex;flex-direction:column;gap:4px}
+.tl-row{display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center}
+.tl-name{font-size:11px;color:var(--muted);text-align:right;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-cells{display:grid;grid-template-columns:repeat(14,1fr);gap:3px}
+.tc{height:24px;border-radius:4px;border:1px solid var(--border);background:var(--bg);cursor:pointer}
+.tc:hover{opacity:.75}
+.tc.busy{border-width:1px}
+.tc.tod-col{outline:2px solid rgba(37,99,235,.25);outline-offset:-1px}
+.tc.sel-col{outline:2px solid var(--text);outline-offset:-1px}
+.kl{display:flex;flex-direction:column;gap:8px}
+.kc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.875rem 1rem}
+.kc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.kdate{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
+.ktrucks{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:.3rem}
+.bdg{display:inline-flex;font-size:10px;padding:3px 8px;border-radius:5px;font-weight:500}
+.kmeta{font-size:11px;color:var(--muted)}
+.kmeta strong{color:var(--text)}
+.kactions{display:flex;gap:5px;flex-shrink:0}
+.btn-edit{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:var(--font);color:var(--text)}
+.btn-del{background:#DC2626;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:var(--font)}
+.pdf-link{font-size:10px;color:#2563EB;cursor:pointer;text-decoration:underline;margin-right:8px}
+.conflict{background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--radius);padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:#991B1B;display:none}
+.conflict.show{display:block}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:2rem 0}
+.spin{text-align:center;color:var(--muted);font-size:13px;padding:2rem 0}
+
+/* BEHEER */
+.beheer-wrap{padding:2rem;max-width:860px;margin:0 auto}
+.beheer-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.bc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.bt{font-size:14px;font-weight:600;margin-bottom:1rem}
+.bl{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem}
+.bi{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--bg);border-radius:7px;font-size:12px}
+.bi-left{display:flex;align-items:center;gap:8px}
+.cswatch{width:10px;height:10px;border-radius:3px}
+.add-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.add-row input[type=text]{flex:1;min-width:120px;font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:var(--font);background:var(--surface);color:var(--text)}
+.add-row input[type=color]{width:34px;height:34px;border:1px solid var(--border);border-radius:7px;cursor:pointer;padding:2px}
+.add-row input:focus{outline:none;border-color:var(--text)}
+.btn-sm{background:var(--text);color:#fff;border:none;border-radius:6px;padding:7px 13px;font-size:11px;font-weight:500;cursor:pointer;font-family:var(--font)}
+.btn-sm:hover{opacity:.85}
+.btn-danger-sm{background:#DC2626;color:#fff;border:none;border-radius:5px;padding:4px 9px;font-size:11px;cursor:pointer;font-family:var(--font)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:14px;border:1px solid var(--border);padding:1.5rem;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:600;margin-bottom:1.25rem}
+.fr{margin-bottom:.875rem}
+.fl{font-size:11px;color:var(--muted);margin-bottom:4px;display:block;font-weight:500}
+.fr input[type=text],.fr input[type=number],.fr input[type=date],.fr select,.fr textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:var(--font)}
+.fr textarea{resize:vertical;min-height:52px}
+.fr input:focus,.fr select:focus,.fr textarea:focus{outline:none;border-color:var(--text)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.chip{font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);cursor:pointer;background:var(--bg);color:var(--text);font-family:var(--font);transition:.1s}
+.chip.on{border-color:var(--text);background:var(--text);color:#fff}
+.bij{border:1.5px dashed var(--border);border-radius:8px;padding:12px;text-align:center;font-size:12px;color:var(--muted);cursor:pointer;margin-top:4px;transition:.15s}
+.bij:hover{border-color:var(--text);color:var(--text)}
+.bij.has{border-color:#059669;background:#F0FDF4;color:#065F46}
+.pdf-list{margin-top:6px;display:flex;flex-direction:column;gap:4px}
+.pdf-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border-radius:6px;padding:5px 9px;font-size:11px}
+.pdf-name{color:#2563EB;cursor:pointer;text-decoration:underline}
+.mfooter{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border)}
+.saving-msg{font-size:12px;color:var(--muted);align-self:center}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-title">TC Group</div>
+    <div class="login-sub">Backend — alleen voor beheerders</div>
+    <input type="password" id="pwInput" placeholder="Wachtwoord" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">Inloggen</button>
+    <div class="login-err" id="loginErr">Onjuist wachtwoord</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="appWrap">
+  <header>
+    <div class="logo">TC Group <span>/ Backend</span></div>
+    <div class="htabs">
+      <button class="htab active" onclick="showPage('rooster')">Rooster</button>
+      <button class="htab" onclick="showPage('beheer')">Beheer</button>
+    </div>
+    <div class="header-right">
+      <div class="abadge">Beheerder</div>
+      <button class="logout-btn" onclick="logout()">Uitloggen</button>
+    </div>
+  </header>
+
+  <!-- ROOSTER PAGE -->
+  <div id="page-rooster" class="page active">
+    <div class="layout">
+      <div class="sidebar">
+        <div class="slabel">Agenda</div>
+        <div class="wh"><span>Ma</span><span>Di</span><span>Wo</span><span>Do</span><span>Vr</span><span>Za</span><span>Zo</span></div>
+        <div class="cg" id="calGrid"><div class="spin">Laden...</div></div>
+        <div class="lgd" id="legenda"></div>
+        <button class="btn-add" onclick="openModal()">+ Klus aanmaken</button>
+      </div>
+      <div class="main">
+        <div class="conflict" id="conflictBanner"></div>
+        <div class="sc">
+          <div class="st">Truckbeschikbaarheid — 2 weken</div>
+          <div class="tl-hdr"><div></div><div class="tl-dates" id="tlDates"></div></div>
+          <div class="tl-rows" id="tlRows"><div class="spin">Laden...</div></div>
+        </div>
+        <div class="sc">
+          <div class="sc-header">
+            <div class="st" id="mainTitle">Alle klussen</div>
+            <button class="btn-ghost" id="btnClear" style="display:none" onclick="clearFilter()">Toon alles</button>
+          </div>
+          <div class="kl" id="klusList"><div class="spin">Laden...</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEHEER PAGE -->
+  <div id="page-beheer" class="page">
+    <div class="beheer-wrap">
+      <div class="beheer-grid">
+        <div class="bc">
+          <div class="bt">Trucks</div>
+          <div class="bl" id="truckBeheer"></div>
+          <div class="add-row">
+            <input type="color" id="newTruckColor" value="#2563EB">
+            <input type="text" id="newTruckName" placeholder="Naam truck">
+            <button class="btn-sm" onclick="addTruck()">Toevoegen</button>
+          </div>
+        </div>
+        <div class="bc">
+          <div class="bt">Personeel</div>
+          <div class="bl" id="personeelBeheer"></div>
+          <div class="add-row">
+            <input type="text" id="newPersNaam" placeholder="Naam personeelslid">
+            <button class="btn-sm" onclick="addPersoneelLid()">Toevoegen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Nieuwe klus</div>
+    <div class="fr">
+      <span class="fl">Trucks (meerdere mogelijk)</span>
+      <div class="chips" id="truckChips"></div>
+    </div>
+    <div class="two">
+      <div class="fr"><span class="fl">Datum</span><input type="date" id="fDatum"></div>
+      <div class="fr"><span class="fl">Aantal personen</span><input type="number" id="fPersonen" min="1" placeholder="bv. 200"></div>
+    </div>
+    <div class="fr"><span class="fl">Soort food</span>
+      <select id="fFood">
+        <option value="">Selecteer</option>
+        <option>Snacks & Friet</option><option>Pannenkoeken</option><option>BBQ</option>
+        <option>Catering buffet</option><option>Desserts</option><option>Anders</option>
+      </select>
+    </div>
+    <div class="fr">
+      <span class="fl">Personeel (meerdere mogelijk)</span>
+      <div class="chips" id="persChips"></div>
+    </div>
+    <div class="fr">
+      <span class="fl">PDF bijlagen</span>
+      <div class="bij" id="bijZone" onclick="document.getElementById('fPdf').click()">Klik om PDF toe te voegen</div>
+      <input type="file" id="fPdf" accept=".pdf,application/pdf" multiple style="display:none" onchange="handlePdf()">
+      <div class="pdf-list" id="pdfList"></div>
+    </div>
+    <div class="fr"><span class="fl">Notities</span><textarea id="fNotitie" placeholder="Extra info..."></textarea></div>
+    <div class="mfooter">
+      <span class="saving-msg" id="savingMsg" style="display:none">Opslaan...</span>
+      <button class="btn-ghost" onclick="closeModal()">Annuleren</button>
+      <button class="btn-sm" onclick="saveKlus()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──
+const WACHTWOORD = 'tcgroup2026'; // ← pas dit aan naar jouw wachtwoord
+const SB = 'https://rxfrdocioodfxrnjtipa.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4ZnJkb2Npb29kZnhybmp0aXBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MjM1MDQsImV4cCI6MjA5MzM5OTUwNH0.dvTDgvVSQQILHdgm0FI_FW8WmALTZI06VTqabLrwu1E';
+const H = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'};
+
+// ── STATE ──
+let TRUCKS=[], PERSONEEL=[], KLUSSEN=[];
+let selDate=null, editId=null;
+let formTrucks=[], formPers=[], formPdfs=[], existingPdfs=[];
+const today=new Date(); const todayStr=fmt(today);
+
+// ── AUTH ──
+function doLogin(){
+  const pw=document.getElementById('pwInput').value;
+  if(pw===WACHTWOORD){
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('appWrap').style.display='block';
+    loadAll();
+  } else {
+    document.getElementById('loginErr').style.display='block';
+  }
+}
+function logout(){
+  document.getElementById('appWrap').style.display='none';
+  document.getElementById('loginWrap').style.display='flex';
+  document.getElementById('pwInput').value='';
+}
+
+// ── UTILS ──
+function fmt(d){return d.toISOString().split('T')[0]}
+function getWeekDates(){
+  const s=new Date(today);s.setDate(s.getDate()-s.getDay()+1);
+  return Array.from({length:14},(_,i)=>{const d=new Date(s);d.setDate(s.getDate()+i);return d});
+}
+async function sbGet(path){const r=await fetch(SB+'/rest/v1/'+path,{headers:H});return r.json()}
+async function sbPost(path,body){const r=await fetch(SB+'/rest/v1/'+path,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(body)});return r.json()}
+async function sbPatch(path,body){return fetch(SB+'/rest/v1/'+path,{method:'PATCH',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(body)})}
+async function sbDelete(path){return fetch(SB+'/rest/v1/'+path,{method:'DELETE',headers:H})}
+function hbg(hex){return hex+'18'}
+
+// ── LOAD ──
+async function loadAll(){
+  const [trucks,personeel,klussen,klusTrucks,klusPers,klusPdfs]=await Promise.all([
+    sbGet('trucks?select=*&order=volgorde'),
+    sbGet('personeel?select=*&order=naam'),
+    sbGet('klussen?select=*&order=datum'),
+    sbGet('klus_trucks?select=*'),
+    sbGet('klus_personeel?select=*'),
+    sbGet('klus_pdfs?select=*'),
+  ]);
+  TRUCKS=trucks; PERSONEEL=personeel;
+  const tMap=Object.fromEntries(trucks.map(t=>[t.id,t]));
+  const pMap=Object.fromEntries(personeel.map(p=>[p.id,p]));
+  KLUSSEN=klussen.map(k=>({
+    ...k,
+    trucks:klusTrucks.filter(x=>x.klus_id===k.id).map(x=>tMap[x.truck_id]).filter(Boolean),
+    personeel:klusPers.filter(x=>x.klus_id===k.id).map(x=>pMap[x.personeel_id]).filter(Boolean),
+    pdfs:klusPdfs.filter(x=>x.klus_id===k.id),
+  }));
+  renderAll();
+}
+
+// ── PAGES ──
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.htab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.target.classList.add('active');
+  if(id==='beheer') renderBeheer();
+}
+
+// ── RENDER ROOSTER ──
+function renderAll(){
+  const days=getWeekDates();
+  const busyMap={};
+  KLUSSEN.forEach(k=>{if(!busyMap[k.datum])busyMap[k.datum]=new Set();k.trucks.forEach(t=>busyMap[k.datum].add(t.id));});
+
+  // Legenda
+  document.getElementById('legenda').innerHTML=`<div class="slabel" style="margin-top:.5rem">Trucks</div>`+TRUCKS.map(t=>`<div class="lgr"><div class="ls" style="background:${t.color}"></div>${t.label}</div>`).join('');
+
+  // Kalender
+  document.getElementById('calGrid').innerHTML=days.map((d,i)=>{
+    const ds=fmt(d);const dots=[...(busyMap[ds]||[])];
+    return(i===7?'<div class="wdiv"></div>':'')+
+      `<div class="cd${ds===todayStr?' today':''}${ds===selDate?' sel':''}${dots.length?' has-klus':''}" onclick="toggleDate('${ds}')">
+        <div class="dn">${d.getDate()}</div>
+        ${dots.length?`<div class="dr">${dots.map(tid=>{const t=TRUCKS.find(x=>x.id===tid);return t?`<div class="dot" style="background:${t.color}"></div>`:''}).join('')}</div>`:''}
+      </div>`;
+  }).join('');
+
+  // Timeline
+  document.getElementById('tlDates').innerHTML=days.map(d=>`<div class="td${fmt(d)===todayStr?' tod':''}">${d.getDate()}</div>`).join('');
+  document.getElementById('tlRows').innerHTML=TRUCKS.map(tr=>`<div class="tl-row">
+    <div class="tl-name" title="${tr.label}">${tr.label}</div>
+    <div class="tl-cells">${days.map(d=>{
+      const ds=fmt(d);const busy=KLUSSEN.some(k=>k.datum===ds&&k.trucks.some(t=>t.id===tr.id));
+      return`<div class="tc${busy?' busy':''}${ds===todayStr?' tod-col':''}${ds===selDate?' sel-col':''}" onclick="toggleDate('${ds}')" style="${busy?`background:${hbg(tr.color)};border-color:${tr.color}`:''}" title="${tr.label} — ${busy?'bezet':'vrij'}"></div>`;
+    }).join('')}</div>
+  </div>`).join('');
+
+  // Conflicten
+  const seen=new Set();const conflicts=[];
+  TRUCKS.forEach(tr=>{
+    const bd={};KLUSSEN.forEach(k=>{if(k.trucks.some(t=>t.id===tr.id)){bd[k.datum]=(bd[k.datum]||0)+1;}});
+    Object.entries(bd).forEach(([d,c])=>{if(c>1){const key=d+tr.id;if(!seen.has(key)){seen.add(key);conflicts.push(`${new Date(d).toLocaleDateString('nl-NL',{day:'numeric',month:'short'})}: ${tr.label} dubbel ingepland`);}}});
+  });
+  const cb=document.getElementById('conflictBanner');
+  if(conflicts.length){cb.className='conflict show';cb.innerHTML='⚠ Conflict: '+conflicts.join(' — ');}
+  else{cb.className='conflict';}
+
+  // Klussen
+  const filtered=selDate?KLUSSEN.filter(k=>k.datum===selDate):KLUSSEN;
+  document.getElementById('mainTitle').textContent=selDate?new Date(selDate).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'}):'Alle klussen';
+  document.getElementById('btnClear').style.display=selDate?'':'none';
+
+  const sorted=[...filtered].sort((a,b)=>a.datum.localeCompare(b.datum));
+  document.getElementById('klusList').innerHTML=sorted.length===0?'<div class="empty">Geen klussen gepland</div>':sorted.map(k=>{
+    const ds=new Date(k.datum).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
+    const tB=k.trucks.map(t=>`<span class="bdg" style="background:${hbg(t.color)};color:${t.color}">${t.label}</span>`).join('');
+    const pdfLinks=k.pdfs&&k.pdfs.length?k.pdfs.map(p=>`<a class="pdf-link" href="${p.url}" target="_blank">${p.naam}</a>`).join(''):'';
+    return`<div class="kc">
+      <div class="kc-top">
+        <div>
+          <div class="kdate">${ds}</div>
+          <div class="ktrucks">${tB}<span class="bdg" style="background:#F5F3FF;color:#4C1D95">${k.food}</span></div>
+          <div class="kmeta"><strong>${k.personen} personen</strong>${k.personeel.length?' &nbsp;·&nbsp; '+k.personeel.map(p=>p.naam).join(', '):''}</div>
+          ${k.notitie?`<div class="kmeta" style="font-style:italic;margin-top:3px">${k.notitie}</div>`:''}
+          ${pdfLinks?`<div style="margin-top:5px">${pdfLinks}</div>`:''}
+        </div>
+        <div class="kactions">
+          <button class="btn-edit" onclick="editKlus('${k.id}')">Bewerk</button>
+          <button class="btn-del" onclick="deleteKlus('${k.id}')">Verwijder</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDate(ds){selDate=ds===selDate?null:ds;renderAll();}
+function clearFilter(){selDate=null;renderAll();}
+
+// ── MODAL ──
+function openModal(id=null){
+  editId=id;
+  const k=id?KLUSSEN.find(x=>x.id===id):null;
+  formTrucks=k?k.trucks.map(t=>t.id):[];
+  formPers=k?k.personeel.map(p=>p.id):[];
+  formPdfs=[];
+  existingPdfs=k&&k.pdfs?[...k.pdfs]:[];
+  document.getElementById('modalTitle').textContent=id?'Klus bewerken':'Nieuwe klus';
+  document.getElementById('fDatum').value=k?k.datum:(selDate||todayStr);
+  document.getElementById('fPersonen').value=k?k.personen:'';
+  document.getElementById('fFood').value=k?k.food:'';
+  document.getElementById('fNotitie').value=k?k.notitie:'';
+  renderModalChips();
+  renderPdfList();
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+function overlayClick(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}
+
+function renderModalChips(){
+  document.getElementById('truckChips').innerHTML=TRUCKS.map(t=>{
+    const on=formTrucks.includes(t.id);
+    return`<div class="chip${on?' on':''}" onclick="toggleTruck('${t.id}')" style="${on?`background:${hbg(t.color)};border-color:${t.color};color:${t.color}`:''}">${t.label}</div>`;
+  }).join('');
+  document.getElementById('persChips').innerHTML=PERSONEEL.map(p=>{
+    const on=formPers.includes(p.id);
+    return`<div class="chip${on?' on':''}" onclick="togglePers('${p.id}')">${p.naam}</div>`;
+  }).join('');
+}
+function toggleTruck(id){formTrucks=formTrucks.includes(id)?formTrucks.filter(x=>x!==id):[...formTrucks,id];renderModalChips();}
+function togglePers(id){formPers=formPers.includes(id)?formPers.filter(x=>x!==id):[...formPers,id];renderModalChips();}
+
+// ── PDF (opgeslagen als base64 data-URL, via Supabase tabel) ──
+function handlePdf(){
+  const files=[...document.getElementById('fPdf').files];
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      formPdfs.push({naam:file.name,url:e.target.result});
+      renderPdfList();
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('fPdf').value='';
+}
+
+function renderPdfList(){
+  const allPdfs=[...existingPdfs,...formPdfs];
+  const zone=document.getElementById('bijZone');
+  zone.textContent=allPdfs.length?`${allPdfs.length} PDF${allPdfs.length>1?'s':''} — klik om meer toe te voegen`:'Klik om PDF toe te voegen';
+  zone.className='bij'+(allPdfs.length?' has':'');
+  document.getElementById('pdfList').innerHTML=[
+    ...existingPdfs.map((p,i)=>`<div class="pdf-item"><a class="pdf-name" href="${p.url}" target="_blank">${p.naam}</a><button class="btn-danger-sm" onclick="removeExistingPdf('${p.id}')">×</button></div>`),
+    ...formPdfs.map((p,i)=>`<div class="pdf-item"><span class="pdf-name">${p.naam}</span><button class="btn-danger-sm" onclick="removeNewPdf(${i})">×</button></div>`),
+  ].join('');
+}
+function removeExistingPdf(id){existingPdfs=existingPdfs.filter(p=>p.id!==id);renderPdfList();}
+function removeNewPdf(i){formPdfs.splice(i,1);renderPdfList();}
+
+// ── SAVE ──
+async function saveKlus(){
+  const datum=document.getElementById('fDatum').value;
+  const personen=parseInt(document.getElementById('fPersonen').value);
+  const food=document.getElementById('fFood').value;
+  const notitie=document.getElementById('fNotitie').value||'';
+  if(!formTrucks.length||!datum||!personen||!food){alert('Vul alle verplichte velden in.');return;}
+
+  document.getElementById('savingMsg').style.display='inline';
+
+  try{
+    let klusId=editId;
+    if(editId){
+      await sbPatch(`klussen?id=eq.${editId}`,{datum,personen,food,notitie});
+      await sbDelete(`klus_trucks?klus_id=eq.${editId}`);
+      await sbDelete(`klus_personeel?klus_id=eq.${editId}`);
+      // Verwijder alleen de pdfs die de gebruiker heeft verwijderd
+      const removedIds=KLUSSEN.find(k=>k.id===editId)?.pdfs.filter(p=>!existingPdfs.find(e=>e.id===p.id)).map(p=>p.id)||[];
+      for(const rid of removedIds){await sbDelete(`klus_pdfs?id=eq.${rid}`);}
+    } else {
+      const res=await sbPost('klussen',{datum,personen,food,notitie});
+      klusId=res[0].id;
+    }
+    if(formTrucks.length) await sbPost('klus_trucks',formTrucks.map(tid=>({klus_id:klusId,truck_id:tid})));
+    if(formPers.length) await sbPost('klus_personeel',formPers.map(pid=>({klus_id:klusId,personeel_id:pid})));
+    if(formPdfs.length) await sbPost('klus_pdfs',formPdfs.map(p=>({klus_id:klusId,naam:p.naam,url:p.url})));
+    closeModal();
+    await loadAll();
+  }catch(e){
+    alert('Fout bij opslaan: '+e.message);
+  }
+  document.getElementById('savingMsg').style.display='none';
+}
+
+async function editKlus(id){openModal(id);}
+
+async function deleteKlus(id){
+  if(!confirm('Weet je zeker dat je deze klus wilt verwijderen?'))return;
+  await sbDelete(`klussen?id=eq.${id}`);
+  await loadAll();
+}
+
+// ── BEHEER ──
+function renderBeheer(){
+  document.getElementById('truckBeheer').innerHTML=TRUCKS.map(t=>`<div class="bi">
+    <div class="bi-left"><div class="cswatch" style="background:${t.color}"></div>${t.label}</div>
+    <button class="btn-danger-sm" onclick="deleteTruck('${t.id}')">Verwijder</button>
+  </div>`).join('');
+  document.getElementById('personeelBeheer').innerHTML=PERSONEEL.map(p=>`<div class="bi">
+    <div class="bi-left">${p.naam}</div>
+    <button class="btn-danger-sm" onclick="deletePersoneel('${p.id}')">Verwijder</button>
+  </div>`).join('');
+}
+
+async function addTruck(){
+  const label=document.getElementById('newTruckName').value.trim();
+  const color=document.getElementById('newTruckColor').value;
+  if(!label)return;
+  await sbPost('trucks',{label,color,volgorde:TRUCKS.length+1});
+  document.getElementById('newTruckName').value='';
+  await loadAll();renderBeheer();
+}
+
+async function deleteTruck(id){
+  if(!confirm('Truck verwijderen? Dit verwijdert ook de koppeling met klussen.'))return;
+  await sbDelete(`klus_trucks?truck_id=eq.${id}`);
+  await sbDelete(`trucks?id=eq.${id}`);
+  await loadAll();renderBeheer();
+}
+
+async function addPersoneelLid(){
+  const naam=document.getElementById('newPersNaam').value.trim();
+  if(!naam)return;
+  await sbPost('personeel',{naam});
+  document.getElementById('newPersNaam').value='';
+  await loadAll();renderBeheer();
+}
+
+async function deletePersoneel(id){
+  if(!confirm('Personeelslid verwijderen?'))return;
+  await sbDelete(`klus_personeel?personeel_id=eq.${id}`);
+  await sbDelete(`personeel?id=eq.${id}`);
+  await loadAll();renderBeheer();
+}
+</script>
+</body>
+</html>
