@@ -162,6 +162,27 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .saving-msg{font-size:12px;color:var(--muted);align-self:center}
 .warn-box{background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:.6rem .875rem;font-size:12px;color:#92400E;margin-bottom:.75rem;display:none}
 .warn-box.show{display:block}
+.med-list{display:flex;flex-direction:column;gap:6px}
+.med-item{padding:.6rem .875rem;background:var(--bg);border-radius:8px;border-left:3px solid var(--border)}
+.med-item.heeft-datum{border-left-color:#2563EB}
+.med-datum{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.med-titel{font-size:13px;font-weight:500;color:var(--text)}
+.med-beschr{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5}
+.med-actions{display:flex;gap:4px;flex-shrink:0}
+.med-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.med-dag{border-radius:8px;border:1px solid var(--border);overflow:hidden;min-height:60px}
+.med-dag-hdr{padding:5px 7px;border-bottom:1px solid var(--border);background:var(--bg)}
+.med-dag-naam{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.med-dag-num{font-size:13px;font-weight:600;color:var(--text);line-height:1.2}
+.med-dag-hdr.vandaag{background:#EFF6FF}.med-dag-hdr.vandaag .med-dag-num{color:#1E40AF}
+.med-dag-items{padding:5px 6px;display:flex;flex-direction:column;gap:3px}
+.med-pill{font-size:10px;font-weight:500;background:#EFF6FF;color:#1E40AF;border-radius:4px;padding:2px 5px;line-height:1.4;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:3px}
+.med-pill:hover{background:#DBEAFE}
+.med-pill-del{background:none;border:none;color:#93C5FD;cursor:pointer;font-size:12px;line-height:1;padding:0;flex-shrink:0}
+.med-pill-del:hover{color:#DC2626}
+.med-geen{font-size:10px;color:var(--muted);padding:4px 6px;font-style:italic}
+.med-zonder-datum{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)}
+.med-zonder-titel{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem}
 
 /* Planning paneel */
 .plan-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:150;align-items:flex-start;justify-content:flex-end}
@@ -220,6 +241,21 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
       </div>
       <div class="main">
         <div class="conflict" id="conflictBanner"></div>
+        <div class="sc">
+          <div class="sc-header" style="margin-bottom:.75rem">
+            <div class="st">Mededelingen</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div class="week-nav">
+                <button class="btn-nav" onclick="changeMedWeek(-1)">&#8592;</button>
+                <span class="week-nav-label" id="medWeekLabel"></span>
+                <button class="btn-nav" onclick="changeMedWeek(0)" style="font-size:11px">Nu</button>
+                <button class="btn-nav" onclick="changeMedWeek(1)">&#8594;</button>
+              </div>
+              <button class="btn-sm" onclick="openMedModal()" style="font-size:11px;padding:5px 12px">+ Mededeling</button>
+            </div>
+          </div>
+          <div id="medList"><div class="spin">Laden...</div></div>
+        </div>
         <div class="sc">
           <div class="sc-header" style="margin-bottom:.5rem">
             <div class="st">Truckbeschikbaarheid</div>
@@ -400,6 +436,27 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
   </div>
 </div>
 
+<!-- MEDEDELING MODAL -->
+<div class="modal-overlay" id="medOverlay" onclick="if(event.target===this)closeMedModal()">
+  <div class="modal">
+    <div class="modal-title" id="medModalTitle">Nieuwe mededeling</div>
+    <div class="fr"><span class="fl">Titel</span>
+      <input type="text" id="fMedTitel" placeholder="bv. APK auto, Pallets levering, Vuilcontainer">
+    </div>
+    <div class="fr"><span class="fl">Datum (optioneel)</span>
+      <input type="date" id="fMedDatum">
+    </div>
+    <div class="fr"><span class="fl">Beschrijving (optioneel)</span>
+      <textarea id="fMedBeschr" placeholder="Extra info..."></textarea>
+    </div>
+    <div class="mfooter">
+      <span class="saving-msg" id="medSavingMsg" style="display:none">Opslaan...</span>
+      <button class="btn-ghost" onclick="closeMedModal()">Annuleren</button>
+      <button class="btn-sm" onclick="saveMededeling()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const WACHTWOORD='tcgroup2026';
 const SB='https://rxfrdocioodfxrnjtipa.supabase.co';
@@ -437,7 +494,7 @@ async function sbDelete(p){return fetch(SB+'/rest/v1/'+p,{method:'DELETE',header
 function hbg(hex){return hex+'18'}
 
 async function loadAll(){
-  const [trucks,personeel,klussen,klusTrucks,klusPers,klusPdfs,soorten]=await Promise.all([
+  const [trucks,personeel,klussen,klusTrucks,klusPers,klusPdfs,soorten,mededelingen]=await Promise.all([
     sbGet('trucks?select=*&order=volgorde'),
     sbGet('personeel?select=*&order=naam'),
     sbGet('klussen?select=*&order=datum'),
@@ -445,6 +502,7 @@ async function loadAll(){
     sbGet('klus_personeel?select=*'),
     sbGet('klus_pdfs?select=*'),
     sbGet('soorten?select=*&order=volgorde'),
+    sbGet('mededelingen?select=*&order=datum.asc,aangemaakt_op.asc'),
   ]);
   TRUCKS=trucks;PERSONEEL=personeel;SOORTEN=soorten;
   const tMap=Object.fromEntries(trucks.map(t=>[t.id,t]));
@@ -455,6 +513,7 @@ async function loadAll(){
     personeel:klusPers.filter(x=>x.klus_id===k.id).map(x=>pMap[x.personeel_id]).filter(Boolean),
     pdfs:klusPdfs.filter(x=>x.klus_id===k.id),
   }));
+  renderMededelingen(mededelingen);
   renderAll();
 }
 
@@ -785,6 +844,115 @@ async function saveKlus(){
 }
 
 async function editKlus(id){openModal(id);}
+
+// ── MEDEDELINGEN ──
+let editMedId=null;
+let medWeekOffset=0;
+let allMededelingen=[];
+
+function getMedWeekDates(){
+  const s=new Date(today);s.setDate(s.getDate()-s.getDay()+1+(medWeekOffset*7));
+  return Array.from({length:7},(_,i)=>{const d=new Date(s);d.setDate(s.getDate()+i);return d});
+}
+function changeMedWeek(dir){
+  medWeekOffset=dir===0?0:medWeekOffset+dir;
+  renderMededelingen(allMededelingen);
+}
+
+function renderMededelingen(meds){
+  allMededelingen=meds||[];
+  const days=getMedWeekDates();
+  const first=days[0],last=days[6];
+  const opts={day:'numeric',month:'short'};
+  const wl=document.getElementById('medWeekLabel');
+  if(wl)wl.textContent=`${first.toLocaleDateString('nl-NL',opts)} – ${last.toLocaleDateString('nl-NL',opts)}`;
+
+  const medsMetDatum=allMededelingen.filter(m=>m.datum);
+  const medsZonderDatum=allMededelingen.filter(m=>!m.datum);
+  const dagNamen=['Ma','Di','Wo','Do','Vr','Za','Zo'];
+
+  const weekGrid=days.map((d,i)=>{
+    const ds=fmt(d);
+    const isToday=ds===todayStr;
+    const dagMeds=medsMetDatum.filter(m=>m.datum===ds);
+    return`<div class="med-dag">
+      <div class="med-dag-hdr${isToday?' vandaag':''}">
+        <div class="med-dag-naam">${dagNamen[i]}</div>
+        <div class="med-dag-num">${d.getDate()}</div>
+      </div>
+      <div class="med-dag-items">
+        ${dagMeds.length?dagMeds.map(m=>`<div class="med-pill" onclick="openMedModal('${m.id}')">
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.titel}</span>
+          <button class="med-pill-del" onclick="event.stopPropagation();deleteMed('${m.id}')">×</button>
+        </div>`).join(''):`<div class="med-geen">–</div>`}
+      </div>
+    </div>`;
+  }).join('');
+
+  let html=`<div class="med-week">${weekGrid}</div>`;
+
+  if(medsZonderDatum.length){
+    html+=`<div class="med-zonder-datum">
+      <div class="med-zonder-titel">Zonder datum</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        ${medsZonderDatum.map(m=>`<div class="med-item" style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div style="flex:1;min-width:0">
+            <div class="med-titel">${m.titel}</div>
+            ${m.beschrijving?`<div class="med-beschr">${m.beschrijving}</div>`:''}
+          </div>
+          <div class="med-actions">
+            <button class="btn-edit" onclick="openMedModal('${m.id}')">Bewerk</button>
+            <button class="btn-del" onclick="deleteMed('${m.id}')">×</button>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('medList').innerHTML=html;
+}
+
+function openMedModal(id=null){
+  editMedId=id;
+  document.getElementById('medModalTitle').textContent=id?'Mededeling bewerken':'Nieuwe mededeling';
+  if(id){
+    sbGet(`mededelingen?id=eq.${id}`).then(([m])=>{
+      document.getElementById('fMedTitel').value=m.titel||'';
+      document.getElementById('fMedDatum').value=m.datum||'';
+      document.getElementById('fMedBeschr').value=m.beschrijving||'';
+    });
+  }else{
+    document.getElementById('fMedTitel').value='';
+    document.getElementById('fMedDatum').value='';
+    document.getElementById('fMedBeschr').value='';
+  }
+  document.getElementById('medOverlay').classList.add('open');
+}
+function closeMedModal(){document.getElementById('medOverlay').classList.remove('open');}
+
+async function saveMededeling(){
+  const titel=document.getElementById('fMedTitel').value.trim();
+  const datum=document.getElementById('fMedDatum').value||null;
+  const beschrijving=document.getElementById('fMedBeschr').value.trim();
+  if(!titel){alert('Vul een titel in.');return;}
+  document.getElementById('medSavingMsg').style.display='inline';
+  if(editMedId){
+    await sbPatch(`mededelingen?id=eq.${editMedId}`,{titel,datum,beschrijving});
+  }else{
+    await sbPost('mededelingen',{titel,datum,beschrijving});
+  }
+  document.getElementById('medSavingMsg').style.display='none';
+  closeMedModal();
+  const meds=await sbGet('mededelingen?select=*&order=datum.asc,aangemaakt_op.asc');
+  renderMededelingen(meds);
+}
+
+async function deleteMed(id){
+  if(!confirm('Mededeling verwijderen?'))return;
+  await sbDelete(`mededelingen?id=eq.${id}`);
+  const meds=await sbGet('mededelingen?select=*&order=datum.asc,aangemaakt_op.asc');
+  renderMededelingen(meds);
+}
 
 function openDetail(id){
   const k=KLUSSEN.find(x=>x.id===id);if(!k)return;

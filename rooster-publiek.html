@@ -94,6 +94,23 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .conflict.show{display:block}
 .empty{text-align:center;color:var(--muted);font-size:13px;padding:2rem 0}
 .spin{text-align:center;color:var(--muted);font-size:13px;padding:2rem 0}
+.med-week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.med-dag{border-radius:8px;border:1px solid var(--border);overflow:hidden;min-height:54px}
+.med-dag-hdr{padding:4px 6px;border-bottom:1px solid var(--border);background:var(--bg)}
+.med-dag-naam{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.med-dag-num{font-size:13px;font-weight:600;color:var(--text);line-height:1.2}
+.med-dag-hdr.vandaag{background:#EFF6FF}.med-dag-hdr.vandaag .med-dag-num{color:#1E40AF}
+.med-dag-items{padding:4px 5px;display:flex;flex-direction:column;gap:3px}
+.med-pill{font-size:10px;font-weight:500;background:#EFF6FF;color:#1E40AF;border-radius:4px;padding:2px 5px;line-height:1.4;cursor:pointer}
+.med-pill:active{opacity:.7}
+.med-geen{font-size:10px;color:var(--muted);padding:3px 5px;font-style:italic}
+.med-zonder-datum{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)}
+.med-zonder-titel{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem}
+.med-item{padding:.5rem .75rem;background:var(--bg);border-radius:7px}
+.med-titel{font-size:12px;font-weight:500;color:var(--text)}
+.med-beschr{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5}
+.med-detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:flex-end;justify-content:center}
+.med-detail-overlay.open{display:flex}
 
 /* ── DETAIL MODAL ── */
 .detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center}
@@ -190,6 +207,19 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
     <div class="conflict" id="conflictBanner"></div>
 
     <div class="sc">
+      <div class="sc-header" style="margin-bottom:.75rem">
+        <div class="st">Mededelingen</div>
+        <div class="week-nav">
+          <button class="btn-nav" onclick="changeMedWeek(-1)">&#8592;</button>
+          <span class="week-nav-label" id="medWeekLabel"></span>
+          <button class="btn-nav" onclick="changeMedWeek(0)" style="font-size:11px">Nu</button>
+          <button class="btn-nav" onclick="changeMedWeek(1)">&#8594;</button>
+        </div>
+      </div>
+      <div id="medList"><div class="spin">Laden...</div></div>
+    </div>
+
+    <div class="sc">
       <div class="sc-header">
         <div class="st">Trucks</div>
         <div class="week-nav">
@@ -270,6 +300,24 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 
 <!-- PLANNING PANEEL -->
 <div class="plan-overlay" id="planOverlay" onclick="if(event.target===this)this.classList.remove('open')">
+
+<!-- MED DETAIL -->
+<div class="med-detail-overlay" id="medDetailOverlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="detail-modal">
+    <div class="detail-drag"></div>
+    <div class="detail-header">
+      <div class="detail-naam" id="medDetailTitel"></div>
+      <button class="detail-close" onclick="document.getElementById('medDetailOverlay').classList.remove('open')">&#x2715;</button>
+    </div>
+    <div class="detail-body">
+      <div class="detail-datum" id="medDetailDatum"></div>
+      <div id="medDetailBeschr" class="detail-value" style="line-height:1.6"></div>
+    </div>
+    <div class="detail-footer">
+      <button class="btn-close-full" onclick="document.getElementById('medDetailOverlay').classList.remove('open')">Sluiten</button>
+    </div>
+  </div>
+</div>
   <div class="plan-panel">
     <div class="plan-header">
       <div>
@@ -300,6 +348,71 @@ function toggleDate(ds){selDate=ds===selDate?null:ds;render(cachedTrucks,cachedK
 function clearSel(){selDate=null;render(cachedTrucks,cachedKlussen,cachedSoorten);}
 function toggleSoortDesc(id){const el=document.getElementById('sd-'+id);if(el)el.classList.toggle('open');}
 
+let medWeekOffset=0;
+let allMededelingen=[];
+const dagNamen=['Ma','Di','Wo','Do','Vr','Za','Zo'];
+
+function getMedWeekDates(){
+  const s=new Date(today);s.setDate(s.getDate()-s.getDay()+1+(medWeekOffset*7));
+  return Array.from({length:7},(_,i)=>{const d=new Date(s);d.setDate(s.getDate()+i);return d});
+}
+function changeMedWeek(dir){
+  medWeekOffset=dir===0?0:medWeekOffset+dir;
+  renderMededelingen(allMededelingen);
+}
+
+function renderMededelingen(meds){
+  allMededelingen=meds||[];
+  const days=getMedWeekDates();
+  const first=days[0],last=days[6],opts={day:'numeric',month:'short'};
+  const wl=document.getElementById('medWeekLabel');
+  if(wl)wl.textContent=`${first.toLocaleDateString('nl-NL',opts)} – ${last.toLocaleDateString('nl-NL',opts)}`;
+
+  const medsMetDatum=allMededelingen.filter(m=>m.datum);
+  const medsZonderDatum=allMededelingen.filter(m=>!m.datum);
+
+  const weekGrid=days.map((d,i)=>{
+    const ds=fmt(d);
+    const isToday=ds===todayStr;
+    const dagMeds=medsMetDatum.filter(m=>m.datum===ds);
+    return`<div class="med-dag">
+      <div class="med-dag-hdr${isToday?' vandaag':''}">
+        <div class="med-dag-naam">${dagNamen[i]}</div>
+        <div class="med-dag-num">${d.getDate()}</div>
+      </div>
+      <div class="med-dag-items">
+        ${dagMeds.length?dagMeds.map(m=>`<div class="med-pill" onclick="openMedDetail('${m.id}')">${m.titel}</div>`).join(''):`<div class="med-geen">–</div>`}
+      </div>
+    </div>`;
+  }).join('');
+
+  let html=`<div class="med-week">${weekGrid}</div>`;
+
+  if(medsZonderDatum.length){
+    html+=`<div class="med-zonder-datum">
+      <div class="med-zonder-titel">Zonder datum</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        ${medsZonderDatum.map(m=>`<div class="med-item" onclick="openMedDetail('${m.id}')">
+          <div class="med-titel">${m.titel}</div>
+          ${m.beschrijving?`<div class="med-beschr">${m.beschrijving}</div>`:''}
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('medList').innerHTML=html;
+}
+
+function openMedDetail(id){
+  const m=allMededelingen.find(x=>x.id===id);if(!m)return;
+  document.getElementById('medDetailTitel').textContent=m.titel;
+  const ds=m.datum?new Date(m.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'Geen datum';
+  document.getElementById('medDetailDatum').textContent=ds;
+  document.getElementById('medDetailBeschr').textContent=m.beschrijving||'';
+  document.getElementById('medDetailBeschr').style.display=m.beschrijving?'':'none';
+  document.getElementById('medDetailOverlay').classList.add('open');
+}
+
 function openPdf(url,naam){
   if(url.startsWith('data:')){
     const arr=url.split(',');const mime=arr[0].match(/:(.*?);/)[1];
@@ -314,7 +427,7 @@ function hbg(hex){return hex+'18'}
 
 async function init(){
   try{
-    const [trucks,personeel,klussen,klusTrucks,klusPersoneel,klusPdfs,soorten]=await Promise.all([
+    const [trucks,personeel,klussen,klusTrucks,klusPersoneel,klusPdfs,soorten,mededelingen]=await Promise.all([
       get('trucks?select=*&order=volgorde'),
       get('personeel?select=*&order=naam'),
       get('klussen?select=*&order=datum'),
@@ -322,6 +435,7 @@ async function init(){
       get('klus_personeel?select=*'),
       get('klus_pdfs?select=*'),
       get('soorten?select=*&order=volgorde'),
+      get('mededelingen?select=*&order=datum.asc,aangemaakt_op.asc'),
     ]);
     const tMap=Object.fromEntries(trucks.map(t=>[t.id,t]));
     const pMap=Object.fromEntries(personeel.map(p=>[p.id,p]));
@@ -332,6 +446,7 @@ async function init(){
       pdfs:klusPdfs.filter(x=>x.klus_id===k.id),
     }));
     cachedTrucks=trucks;cachedKlussen=enriched;cachedSoorten=soorten;cachedPersoneel=personeel;
+    renderMededelingen(mededelingen);
     render(trucks,enriched,soorten);
   }catch(e){
     document.getElementById('klusList').innerHTML='<div class="empty">Fout bij laden.</div>';
