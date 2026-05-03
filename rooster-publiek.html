@@ -111,6 +111,11 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .med-beschr{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5}
 .med-detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:flex-end;justify-content:center}
 .med-detail-overlay.open{display:flex}
+@media(min-width:768px){.med-detail-overlay{align-items:center}
+.med-detail-overlay .detail-modal{border-radius:14px;max-width:440px;max-height:80vh}
+.med-detail-overlay .detail-drag{display:none}
+.med-detail-overlay .detail-footer{justify-content:flex-end}
+.med-detail-overlay .btn-close-full{width:auto;padding:8px 1.5rem;font-size:13px}}
 
 /* ── DETAIL MODAL ── */
 .detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center}
@@ -298,9 +303,6 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
   </div>
 </div>
 
-<!-- PLANNING PANEEL -->
-<div class="plan-overlay" id="planOverlay" onclick="if(event.target===this)this.classList.remove('open')">
-
 <!-- MED DETAIL -->
 <div class="med-detail-overlay" id="medDetailOverlay" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="detail-modal">
@@ -318,6 +320,9 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
     </div>
   </div>
 </div>
+
+<!-- PLANNING PANEEL -->
+<div class="plan-overlay" id="planOverlay" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="plan-panel">
     <div class="plan-header">
       <div>
