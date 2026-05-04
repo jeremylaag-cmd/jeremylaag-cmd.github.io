@@ -18,7 +18,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .login-box button{width:100%;background:var(--text);color:#fff;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font)}
 .login-err{font-size:12px;color:#DC2626;margin-top:.5rem;display:none}
 .app{display:none}
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:50}
 .logo{font-size:15px;font-weight:600;letter-spacing:-.02em}
 .logo span{color:var(--muted);font-weight:400}
 .abadge{font-size:11px;background:#FFF7ED;color:#9A3412;border:1px solid #FED7AA;border-radius:20px;padding:3px 10px;font-weight:500}
@@ -27,7 +27,6 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .htab{padding:0 1.25rem;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;height:100%;font-family:var(--font)}
 .htab.active{color:var(--text);border-bottom-color:var(--text)}
 .logout-btn{font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:var(--font)}
-.logout-btn:hover{color:var(--text)}
 .page{display:none}.page.active{display:block}
 .layout{display:grid;grid-template-columns:240px 1fr;height:calc(100vh - 56px)}
 .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:1.25rem;overflow-y:auto}
@@ -44,8 +43,9 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .dn{font-size:11px;color:var(--text)}
 .dot{width:4px;height:4px;border-radius:50%}
 .wdiv{grid-column:1/-1;border-top:1px solid var(--border);margin:4px 0}
-.lgd{margin-top:1rem;display:flex;flex-direction:column;gap:5px}
-.lgr{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.lgd{margin-top:1rem;display:flex;flex-direction:column;gap:3px}
+.lgr-btn{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);cursor:pointer;padding:6px 8px;border-radius:7px;background:transparent;border:none;text-align:left;width:100%;font-family:var(--font)}
+.lgr-btn:hover{background:var(--bg);color:var(--text)}
 .ls{width:10px;height:10px;border-radius:3px}
 .btn-add{background:var(--text);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;width:100%;margin-top:.875rem;font-family:var(--font)}
 .btn-add:hover{opacity:.85}
@@ -71,36 +71,9 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .tc.busy{border-width:1px}
 .tc.tod-col{outline:2px solid rgba(37,99,235,.25);outline-offset:-1px}
 .tc.sel-col{outline:2px solid var(--text);outline-offset:-1px}
-.tijd-cell{height:32px;border-radius:4px;border:1px solid var(--border);background:var(--bg);cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.tijd-cell.heeft-tijd{background:#EFF6FF;border-color:#BFDBFE}
-.tijd-cell.tod-col{outline:2px solid rgba(37,99,235,.25);outline-offset:-1px}
-.tijd-cell.sel-col{outline:2px solid var(--text);outline-offset:-1px}
-.tijd-label{font-size:10px;color:#1E40AF;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 3px;text-align:center;line-height:1.2}
 .kl{display:flex;flex-direction:column;gap:8px}
 .kc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.875rem 1rem;cursor:pointer;transition:.1s}
-.kc:hover{border-color:var(--border);box-shadow:0 1px 4px rgba(0,0,0,.06)}
-
-/* Detail modal */
-.detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center}
-.detail-overlay.open{display:flex}
-.detail-modal{background:var(--surface);border-radius:14px;border:1px solid var(--border);width:480px;max-width:95vw;max-height:88vh;overflow-y:auto}
-.detail-header{padding:1.25rem 1.5rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
-.detail-naam{font-size:18px;font-weight:600;color:var(--text);line-height:1.3}
-.detail-close{background:none;border:none;cursor:pointer;font-size:20px;color:var(--muted);line-height:1;padding:0;flex-shrink:0}
-.detail-close:hover{color:var(--text)}
-.detail-body{padding:1.25rem 1.5rem}
-.detail-tijd{font-size:22px;font-weight:600;color:var(--text);margin-bottom:.25rem}
-.detail-datum{font-size:12px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:1rem}
-.detail-section{margin-bottom:1rem}
-.detail-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
-.detail-value{font-size:13px;color:var(--text)}
-.detail-trucks{display:flex;gap:5px;flex-wrap:wrap}
-.detail-pers{font-size:13px;color:var(--text);line-height:1.6}
-.detail-notitie{font-size:13px;color:var(--muted);font-style:italic;line-height:1.6}
-.detail-pdfs{display:flex;flex-direction:column;gap:4px}
-.detail-pdf-link{font-size:12px;color:#2563EB;cursor:pointer;text-decoration:underline}
-.detail-footer{padding:.875rem 1.5rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
-.detail-soort{display:flex;flex-direction:column;gap:3px}
+.kc:hover{box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .kc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .kdate{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
 .knaam{font-size:13px;font-weight:600;color:var(--text);margin-bottom:.3rem}
@@ -116,16 +89,19 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .conflict.show{display:block}
 .empty{text-align:center;color:var(--muted);font-size:13px;padding:2rem 0}
 .spin{text-align:center;color:var(--muted);font-size:13px;padding:2rem 0}
+
+/* Beheer */
 .beheer-wrap{padding:2rem;max-width:1000px;margin:0 auto}
 .beheer-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
 .bc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
 .bt{font-size:14px;font-weight:600;margin-bottom:1rem}
-.bl{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;max-height:260px;overflow-y:auto}
+.bl{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;max-height:280px;overflow-y:auto}
 .bi{display:flex;align-items:flex-start;justify-content:space-between;padding:7px 10px;background:var(--bg);border-radius:7px;font-size:12px;gap:6px}
 .bi-left{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
 .bi-name{font-weight:500;display:flex;align-items:center;gap:6px}
 .bi-desc{font-size:10px;color:var(--muted)}
 .cswatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.bi-actions{display:flex;gap:4px;flex-shrink:0}
 .add-form{display:flex;flex-direction:column;gap:6px}
 .add-form input[type=text],.add-form textarea{font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:var(--font);background:var(--surface);color:var(--text);width:100%}
 .add-form textarea{resize:vertical;min-height:52px}
@@ -134,18 +110,76 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .add-form-row{display:flex;gap:6px;align-items:center}
 .btn-sm{background:var(--text);color:#fff;border:none;border-radius:6px;padding:7px 13px;font-size:11px;font-weight:500;cursor:pointer;font-family:var(--font);align-self:flex-end}
 .btn-sm:hover{opacity:.85}
-.btn-danger-sm{background:#DC2626;color:#fff;border:none;border-radius:5px;padding:4px 9px;font-size:11px;cursor:pointer;font-family:var(--font);flex-shrink:0}
+.btn-danger-sm{background:#DC2626;color:#fff;border:none;border-radius:5px;padding:4px 9px;font-size:11px;cursor:pointer;font-family:var(--font)}
+
+/* Mededelingen */
+.med-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.med-dag{border-radius:8px;border:1px solid var(--border);overflow:hidden;min-height:60px}
+.med-dag-hdr{padding:5px 7px;border-bottom:1px solid var(--border);background:var(--bg)}
+.med-dag-naam{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.med-dag-num{font-size:13px;font-weight:600;color:var(--text);line-height:1.2}
+.med-dag-hdr.vandaag{background:#EFF6FF}.med-dag-hdr.vandaag .med-dag-num{color:#1E40AF}
+.med-dag-items{padding:5px 6px;display:flex;flex-direction:column;gap:3px}
+.med-pill{font-size:10px;font-weight:500;background:#EFF6FF;color:#1E40AF;border-radius:4px;padding:2px 5px;line-height:1.4;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:3px}
+.med-pill:hover{background:#DBEAFE}
+.med-pill-del{background:none;border:none;color:#93C5FD;cursor:pointer;font-size:12px;line-height:1;padding:0;flex-shrink:0}
+.med-pill-del:hover{color:#DC2626}
+.med-geen{font-size:10px;color:var(--muted);padding:4px 6px;font-style:italic}
+.med-zonder-datum{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)}
+.med-zonder-titel{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem}
+.med-item-row{display:flex;align-items:flex-start;justify-content:space-between;padding:6px 9px;background:var(--bg);border-radius:7px;gap:6px}
+
+/* Plan paneel */
+.plan-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:150;align-items:center;justify-content:center}
+.plan-overlay.open{display:flex}
+.plan-panel{background:var(--surface);width:92%;max-width:480px;height:70vh;border-radius:16px;border:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.plan-header{padding:1.25rem 1.25rem .875rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.plan-title{font-size:14px;font-weight:600}
+.plan-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.plan-close{background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted);line-height:1;padding:0}
+.plan-body{padding:1.25rem;flex:1}
+.plan-week{margin-bottom:1.25rem}
+.plan-week-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem}
+.plan-klus{background:var(--bg);border-radius:8px;padding:.6rem .875rem;margin-bottom:5px;border-left:3px solid var(--border);cursor:pointer}
+.plan-klus:hover{opacity:.85}
+.plan-klus-date{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.plan-klus-naam{font-size:12px;font-weight:600;color:var(--text);margin-top:2px}
+.plan-klus-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.plan-empty{font-size:12px;color:var(--muted);font-style:italic;padding:.5rem 0}
+
+/* Detail modal */
+.detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center}
+.detail-overlay.open{display:flex}
+.detail-modal{background:var(--surface);border-radius:14px;border:1px solid var(--border);width:480px;max-width:95vw;max-height:88vh;overflow-y:auto}
+.detail-header{padding:1.25rem 1.5rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.detail-naam{font-size:18px;font-weight:600;color:var(--text);line-height:1.3}
+.detail-close{background:none;border:none;cursor:pointer;font-size:20px;color:var(--muted);line-height:1;padding:0;flex-shrink:0}
+.detail-body{padding:1.25rem 1.5rem}
+.detail-tijd{font-size:22px;font-weight:600;color:var(--text);margin-bottom:.25rem}
+.detail-datum{font-size:12px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:1rem}
+.detail-section{margin-bottom:1rem}
+.detail-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+.detail-value{font-size:13px;color:var(--text)}
+.detail-trucks{display:flex;gap:5px;flex-wrap:wrap}
+.detail-pers{font-size:13px;color:var(--text);line-height:1.6}
+.detail-notitie{font-size:13px;color:var(--muted);font-style:italic;line-height:1.6}
+.detail-pdfs{display:flex;flex-direction:column;gap:4px}
+.detail-pdf-link{font-size:12px;color:#2563EB;cursor:pointer;text-decoration:underline}
+.detail-footer{padding:.875rem 1.5rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.detail-soort{display:flex;flex-direction:column;gap:3px}
+
+/* Klus modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
-.modal{background:var(--surface);border-radius:14px;border:1px solid var(--border);padding:1.5rem;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal{background:var(--surface);border-radius:14px;border:1px solid var(--border);padding:1.5rem;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto}
 .modal-title{font-size:15px;font-weight:600;margin-bottom:1.25rem}
 .fr{margin-bottom:.875rem}
 .fl{font-size:11px;color:var(--muted);margin-bottom:4px;display:block;font-weight:500}
-.fr input[type=text],.fr input[type=number],.fr input[type=date],.fr input[type=time],.fr select,.fr textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:var(--font)}
+.fr input[type=text],.fr input[type=number],.fr input[type=date],.fr select,.fr textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:var(--font)}
 .fr textarea{resize:vertical;min-height:52px}
 .fr input:focus,.fr select:focus,.fr textarea:focus{outline:none;border-color:var(--text)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.four{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
 .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .chip{font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);cursor:pointer;background:var(--bg);color:var(--text);font-family:var(--font);transition:.1s}
 .chip.on{border-color:var(--text);background:var(--text);color:#fff}
@@ -162,47 +196,67 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .saving-msg{font-size:12px;color:var(--muted);align-self:center}
 .warn-box{background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:.6rem .875rem;font-size:12px;color:#92400E;margin-bottom:.75rem;display:none}
 .warn-box.show{display:block}
-.med-list{display:flex;flex-direction:column;gap:6px}
-.med-item{padding:.6rem .875rem;background:var(--bg);border-radius:8px;border-left:3px solid var(--border)}
-.med-item.heeft-datum{border-left-color:#2563EB}
-.med-datum{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
-.med-titel{font-size:13px;font-weight:500;color:var(--text)}
-.med-beschr{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5}
-.med-actions{display:flex;gap:4px;flex-shrink:0}
-.med-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.med-dag{border-radius:8px;border:1px solid var(--border);overflow:hidden;min-height:60px}
-.med-dag-hdr{padding:5px 7px;border-bottom:1px solid var(--border);background:var(--bg)}
-.med-dag-naam{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.med-dag-num{font-size:13px;font-weight:600;color:var(--text);line-height:1.2}
-.med-dag-hdr.vandaag{background:#EFF6FF}.med-dag-hdr.vandaag .med-dag-num{color:#1E40AF}
-.med-dag-items{padding:5px 6px;display:flex;flex-direction:column;gap:3px}
-.med-pill{font-size:10px;font-weight:500;background:#EFF6FF;color:#1E40AF;border-radius:4px;padding:2px 5px;line-height:1.4;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:3px}
-.med-pill:hover{background:#DBEAFE}
-.med-pill-del{background:none;border:none;color:#93C5FD;cursor:pointer;font-size:12px;line-height:1;padding:0;flex-shrink:0}
-.med-pill-del:hover{color:#DC2626}
-.med-geen{font-size:10px;color:var(--muted);padding:4px 6px;font-style:italic}
-.med-zonder-datum{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)}
-.med-zonder-titel{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem}
 
-/* Planning paneel */
-.plan-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:150;align-items:flex-start;justify-content:flex-end}
-.plan-overlay.open{display:flex}
-.plan-panel{background:var(--surface);width:380px;max-width:95vw;height:100%;border-left:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
-.plan-header{padding:1.25rem 1.25rem .875rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.plan-title{font-size:14px;font-weight:600}
-.plan-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.plan-close{background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted);line-height:1;padding:0}
-.plan-close:hover{color:var(--text)}
-.plan-body{padding:1.25rem;flex:1}
-.plan-week{margin-bottom:1.25rem}
-.plan-week-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem}
-.plan-klus{background:var(--bg);border-radius:8px;padding:.6rem .875rem;margin-bottom:5px;border-left:3px solid var(--border)}
-.plan-klus-date{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
-.plan-klus-naam{font-size:12px;font-weight:600;color:var(--text);margin-top:2px}
-.plan-klus-meta{font-size:11px;color:var(--muted);margin-top:2px}
-.plan-empty{font-size:12px;color:var(--muted);font-style:italic;padding:.5rem 0}
-.lgr-btn{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);cursor:pointer;padding:4px 6px;border-radius:6px;margin:-4px -6px;transition:.1s;width:calc(100% + 12px)}
-.lgr-btn:hover{background:var(--bg);color:var(--text)}
+/* Tijdveld */
+.tijd-input{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:var(--font)}
+.tijd-input:focus{outline:none;border-color:var(--text)}
+
+/* Truck-soorten sectie in modal */
+.truck-soort-block{background:var(--bg);border-radius:8px;padding:.75rem;margin-bottom:6px}
+.truck-soort-naam{font-size:12px;font-weight:600;color:var(--text);margin-bottom:.4rem;display:flex;align-items:center;gap:6px}
+
+/* Bewerk inline */
+.bi-edit-form{display:flex;flex-direction:column;gap:5px;margin-top:5px}
+.bi-edit-form input[type=text],.bi-edit-form textarea{font-size:12px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);background:var(--surface);color:var(--text);width:100%}
+.bi-edit-form textarea{resize:vertical;min-height:44px}
+.bi-edit-form input:focus,.bi-edit-form textarea:focus{outline:none;border-color:var(--text)}
+.bi-edit-row{display:flex;gap:5px;align-items:center}
+
+/* Zoekbalk */
+.zoek-wrap{position:relative;margin:.4rem 0 .25rem}
+.zoek-wrap input{width:100%;font-size:12px;padding:6px 8px 6px 28px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-family:var(--font)}
+.zoek-wrap input:focus{outline:none;border-color:var(--text)}
+.zoek-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted)}
+
+/* Mobile */
+@media(max-width:767px){
+  header{padding:0 1rem;height:52px}
+  .logo{font-size:13px}
+  .htabs{height:52px}
+  .htab{padding:0 .875rem;font-size:12px}
+  .abadge{display:none}
+  .layout{display:flex;flex-direction:column;height:auto}
+  .sidebar{border-right:none;border-bottom:1px solid var(--border);padding:1rem;overflow-y:visible}
+  .main{padding:1rem;overflow-y:visible}
+  .sc{padding:1rem;margin-bottom:1rem}
+  .sc-header{flex-wrap:wrap;gap:6px}
+  .week-nav-label{min-width:100px;font-size:11px}
+  .tl-hdr,.tl-row{grid-template-columns:80px 1fr;gap:8px}
+  .tc{height:24px}
+  .kc{padding:.875rem}
+  .kactions{flex-direction:column;gap:4px}
+  .beheer-wrap{padding:1rem}
+  .beheer-grid{grid-template-columns:1fr;gap:1rem}
+  .modal-overlay{align-items:flex-end}
+  .modal{border-radius:18px 18px 0 0;width:100%;max-width:100%;max-height:92vh}
+  .modal::before{content:'';display:block;width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto .875rem}
+  .two{grid-template-columns:1fr 1fr}
+  .four{grid-template-columns:1fr 1fr}
+  .detail-overlay{align-items:flex-end}
+  .detail-modal{border-radius:18px 18px 0 0;width:100%;max-width:100%;max-height:92vh}
+  .detail-header{padding:1rem 1.25rem .875rem}
+  .detail-body{padding:1rem 1.25rem}
+  .detail-footer{padding:.75rem 1.25rem 1.5rem;flex-direction:column}
+  .detail-footer .btn-ghost,.detail-footer .btn-edit{width:100%;padding:10px;font-size:14px;text-align:center}
+  .mfooter{flex-direction:column-reverse;gap:8px}
+  .mfooter .btn-ghost,.mfooter .btn-sm{width:100%;text-align:center;padding:10px;font-size:14px}
+  .plan-header{padding:1rem 1.25rem .875rem}
+  .plan-body{padding:1rem 1.25rem 2rem}
+}
+@media(min-width:768px){
+  .plan-overlay{align-items:flex-start;justify-content:flex-end}
+  .plan-panel{width:380px;max-width:95vw;height:100%;border-radius:0;border-top:none;border-left:1px solid var(--border)}
+}
 </style>
 </head>
 <body>
@@ -235,14 +289,14 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
       <div class="sidebar">
         <div class="slabel">Agenda</div>
         <div class="wh"><span>Ma</span><span>Di</span><span>Wo</span><span>Do</span><span>Vr</span><span>Za</span><span>Zo</span></div>
-        <div class="cg" id="calGrid"><div class="spin">Laden...</div></div>
+        <div class="cg" id="calGrid"></div>
         <div class="lgd" id="legenda"></div>
         <button class="btn-add" onclick="openModal()">+ Klus aanmaken</button>
       </div>
       <div class="main">
         <div class="conflict" id="conflictBanner"></div>
         <div class="sc">
-          <div class="sc-header" style="margin-bottom:.75rem">
+          <div class="sc-header" style="margin-bottom:.5rem">
             <div class="st">Mededelingen</div>
             <div style="display:flex;align-items:center;gap:6px">
               <div class="week-nav">
@@ -254,7 +308,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
               <button class="btn-sm" onclick="openMedModal()" style="font-size:11px;padding:5px 12px">+ Mededeling</button>
             </div>
           </div>
-          <div id="medList"><div class="spin">Laden...</div></div>
+          <div id="medList"></div>
         </div>
         <div class="sc">
           <div class="sc-header" style="margin-bottom:.5rem">
@@ -266,8 +320,12 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
               <button class="btn-nav" onclick="changeWeek(1)">&#8594;</button>
             </div>
           </div>
-          <div class="tl-hdr"><div></div><div class="tl-dates" id="tlDates"></div></div>
-          <div class="tl-rows" id="tlRows"><div class="spin">Laden...</div></div>
+          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+            <div style="min-width:560px">
+              <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;margin-bottom:4px"><div></div><div class="tl-dates" id="tlDates"></div></div>
+              <div class="tl-rows" id="tlRows"></div>
+            </div>
+          </div>
         </div>
         <div class="sc">
           <div class="sc-header">
@@ -276,70 +334,6 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
           </div>
           <div class="kl" id="klusList"><div class="spin">Laden...</div></div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PLANNING PANEEL -->
-  <div class="plan-overlay" id="planOverlay" onclick="closePlan(event)">    <div class="plan-panel">
-      <div class="plan-header">
-        <div>
-          <div class="plan-title" id="planTitle"></div>
-          <div class="plan-sub" id="planSub"></div>
-        </div>
-        <button class="plan-close" onclick="document.getElementById('planOverlay').classList.remove('open')">&#x2715;</button>
-      </div>
-      <div class="plan-body" id="planBody"></div>
-    </div>
-  </div>
-
-  <!-- DETAIL MODAL -->
-  <div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
-    <div class="detail-modal">
-      <div class="detail-header">
-        <div class="detail-naam" id="detailNaam">—</div>
-        <button class="detail-close" onclick="closeDetail()">&#x2715;</button>
-      </div>
-      <div class="detail-body">
-        <div class="detail-tijd" id="detailTijd"></div>
-        <div class="detail-datum" id="detailDatum"></div>
-        <div class="detail-section">
-          <div class="detail-label">Trucks</div>
-          <div class="detail-trucks" id="detailTrucks"></div>
-        </div>
-        <div class="detail-section">
-          <div class="detail-label">Soort</div>
-          <div class="detail-soort" id="detailSoort"></div>
-        </div>
-        <div class="detail-section">
-          <div class="detail-label">Personen</div>
-          <div class="detail-value" id="detailPersonen"></div>
-        </div>
-        <div class="detail-section" id="detailAdresSection">
-          <div class="detail-label">Adres</div>
-          <div class="detail-value" id="detailAdres"></div>
-        </div>
-        <div class="detail-section" id="detailContactSection">
-          <div class="detail-label">Contactpersoon</div>
-          <div class="detail-value" id="detailContact"></div>
-          <div class="detail-value" id="detailTelefoon" style="margin-top:3px"></div>
-        </div>
-        <div class="detail-section" id="detailPersSection">
-          <div class="detail-label">Personeel</div>
-          <div class="detail-pers" id="detailPers"></div>
-        </div>
-        <div class="detail-section" id="detailNotitieSection">
-          <div class="detail-label">Notities</div>
-          <div class="detail-notitie" id="detailNotitie"></div>
-        </div>
-        <div class="detail-section" id="detailPdfSection">
-          <div class="detail-label">Bijlagen</div>
-          <div class="detail-pdfs" id="detailPdfs"></div>
-        </div>
-      </div>
-      <div class="detail-footer">
-        <button class="btn-ghost" onclick="closeDetail()">Sluiten</button>
-        <button class="btn-edit" id="detailEditBtn" onclick="">Bewerk</button>
       </div>
     </div>
   </div>
@@ -380,6 +374,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
   </div>
 </div>
 
+<!-- KLUS MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="overlayClick(event)">
   <div class="modal">
     <div class="modal-title" id="modalTitle">Nieuwe klus</div>
@@ -391,16 +386,24 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
       <div class="chips" id="truckChips"></div>
       <div class="chip-warn" id="truckWarn"></div>
     </div>
-    <div class="three">
-      <div class="fr"><span class="fl">Datum</span><input type="date" id="fDatum" onchange="onDateChange()"></div>
-      <div class="fr"><span class="fl">Vertrektijd</span><input type="time" id="fVertrek"></div>
-      <div class="fr"><span class="fl">Eindtijd</span><input type="time" id="fEind"></div>
+    <div class="two">
+      <div class="fr"><span class="fl">Startdatum</span><input type="date" id="fDatum" onchange="onDateChange()"></div>
+      <div class="fr"><span class="fl">Einddatum <span style="color:var(--muted);font-weight:400">(optioneel)</span></span><input type="date" id="fDatumEind"></div>
+    </div>
+    <div class="fr"><span class="fl">Tijden</span>
+      <div class="four">
+        <div><span class="fl" style="font-size:10px">Vertrektijd</span><input type="text" class="tijd-input" id="fVertrek" placeholder="08.30" maxlength="5" oninput="formatTijd(this)"></div>
+        <div><span class="fl" style="font-size:10px">Start opbouw</span><input type="text" class="tijd-input" id="fOpbouw" placeholder="10.00" maxlength="5" oninput="formatTijd(this)"></div>
+        <div><span class="fl" style="font-size:10px">Start feest</span><input type="text" class="tijd-input" id="fFeest" placeholder="14.00" maxlength="5" oninput="formatTijd(this)"></div>
+        <div><span class="fl" style="font-size:10px">Einde feest</span><input type="text" class="tijd-input" id="fEinde" placeholder="23.00" maxlength="5" oninput="formatTijd(this)"></div>
+      </div>
     </div>
     <div class="fr"><span class="fl">Aantal personen</span>
       <input type="number" id="fPersonen" min="1" placeholder="bv. 200">
     </div>
-    <div class="fr"><span class="fl">Soort</span>
-      <select id="fFood"><option value="">Selecteer soort</option></select>
+    <div class="fr">
+      <span class="fl">Food per truck</span>
+      <div id="truckSoortBlocks"></div>
     </div>
     <div class="fr">
       <span class="fl">Personeel (meerdere mogelijk)</span>
@@ -417,16 +420,10 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
       <input type="text" id="fAdres" placeholder="Locatie of adres van het evenement">
     </div>
     <div class="two">
-      <div class="fr"><span class="fl">Contactpersoon</span>
-        <input type="text" id="fContact" placeholder="Naam contactpersoon">
-      </div>
-      <div class="fr"><span class="fl">Telefoonnummer</span>
-        <input type="text" id="fTelefoon" placeholder="06-12345678">
-      </div>
+      <div class="fr"><span class="fl">Contactpersoon</span><input type="text" id="fContact" placeholder="Naam contactpersoon"></div>
+      <div class="fr"><span class="fl">Telefoonnummer</span><input type="text" id="fTelefoon" placeholder="06-12345678"></div>
     </div>
-    <div class="fr"><span class="fl">Notities</span>
-      <textarea id="fNotitie" placeholder="Extra info..."></textarea>
-    </div>
+    <div class="fr"><span class="fl">Notities</span><textarea id="fNotitie" placeholder="Extra info..."></textarea></div>
     <div class="warn-box" id="warnBox"></div>
     <div class="mfooter">
       <span class="saving-msg" id="savingMsg" style="display:none">Opslaan...</span>
@@ -440,19 +437,54 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 <div class="modal-overlay" id="medOverlay" onclick="if(event.target===this)closeMedModal()">
   <div class="modal">
     <div class="modal-title" id="medModalTitle">Nieuwe mededeling</div>
-    <div class="fr"><span class="fl">Titel</span>
-      <input type="text" id="fMedTitel" placeholder="bv. APK auto, Pallets levering, Vuilcontainer">
-    </div>
-    <div class="fr"><span class="fl">Datum (optioneel)</span>
-      <input type="date" id="fMedDatum">
-    </div>
-    <div class="fr"><span class="fl">Beschrijving (optioneel)</span>
-      <textarea id="fMedBeschr" placeholder="Extra info..."></textarea>
-    </div>
+    <div class="fr"><span class="fl">Titel</span><input type="text" id="fMedTitel" placeholder="bv. APK auto, Pallets levering"></div>
+    <div class="fr"><span class="fl">Datum (optioneel)</span><input type="date" id="fMedDatum"></div>
+    <div class="fr"><span class="fl">Beschrijving (optioneel)</span><textarea id="fMedBeschr" placeholder="Extra info..."></textarea></div>
     <div class="mfooter">
       <span class="saving-msg" id="medSavingMsg" style="display:none">Opslaan...</span>
       <button class="btn-ghost" onclick="closeMedModal()">Annuleren</button>
       <button class="btn-sm" onclick="saveMededeling()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- PLAN PANEEL -->
+<div class="plan-overlay" id="planOverlay" onclick="closePlan(event)">
+  <div class="plan-panel">
+    <div class="plan-header">
+      <div><div class="plan-title" id="planTitle"></div><div class="plan-sub" id="planSub"></div></div>
+      <button class="plan-close" onclick="document.getElementById('planOverlay').classList.remove('open')">&#x2715;</button>
+    </div>
+    <div class="plan-body" id="planBody"></div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+  <div class="detail-modal">
+    <div class="detail-header">
+      <div class="detail-naam" id="detailNaam">—</div>
+      <button class="detail-close" onclick="closeDetail()">&#x2715;</button>
+    </div>
+    <div class="detail-body">
+      <div class="detail-tijd" id="detailTijd"></div>
+      <div class="detail-datum" id="detailDatum"></div>
+      <div class="detail-section"><div class="detail-label">Trucks</div><div class="detail-trucks" id="detailTrucks"></div></div>
+      <div class="detail-section"><div class="detail-label">Food per truck</div><div id="detailSoort"></div></div>
+      <div class="detail-section"><div class="detail-label">Personen</div><div class="detail-value" id="detailPersonen"></div></div>
+      <div class="detail-section" id="detailAdresSection"><div class="detail-label">Adres</div><div class="detail-value" id="detailAdres"></div></div>
+      <div class="detail-section" id="detailContactSection">
+        <div class="detail-label">Contactpersoon</div>
+        <div class="detail-value" id="detailContact"></div>
+        <div class="detail-value" id="detailTelefoon" style="margin-top:3px"></div>
+      </div>
+      <div class="detail-section" id="detailPersSection"><div class="detail-label">Personeel</div><div class="detail-pers" id="detailPers"></div></div>
+      <div class="detail-section" id="detailNotitieSection"><div class="detail-label">Notities</div><div class="detail-notitie" id="detailNotitie"></div></div>
+      <div class="detail-section" id="detailPdfSection"><div class="detail-label">Bijlagen</div><div class="detail-pdfs" id="detailPdfs"></div></div>
+    </div>
+    <div class="detail-footer">
+      <button class="btn-ghost" onclick="closeDetail()">Sluiten</button>
+      <button class="btn-edit" id="detailEditBtn">Bewerk</button>
     </div>
   </div>
 </div>
@@ -464,8 +496,9 @@ const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6
 const H={'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'};
 
 let TRUCKS=[],PERSONEEL=[],KLUSSEN=[],SOORTEN=[];
-let selDate=null,editId=null,weekOffset=0;
-let formTrucks=[],formPers=[],formPdfs=[],existingPdfs=[];
+let selDate=null,editId=null,weekOffset=0,medWeekOffset=0;
+let formTrucks=[],formPers=[],formTruckSoorten={},formPdfs=[],existingPdfs=[];
+let allMededelingen=[],editMedId=null;
 const today=new Date();const todayStr=fmt(today);
 
 function doLogin(){
@@ -486,37 +519,14 @@ function getWeekDates(){
   const s=new Date(today);s.setDate(s.getDate()-s.getDay()+1+(weekOffset*14));
   return Array.from({length:14},(_,i)=>{const d=new Date(s);d.setDate(s.getDate()+i);return d});
 }
-function changeWeek(dir){weekOffset=dir===0?0:weekOffset+dir;selDate=null;renderAll();}
-async function sbGet(p){const r=await fetch(SB+'/rest/v1/'+p,{headers:H});return r.json()}
-async function sbPost(p,b){const r=await fetch(SB+'/rest/v1/'+p,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(b)});return r.json()}
-async function sbPatch(p,b){return fetch(SB+'/rest/v1/'+p,{method:'PATCH',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(b)})}
-async function sbDelete(p){return fetch(SB+'/rest/v1/'+p,{method:'DELETE',headers:H})}
-function hbg(hex){return hex+'18'}
-
-async function loadAll(){
-  const [trucks,personeel,klussen,klusTrucks,klusPers,klusPdfs,soorten,mededelingen]=await Promise.all([
-    sbGet('trucks?select=*&order=volgorde'),
-    sbGet('personeel?select=*&order=naam'),
-    sbGet('klussen?select=*&order=datum'),
-    sbGet('klus_trucks?select=*'),
-    sbGet('klus_personeel?select=*'),
-    sbGet('klus_pdfs?select=*'),
-    sbGet('soorten?select=*&order=volgorde'),
-    sbGet('mededelingen?select=*&order=datum.asc,aangemaakt_op.asc'),
-  ]);
-  TRUCKS=trucks;PERSONEEL=personeel;SOORTEN=soorten;
-  const tMap=Object.fromEntries(trucks.map(t=>[t.id,t]));
-  const pMap=Object.fromEntries(personeel.map(p=>[p.id,p]));
-  KLUSSEN=klussen.map(k=>({
-    ...k,
-    trucks:klusTrucks.filter(x=>x.klus_id===k.id).map(x=>tMap[x.truck_id]).filter(Boolean),
-    personeel:klusPers.filter(x=>x.klus_id===k.id).map(x=>pMap[x.personeel_id]).filter(Boolean),
-    pdfs:klusPdfs.filter(x=>x.klus_id===k.id),
-  }));
-  renderMededelingen(mededelingen);
-  renderAll();
+function getMedWeekDates(){
+  const s=new Date(today);s.setDate(s.getDate()-s.getDay()+1+(medWeekOffset*7));
+  return Array.from({length:7},(_,i)=>{const d=new Date(s);d.setDate(s.getDate()+i);return d});
 }
-
+function changeWeek(dir){weekOffset=dir===0?0:weekOffset+dir;selDate=null;renderAll();}
+function changeMedWeek(dir){medWeekOffset=dir===0?0:medWeekOffset+dir;renderMededelingen(allMededelingen);}
+function toggleDate(ds){selDate=ds===selDate?null:ds;renderAll();}
+function clearFilter(){selDate=null;renderAll();}
 function showPage(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.htab').forEach(t=>t.classList.remove('active'));
@@ -525,20 +535,80 @@ function showPage(id,btn){
   if(id==='beheer')renderBeheer();
 }
 
+async function sbGet(p){const r=await fetch(SB+'/rest/v1/'+p,{headers:H});return r.json()}
+async function sbPost(p,b){const r=await fetch(SB+'/rest/v1/'+p,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(b)});return r.json()}
+async function sbPatch(p,b){return fetch(SB+'/rest/v1/'+p,{method:'PATCH',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(b)})}
+async function sbDelete(p){return fetch(SB+'/rest/v1/'+p,{method:'DELETE',headers:H})}
+function hbg(hex){return hex+'18'}
+
+function klusDagen(k){
+  const r=[];const s=new Date(k.datum);const e=k.datum_eind?new Date(k.datum_eind):new Date(k.datum);
+  for(let d=new Date(s);d<=e;d.setDate(d.getDate()+1))r.push(fmt(new Date(d)));
+  return r;
+}
+
+// Tijdveld formatter: automatisch punt invoegen
+function formatTijd(el){
+  let v=el.value.replace(/[^0-9]/g,'');
+  if(v.length>2)v=v.slice(0,2)+'.'+v.slice(2,4);
+  el.value=v;
+}
+function tijdToDb(v){
+  if(!v)return null;
+  const parts=v.replace('.',':').split(':');
+  if(parts.length===2)return`${parts[0].padStart(2,'0')}:${parts[1].padEnd(2,'0')}:00`;
+  return null;
+}
+function tijdFromDb(t){return t?t.slice(0,5).replace(':','.'):''}
+
+async function loadAll(){
+  const [trucks,personeel,klussen,klusTrucks,klusPers,klusPdfs,soorten,meds,klusSoorten,klusTruckSoorten]=await Promise.all([
+    sbGet('trucks?select=*&order=volgorde'),
+    sbGet('personeel?select=*&order=naam'),
+    sbGet('klussen?select=*&order=datum'),
+    sbGet('klus_trucks?select=*'),
+    sbGet('klus_personeel?select=*'),
+    sbGet('klus_pdfs?select=*'),
+    sbGet('soorten?select=*&order=volgorde'),
+    sbGet('mededelingen?select=*&order=datum.asc,aangemaakt_op.asc'),
+    sbGet('klus_soorten?select=*'),
+    sbGet('klus_truck_soorten?select=*'),
+  ]);
+  TRUCKS=trucks;PERSONEEL=personeel;SOORTEN=soorten;
+  const tMap=Object.fromEntries(trucks.map(t=>[t.id,t]));
+  const pMap=Object.fromEntries(personeel.map(p=>[p.id,p]));
+  const sMap=Object.fromEntries(soorten.map(s=>[s.id,s]));
+  KLUSSEN=klussen.map(k=>({
+    ...k,
+    trucks:klusTrucks.filter(x=>x.klus_id===k.id).map(x=>tMap[x.truck_id]).filter(Boolean),
+    personeel:klusPers.filter(x=>x.klus_id===k.id).map(x=>pMap[x.personeel_id]).filter(Boolean),
+    pdfs:klusPdfs.filter(x=>x.klus_id===k.id),
+    soorten:klusSoorten.filter(x=>x.klus_id===k.id).map(x=>sMap[x.soort_id]).filter(Boolean),
+    truckSoorten:klusTruckSoorten.filter(x=>x.klus_id===k.id).map(x=>({truck:tMap[x.truck_id],soort:sMap[x.soort_id]})).filter(x=>x.truck&&x.soort),
+  }));
+  renderMededelingen(meds);
+  renderAll();
+}
+
 function renderAll(){
   const days=getWeekDates();
   const busyMap={};
-  KLUSSEN.forEach(k=>{if(!busyMap[k.datum])busyMap[k.datum]=new Set();k.trucks.forEach(t=>busyMap[k.datum].add(t.id));});
+  KLUSSEN.forEach(k=>klusDagen(k).forEach(ds=>{if(!busyMap[ds])busyMap[ds]=new Set();k.trucks.forEach(t=>busyMap[ds].add(t.id));}));
+
   const first=days[0],last=days[13],opts={day:'numeric',month:'short'};
   const wl=document.getElementById('weekLabel');
   if(wl)wl.textContent=`${first.toLocaleDateString('nl-NL',opts)} – ${last.toLocaleDateString('nl-NL',opts)}`;
 
+  // Legenda
   document.getElementById('legenda').innerHTML=
-    `<div class="slabel" style="margin-top:.5rem">Trucks — klik voor planning</div>`+
-    TRUCKS.map(t=>`<div class="lgr-btn" onclick="openPlan('truck','${t.id}')"><div class="ls" style="background:${t.color}"></div>${t.label}</div>`).join('')+
-    `<div class="slabel" style="margin-top:.75rem">Personeel — klik voor planning</div>`+
-    PERSONEEL.map(p=>`<div class="lgr-btn" onclick="openPlan('pers','${p.id}')">${p.naam}</div>`).join('');
+    `<div class="slabel" style="margin-top:.5rem">Trucks — klik voor planning</div>
+    <div class="zoek-wrap"><span class="zoek-icon">&#128269;</span><input type="text" placeholder="Zoeken..." oninput="filterLgd('bTruck',this.value)"></div>
+    <div id="bTruckLijst">${TRUCKS.map(t=>`<div class="lgr-btn" data-naam="${t.label.toLowerCase()}" onclick="openPlan('truck','${t.id}')"><div class="ls" style="background:${t.color}"></div>${t.label}</div>`).join('')}</div>
+    <div class="slabel" style="margin-top:.75rem">Personeel — klik voor planning</div>
+    <div class="zoek-wrap"><span class="zoek-icon">&#128269;</span><input type="text" placeholder="Zoeken..." oninput="filterLgd('bPers',this.value)"></div>
+    <div id="bPersLijst">${PERSONEEL.map(p=>`<div class="lgr-btn" data-naam="${p.naam.toLowerCase()}" onclick="openPlan('pers','${p.id}')">${p.naam}</div>`).join('')}</div>`;
 
+  // Kalender
   document.getElementById('calGrid').innerHTML=days.map((d,i)=>{
     const ds=fmt(d);const dots=[...(busyMap[ds]||[])];
     return(i===7?'<div class="wdiv"></div>':'')+
@@ -548,70 +618,54 @@ function renderAll(){
       </div>`;
   }).join('');
 
+  // Timeline
   document.getElementById('tlDates').innerHTML=days.map(d=>`<div class="td${fmt(d)===todayStr?' tod':''}">${d.getDate()}</div>`).join('');
   document.getElementById('tlRows').innerHTML=TRUCKS.map(tr=>`<div class="tl-row">
     <div class="tl-name" title="${tr.label}">${tr.label}</div>
     <div class="tl-cells">${days.map(d=>{
-      const ds=fmt(d);const busy=KLUSSEN.some(k=>k.datum===ds&&k.trucks.some(t=>t.id===tr.id));
+      const ds=fmt(d);const busy=KLUSSEN.some(k=>klusDagen(k).includes(ds)&&k.trucks.some(t=>t.id===tr.id));
       return`<div class="tc${busy?' busy':''}${ds===todayStr?' tod-col':''}${ds===selDate?' sel-col':''}" onclick="toggleDate('${ds}')" style="${busy?`background:${hbg(tr.color)};border-color:${tr.color}`:''}" title="${tr.label} — ${busy?'bezet':'vrij'}"></div>`;
     }).join('')}</div>
   </div>`).join('');
 
-  // Tijdbestek rij
-  const tijdRow=document.getElementById('tijdRow');
-  if(tijdRow){
-    tijdRow.innerHTML=days.map(d=>{
-      const ds=fmt(d);
-      const dagKlussen=KLUSSEN.filter(k=>k.datum===ds&&(k.vertrek_tijd||k.eind_tijd));
-      const isToday=ds===todayStr,isSel=ds===selDate;
-      if(!dagKlussen.length){
-        return`<div class="tijd-cell${isToday?' tod-col':''}${isSel?' sel-col':''}" onclick="toggleDate('${ds}')"></div>`;
-      }
-      const fmtT=t=>t?t.slice(0,5).replace(':','.'):'';
-      const tijdLabels=dagKlussen.map(k=>{
-        const v=fmtT(k.vertrek_tijd),e=fmtT(k.eind_tijd);
-        return v&&e?`${v} – ${e}`:v||e;
-      }).join('\n');
-      const title=dagKlussen.map(k=>{
-        const v=fmtT(k.vertrek_tijd),e=fmtT(k.eind_tijd);
-        return`${k.naam||k.food||'Klus'}: ${v&&e?v+' – '+e:v||e}`;
-      }).join('\n');
-      return`<div class="tijd-cell heeft-tijd${isToday?' tod-col':''}${isSel?' sel-col':''}" onclick="toggleDate('${ds}')" title="${title}">
-        <div class="tijd-label">${tijdLabels}</div>
-      </div>`;
-    }).join('');
-  }
-
+  // Conflicten
   const seen=new Set();const conflicts=[];
   TRUCKS.forEach(tr=>{
-    const bd={};KLUSSEN.forEach(k=>{if(k.trucks.some(t=>t.id===tr.id)){bd[k.datum]=(bd[k.datum]||0)+1;}});
+    const bd={};KLUSSEN.forEach(k=>{klusDagen(k).forEach(ds=>{if(k.trucks.some(t=>t.id===tr.id)){bd[ds]=(bd[ds]||0)+1;}});});
     Object.entries(bd).forEach(([d,c])=>{if(c>1){const key=d+tr.id;if(!seen.has(key)){seen.add(key);conflicts.push(`${new Date(d).toLocaleDateString('nl-NL',{day:'numeric',month:'short'})}: ${tr.label} dubbel ingepland`);}}});
   });
   const cb=document.getElementById('conflictBanner');
   if(conflicts.length){cb.className='conflict show';cb.innerHTML='⚠ Conflict: '+conflicts.join(' — ');}
   else{cb.className='conflict';}
 
-  const filtered=selDate?KLUSSEN.filter(k=>k.datum===selDate):KLUSSEN;
+  // Klussen
+  const filtered=selDate?KLUSSEN.filter(k=>klusDagen(k).includes(selDate)):KLUSSEN;
   document.getElementById('mainTitle').textContent=selDate?new Date(selDate).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'}):'Alle klussen';
   document.getElementById('btnClear').style.display=selDate?'':'none';
-
   const sorted=[...filtered].sort((a,b)=>a.datum.localeCompare(b.datum));
+
   document.getElementById('klusList').innerHTML=sorted.length===0?'<div class="empty">Geen klussen gepland</div>':sorted.map(k=>{
     const ds=new Date(k.datum).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
+    const dsEind=k.datum_eind?new Date(k.datum_eind).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'}):'';
+    const datumStr=dsEind&&dsEind!==ds?`${ds} – ${dsEind}`:ds;
     const tB=k.trucks.map(t=>`<span class="bdg" style="background:${hbg(t.color)};color:${t.color}">${t.label}</span>`).join('');
+    const tijden=[k.vertrek_tijd,k.start_opbouw,k.start_feest,k.einde_feest].filter(Boolean).map(tijdFromDb);
+    const tijdStr=tijden.length?tijden[0]+(tijden.length>1?` → ${tijden[tijden.length-1]}`:''):'';
+    // Soorten per truck
+    const soortBadges=k.truckSoorten&&k.truckSoorten.length
+      ?[...new Set(k.truckSoorten.map(ts=>ts.soort.titel))].map(t=>`<span class="bdg" style="background:#F5F3FF;color:#4C1D95">${t}</span>`).join('')
+      :k.soorten&&k.soorten.length?k.soorten.map(s=>`<span class="bdg" style="background:#F5F3FF;color:#4C1D95">${s.titel}</span>`).join('')
+      :k.food?`<span class="bdg" style="background:#F5F3FF;color:#4C1D95">${k.food}</span>`:'';
     const pdfLinks=k.pdfs&&k.pdfs.length?k.pdfs.map(p=>`<span class="pdf-link" onclick="openPdf(\`${p.url}\`,\`${p.naam}\`)">${p.naam}</span>`).join(''):'';
-    const soort=SOORTEN.find(s=>s.titel===k.food);
-    const fmtT=t=>t?t.slice(0,5).replace(':','.'):'';
-    const v=fmtT(k.vertrek_tijd),e=fmtT(k.eind_tijd);
-    const tijden=v&&e?`${v} – ${e}`:v||e;
     return`<div class="kc" onclick="openDetail('${k.id}')">
       <div class="kc-top">
         <div style="min-width:0;flex:1">
-          ${k.naam?`<div class="knaam" style="margin-bottom:.3rem">${k.naam}</div>`:''}
-          <div class="kdate">${ds}</div>
-          ${tijden?`<div style="font-size:14px;font-weight:600;color:var(--text);margin:.2rem 0 .4rem">${tijden}</div>`:''}
-          <div class="ktrucks">${tB}${k.food?`<span class="bdg" style="background:#F5F3FF;color:#4C1D95" title="${soort&&soort.beschrijving?soort.beschrijving:''}">${k.food}</span>`:''}</div>
+          ${k.naam?`<div class="knaam">${k.naam}</div>`:''}
+          <div class="kdate">${datumStr}${tijdStr?` · ${tijdStr}`:''}</div>
+          <div class="ktrucks">${tB}${soortBadges}</div>
           <div class="kmeta"><strong>${k.personen} personen</strong>${k.personeel.length?' &nbsp;·&nbsp; '+k.personeel.map(p=>p.naam).join(', '):''}</div>
+          ${k.notitie?`<div class="kmeta" style="font-style:italic;margin-top:2px">${k.notitie}</div>`:''}
+          ${pdfLinks?`<div style="margin-top:5px">${pdfLinks}</div>`:''}
         </div>
         <div class="kactions" onclick="event.stopPropagation()">
           <button class="btn-edit" onclick="editKlus('${k.id}')">Bewerk</button>
@@ -622,175 +676,160 @@ function renderAll(){
   }).join('');
 }
 
-function toggleDate(ds){selDate=ds===selDate?null:ds;renderAll();}
-function clearFilter(){selDate=null;renderAll();}
-
-function openPlan(type,id){
-  const now=new Date();
-  const start=new Date(now);start.setDate(start.getDate()-start.getDay()+1);
-  const days=Array.from({length:14},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);return d});
-
-  let titel,sub,klussen;
-  if(type==='truck'){
-    const t=TRUCKS.find(x=>x.id===id);
-    titel=t.label;sub='Planning aankomende 2 weken';
-    klussen=KLUSSEN.filter(k=>k.trucks.some(tr=>tr.id===id));
-  }else{
-    const p=PERSONEEL.find(x=>x.id===id);
-    titel=p.naam;sub='Planning aankomende 2 weken';
-    klussen=KLUSSEN.filter(k=>k.personeel.some(pr=>pr.id===id));
-  }
-
-  const week1=days.slice(0,7);const week2=days.slice(7);
-  const opts={day:'numeric',month:'short'};
-
-  function renderWeek(weekDays,label){
-    const klussenInWeek=weekDays.map(d=>{
-      const ds=fmt(d);return klussen.filter(k=>k.datum===ds);
-    }).flat();
-    if(klussenInWeek.length===0){
-      return`<div class="plan-week">
-        <div class="plan-week-label">${label}</div>
-        <div class="plan-empty">Geen klussen gepland</div>
-      </div>`;
-    }
-    return`<div class="plan-week">
-      <div class="plan-week-label">${label}</div>
-      ${klussenInWeek.map(k=>{
-        const ds=new Date(k.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});
-        const tijden=[k.vertrek_tijd,k.eind_tijd].filter(Boolean).map(t=>t.slice(0,5).replace(':','.')).join(' – ');
-        const tB=k.trucks.map(tr=>`<span style="display:inline-flex;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:500;background:${hbg(tr.color)};color:${tr.color};margin-right:3px">${tr.label}</span>`).join('');
-        return`<div class="plan-klus" style="border-left-color:${type==='truck'?TRUCKS.find(t=>t.id===id)?.color:'#888'}">
-          <div class="plan-klus-date">${ds}${tijden?` · ${tijden}`:''}</div>
-          ${k.naam?`<div class="plan-klus-naam">${k.naam}</div>`:''}
-          <div class="plan-klus-meta">${tB}${k.food?`<span style="font-size:10px;color:var(--muted)">${k.food}</span>`:''}</div>
-          <div class="plan-klus-meta">${k.personen} pers.${k.personeel.length?' · '+k.personeel.map(p=>p.naam).join(', '):''}</div>
-        </div>`;
-      }).join('')}
-    </div>`;
-  }
-
-  const w1label=`${week1[0].toLocaleDateString('nl-NL',opts)} – ${week1[6].toLocaleDateString('nl-NL',opts)}`;
-  const w2label=`${week2[0].toLocaleDateString('nl-NL',opts)} – ${week2[6].toLocaleDateString('nl-NL',opts)}`;
-
-  document.getElementById('planTitle').textContent=titel;
-  document.getElementById('planSub').textContent=sub;
-  document.getElementById('planBody').innerHTML=renderWeek(week1,w1label)+renderWeek(week2,w2label);
-  document.getElementById('planOverlay').classList.add('open');
+function filterLgd(listId,q){
+  document.querySelectorAll('#'+listId+'Lijst .lgr-btn').forEach(el=>{
+    el.style.display=el.dataset.naam.includes(q.toLowerCase())?'':'none';
+  });
 }
 
+// ── PLAN ──
+function openPlan(type,id){
+  const now=new Date();const start=new Date(now);start.setDate(start.getDate()-start.getDay()+1);
+  const days=Array.from({length:14},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);return d});
+  const week1=days.slice(0,7),week2=days.slice(7);const opts={day:'numeric',month:'short'};
+  let titel,klussen,accent='#888';
+  if(type==='truck'){const t=TRUCKS.find(x=>x.id===id);titel=t.label;accent=t.color;klussen=KLUSSEN.filter(k=>k.trucks.some(tr=>tr.id===id));}
+  else{const p=PERSONEEL.find(x=>x.id===id);titel=p.naam;klussen=KLUSSEN.filter(k=>k.personeel.some(pr=>pr.id===id));}
+  function rw(wdays,label){
+    const kw=wdays.flatMap(d=>klussen.filter(k=>klusDagen(k).includes(fmt(d))));
+    if(!kw.length)return`<div class="plan-week"><div class="plan-week-label">${label}</div><div class="plan-empty">Geen klussen gepland</div></div>`;
+    return`<div class="plan-week"><div class="plan-week-label">${label}</div>${kw.map(k=>{
+      const ds=new Date(k.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});
+      const t1=tijdFromDb(k.vertrek_tijd),t2=tijdFromDb(k.einde_feest);
+      const tijden=t1&&t2?`${t1} → ${t2}`:t1||t2||'';
+      return`<div class="plan-klus" style="border-left-color:${accent}" onclick="openDetail('${k.id}')">
+        <div class="plan-klus-date">${ds}${tijden?` · ${tijden}`:''}</div>
+        ${k.naam?`<div class="plan-klus-naam">${k.naam}</div>`:''}
+        <div class="plan-klus-meta">${k.personen} pers.</div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+  document.getElementById('planTitle').textContent=titel;
+  document.getElementById('planSub').textContent='Planning aankomende 2 weken';
+  document.getElementById('planBody').innerHTML=rw(week1,`${week1[0].toLocaleDateString('nl-NL',opts)} – ${week1[6].toLocaleDateString('nl-NL',opts)}`)+rw(week2,`${week2[0].toLocaleDateString('nl-NL',opts)} – ${week2[6].toLocaleDateString('nl-NL',opts)}`);
+  document.getElementById('planOverlay').classList.add('open');
+}
 function closePlan(e){if(e.target===document.getElementById('planOverlay'))document.getElementById('planOverlay').classList.remove('open');}
 
+// ── MODAL ──
 function getBezette(datum){
-  const andereKlussen=KLUSSEN.filter(k=>k.datum===datum&&k.id!==editId);
-  return{
-    trucks:andereKlussen.flatMap(k=>k.trucks.map(t=>t.id)),
-    pers:andereKlussen.flatMap(k=>k.personeel.map(p=>p.id)),
-  };
+  if(!datum)return{trucks:[],pers:[]};
+  const andere=KLUSSEN.filter(k=>k.id!==editId&&klusDagen(k).includes(datum));
+  return{trucks:andere.flatMap(k=>k.trucks.map(t=>t.id)),pers:andere.flatMap(k=>k.personeel.map(p=>p.id))};
+}
+
+function renderTruckChips(bezette){
+  const tc=document.getElementById('truckChips');
+  if(!tc)return;
+  tc.innerHTML=TRUCKS.map(t=>{
+    const on=formTrucks.includes(t.id);const warn=bezette.includes(t.id)&&!on;
+    return`<div class="chip${on?' on':''}${warn?' warn':''}" onclick="toggleTruck('${t.id}')">${t.label}${warn?' ⚠':''}</div>`;
+  }).join('');
+}
+function renderPersChips(bezette){
+  const pc=document.getElementById('persChips');
+  if(!pc)return;
+  pc.innerHTML=PERSONEEL.map(p=>{
+    const on=formPers.includes(p.id);const warn=bezette.includes(p.id)&&!on;
+    return`<div class="chip${on?' on':''}${warn?' warn':''}" onclick="togglePers('${p.id}')">${p.naam}${warn?' ⚠':''}</div>`;
+  }).join('');
+}
+function renderTruckSoortBlocks(){
+  const el=document.getElementById('truckSoortBlocks');
+  if(!el)return;
+  if(!formTrucks.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);font-style:italic">Selecteer eerst trucks hierboven</div>';return;}
+  el.innerHTML=formTrucks.map(tid=>{
+    const t=TRUCKS.find(x=>x.id===tid);if(!t)return'';
+    const sel=formTruckSoorten[tid]||[];
+    return`<div class="truck-soort-block">
+      <div class="truck-soort-naam"><div class="ls" style="background:${t.color}"></div>${t.label}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">${SOORTEN.map(s=>{
+        const on=sel.includes(s.id);
+        return`<div class="chip${on?' on':''}" style="font-size:10px;padding:4px 9px" onclick="toggleTruckSoort('${tid}','${s.id}')">${s.titel}</div>`;
+      }).join('')}</div>
+    </div>`;
+  }).join('');
 }
 
 function onDateChange(){
-  const datum=document.getElementById('fDatum').value;
-  if(!datum)return;
+  const datum=document.getElementById('fDatum')?.value;if(!datum)return;
   const {trucks,pers}=getBezette(datum);
-  const tw=document.getElementById('truckWarn');
-  const pw=document.getElementById('persWarn');
-  const conflTrucks=TRUCKS.filter(t=>trucks.includes(t.id));
-  const conflPers=PERSONEEL.filter(p=>pers.includes(p.id));
-  const datLabel=new Date(datum).toLocaleDateString('nl-NL',{day:'numeric',month:'long'});
-  tw.className=conflTrucks.length?'chip-warn show':'chip-warn';
-  tw.textContent=conflTrucks.length?`⚠ Al ingepland op ${datLabel}: ${conflTrucks.map(t=>t.label).join(', ')}`:'' ;
-  pw.className=conflPers.length?'chip-warn show':'chip-warn';
-  pw.textContent=conflPers.length?`⚠ Al ingepland op ${datLabel}: ${conflPers.map(p=>p.naam).join(', ')}`:'' ;
-  renderChips(trucks,pers);
-}
-
-function renderChips(bezetteTrucks,bezettePers){
-  document.getElementById('truckChips').innerHTML=TRUCKS.map(t=>{
-    const on=formTrucks.includes(t.id);
-    const warn=bezetteTrucks.includes(t.id)&&!on;
-    return`<div class="chip${on?' on':''}${warn?' warn':''}" onclick="toggleTruck('${t.id}')" title="${warn?'Al ingepland op deze dag':''}">${t.label}${warn?' ⚠':''}</div>`;
-  }).join('');
-  document.getElementById('persChips').innerHTML=PERSONEEL.map(p=>{
-    const on=formPers.includes(p.id);
-    const warn=bezettePers.includes(p.id)&&!on;
-    return`<div class="chip${on?' on':''}${warn?' warn':''}" onclick="togglePers('${p.id}')" title="${warn?'Al ingepland op deze dag':''}">${p.naam}${warn?' ⚠':''}</div>`;
-  }).join('');
+  const tw=document.getElementById('truckWarn');const pw=document.getElementById('persWarn');
+  const ct=TRUCKS.filter(t=>trucks.includes(t.id));const cp=PERSONEEL.filter(p=>pers.includes(p.id));
+  const dl=new Date(datum).toLocaleDateString('nl-NL',{day:'numeric',month:'long'});
+  if(tw){tw.className=ct.length?'chip-warn show':'chip-warn';tw.textContent=ct.length?`⚠ Al ingepland op ${dl}: ${ct.map(t=>t.label).join(', ')}`:''}
+  if(pw){pw.className=cp.length?'chip-warn show':'chip-warn';pw.textContent=cp.length?`⚠ Al ingepland op ${dl}: ${cp.map(p=>p.naam).join(', ')}`:''}
+  renderTruckChips(trucks);renderPersChips(pers);
 }
 
 function toggleTruck(id){
-  const datum=document.getElementById('fDatum').value;
+  const datum=document.getElementById('fDatum')?.value||'';
   const {trucks,pers}=getBezette(datum);
-  if(!formTrucks.includes(id)&&trucks.includes(id)){
-    const t=TRUCKS.find(x=>x.id===id);
-    showWarn(`⚠ ${t.label} staat al ingepland op deze dag. Selecteer een andere truck of verander de datum.`);
-    return;
-  }
+  if(!formTrucks.includes(id)&&trucks.includes(id)){showWarn(`⚠ ${TRUCKS.find(t=>t.id===id)?.label} staat al ingepland op deze dag.`);return;}
   formTrucks=formTrucks.includes(id)?formTrucks.filter(x=>x!==id):[...formTrucks,id];
-  renderChips(trucks,pers);
+  if(!formTrucks.includes(id))delete formTruckSoorten[id];
+  renderTruckChips(trucks);renderTruckSoortBlocks();
+  document.getElementById('warnBox').className='warn-box';
 }
-
 function togglePers(id){
-  const datum=document.getElementById('fDatum').value;
+  const datum=document.getElementById('fDatum')?.value||'';
   const {trucks,pers}=getBezette(datum);
-  if(!formPers.includes(id)&&pers.includes(id)){
-    const p=PERSONEEL.find(x=>x.id===id);
-    showWarn(`⚠ ${p.naam} staat al ingepland op deze dag. Selecteer iemand anders of verander de datum.`);
-    return;
-  }
+  if(!formPers.includes(id)&&pers.includes(id)){showWarn(`⚠ ${PERSONEEL.find(p=>p.id===id)?.naam} staat al ingepland op deze dag.`);return;}
   formPers=formPers.includes(id)?formPers.filter(x=>x!==id):[...formPers,id];
-  renderChips(trucks,pers);
+  renderPersChips(pers);
+  document.getElementById('warnBox').className='warn-box';
 }
-
-function showWarn(msg){
-  const wb=document.getElementById('warnBox');
-  wb.textContent=msg;wb.className='warn-box show';
-  setTimeout(()=>wb.className='warn-box',4000);
+function toggleTruckSoort(tid,sid){
+  if(!formTruckSoorten[tid])formTruckSoorten[tid]=[];
+  formTruckSoorten[tid]=formTruckSoorten[tid].includes(sid)?formTruckSoorten[tid].filter(x=>x!==sid):[...formTruckSoorten[tid],sid];
+  renderTruckSoortBlocks();
 }
+function showWarn(msg){const wb=document.getElementById('warnBox');if(wb){wb.textContent=msg;wb.className='warn-box show';setTimeout(()=>wb.className='warn-box',4000);}}
 
 function openModal(id=null){
   editId=id;
   const k=id?KLUSSEN.find(x=>x.id===id):null;
   formTrucks=k?k.trucks.map(t=>t.id):[];
   formPers=k?k.personeel.map(p=>p.id):[];
+  formTruckSoorten={};
+  if(k&&k.truckSoorten){k.truckSoorten.forEach(ts=>{if(!formTruckSoorten[ts.truck.id])formTruckSoorten[ts.truck.id]=[];if(!formTruckSoorten[ts.truck.id].includes(ts.soort.id))formTruckSoorten[ts.truck.id].push(ts.soort.id);});}
   formPdfs=[];existingPdfs=k&&k.pdfs?[...k.pdfs]:[];
   document.getElementById('modalTitle').textContent=id?'Klus bewerken':'Nieuwe klus';
   document.getElementById('fNaam').value=k?k.naam||'':'';
   document.getElementById('fDatum').value=k?k.datum:(selDate||todayStr);
-  document.getElementById('fVertrek').value=k&&k.vertrek_tijd?k.vertrek_tijd.slice(0,5):'';
-  document.getElementById('fEind').value=k&&k.eind_tijd?k.eind_tijd.slice(0,5):'';
+  document.getElementById('fDatumEind').value=k&&k.datum_eind?k.datum_eind:'';
+  document.getElementById('fVertrek').value=tijdFromDb(k?.vertrek_tijd);
+  document.getElementById('fOpbouw').value=tijdFromDb(k?.start_opbouw);
+  document.getElementById('fFeest').value=tijdFromDb(k?.start_feest);
+  document.getElementById('fEinde').value=tijdFromDb(k?.einde_feest);
   document.getElementById('fPersonen').value=k?k.personen:'';
   document.getElementById('fNotitie').value=k?k.notitie:'';
   document.getElementById('fAdres').value=k?k.adres||'':'';
   document.getElementById('fContact').value=k?k.contactpersoon||'':'';
   document.getElementById('fTelefoon').value=k?k.telefoon||'':'';
   document.getElementById('warnBox').className='warn-box';
-  document.getElementById('truckWarn').className='chip-warn';
-  document.getElementById('persWarn').className='chip-warn';
-  const sel=document.getElementById('fFood');
-  sel.innerHTML='<option value="">Selecteer soort</option>'+SOORTEN.map(s=>`<option value="${s.titel}"${k&&k.food===s.titel?' selected':''}>${s.titel}</option>`).join('');
-  renderChips([],[]);
-  renderPdfList();
+  const tw=document.getElementById('truckWarn');const pw=document.getElementById('persWarn');
+  if(tw)tw.className='chip-warn';if(pw)pw.className='chip-warn';
+  renderTruckChips([]);renderPersChips([]);renderTruckSoortBlocks();renderPdfList();
   document.getElementById('modalOverlay').classList.add('open');
-  if(k){onDateChange();}
+  if(k)onDateChange();
 }
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
 function overlayClick(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}
 
+// ── PDF ──
 function handlePdf(){
   [...document.getElementById('fPdf').files].forEach(file=>{
-    const r=new FileReader();
-    r.onload=e=>{formPdfs.push({naam:file.name,url:e.target.result});renderPdfList();};
-    r.readAsDataURL(file);
-  });
-  document.getElementById('fPdf').value='';
+    const r=new FileReader();r.onload=e=>{formPdfs.push({naam:file.name,url:e.target.result});renderPdfList();};r.readAsDataURL(file);
+  });document.getElementById('fPdf').value='';
 }
 function renderPdfList(){
   const all=[...existingPdfs,...formPdfs];
-  const z=document.getElementById('bijZone');
+  const z=document.getElementById('bijZone');if(!z)return;
   z.textContent=all.length?`${all.length} PDF${all.length>1?'s':''} — klik om meer toe te voegen`:'Klik om PDF toe te voegen';
   z.className='bij'+(all.length?' has':'');
-  document.getElementById('pdfList').innerHTML=[
+  const pl=document.getElementById('pdfList');if(!pl)return;
+  pl.innerHTML=[
     ...existingPdfs.map(p=>`<div class="pdf-item"><span class="pdf-name" onclick="openPdf(\`${p.url}\`,\`${p.naam}\`)">${p.naam}</span><button class="btn-danger-sm" onclick="removeExistingPdf('${p.id}')">×</button></div>`),
     ...formPdfs.map((p,i)=>`<div class="pdf-item"><span class="pdf-name" onclick="openPdf(\`${p.url}\`,\`${p.naam}\`)">${p.naam}</span><button class="btn-danger-sm" onclick="removeNewPdf(${i})">×</button></div>`),
   ].join('');
@@ -801,152 +840,143 @@ function openPdf(url,naam){
   if(url.startsWith('data:')){
     const arr=url.split(',');const mime=arr[0].match(/:(.*?);/)[1];
     const bstr=atob(arr[1]);let n=bstr.length;const u8=new Uint8Array(n);
-    while(n--){u8[n]=bstr.charCodeAt(n);}
-    const blob=new Blob([u8],{type:mime});
-    const blobUrl=URL.createObjectURL(blob);
-    window.open(blobUrl,'_blank');
-  }else{
-    window.open(url,'_blank');
-  }
+    while(n--)u8[n]=bstr.charCodeAt(n);
+    window.open(URL.createObjectURL(new Blob([u8],{type:mime})),'_blank');
+  }else{window.open(url,'_blank');}
 }
 
+// ── SAVE ──
 async function saveKlus(){
   const naam=document.getElementById('fNaam').value.trim();
   const datum=document.getElementById('fDatum').value;
-  const vertrek_tijd=document.getElementById('fVertrek').value||null;
-  const eind_tijd=document.getElementById('fEind').value||null;
+  const datum_eind=document.getElementById('fDatumEind').value||null;
+  const vertrek_tijd=tijdToDb(document.getElementById('fVertrek').value);
+  const start_opbouw=tijdToDb(document.getElementById('fOpbouw').value);
+  const start_feest=tijdToDb(document.getElementById('fFeest').value);
+  const einde_feest=tijdToDb(document.getElementById('fEinde').value);
   const personen=parseInt(document.getElementById('fPersonen').value);
-  const food=document.getElementById('fFood').value;
   const notitie=document.getElementById('fNotitie').value||'';
   const adres=document.getElementById('fAdres').value.trim();
   const contactpersoon=document.getElementById('fContact').value.trim();
   const telefoon=document.getElementById('fTelefoon').value.trim();
-  if(!datum||!personen||!food){showWarn('Vul datum, aantal personen en soort in.');return;}
+  if(!datum||!personen){showWarn('Vul datum en aantal personen in.');return;}
+  // food = eerste soort voor backwards compat
+  const allSoortIds=[...new Set(Object.values(formTruckSoorten).flat())];
+  const foodLabel=allSoortIds.length?SOORTEN.find(s=>s.id===allSoortIds[0])?.titel||'':'';
   document.getElementById('savingMsg').style.display='inline';
   try{
     let klusId=editId;
     if(editId){
-      await sbPatch(`klussen?id=eq.${editId}`,{naam,datum,vertrek_tijd,eind_tijd,personen,food,notitie,adres,contactpersoon,telefoon});
+      await sbPatch(`klussen?id=eq.${editId}`,{naam,datum,datum_eind,vertrek_tijd,start_opbouw,start_feest,einde_feest,personen,food:foodLabel,notitie,adres,contactpersoon,telefoon});
       await sbDelete(`klus_trucks?klus_id=eq.${editId}`);
       await sbDelete(`klus_personeel?klus_id=eq.${editId}`);
-      const removedIds=KLUSSEN.find(k=>k.id===editId)?.pdfs.filter(p=>!existingPdfs.find(e=>e.id===p.id)).map(p=>p.id)||[];
-      for(const rid of removedIds){await sbDelete(`klus_pdfs?id=eq.${rid}`);}
+      await sbDelete(`klus_soorten?klus_id=eq.${editId}`);
+      await sbDelete(`klus_truck_soorten?klus_id=eq.${editId}`);
+      const removedPdfs=KLUSSEN.find(k=>k.id===editId)?.pdfs.filter(p=>!existingPdfs.find(e=>e.id===p.id)).map(p=>p.id)||[];
+      for(const rid of removedPdfs)await sbDelete(`klus_pdfs?id=eq.${rid}`);
     }else{
-      const res=await sbPost('klussen',{naam,datum,vertrek_tijd,eind_tijd,personen,food,notitie,adres,contactpersoon,telefoon});
+      const res=await sbPost('klussen',{naam,datum,datum_eind,vertrek_tijd,start_opbouw,start_feest,einde_feest,personen,food:foodLabel,notitie,adres,contactpersoon,telefoon});
       klusId=res[0].id;
     }
     if(formTrucks.length)await sbPost('klus_trucks',formTrucks.map(tid=>({klus_id:klusId,truck_id:tid})));
     if(formPers.length)await sbPost('klus_personeel',formPers.map(pid=>({klus_id:klusId,personeel_id:pid})));
+    // Sla klus_soorten op (uniek over alle trucks)
+    if(allSoortIds.length)await sbPost('klus_soorten',allSoortIds.map(sid=>({klus_id:klusId,soort_id:sid})));
+    // Sla klus_truck_soorten op
+    const truckSoortRows=[];
+    Object.entries(formTruckSoorten).forEach(([tid,sids])=>sids.forEach(sid=>truckSoortRows.push({klus_id:klusId,truck_id:tid,soort_id:sid})));
+    if(truckSoortRows.length)await sbPost('klus_truck_soorten',truckSoortRows);
     if(formPdfs.length)await sbPost('klus_pdfs',formPdfs.map(p=>({klus_id:klusId,naam:p.naam,url:p.url})));
     closeModal();await loadAll();
   }catch(e){showWarn('Fout bij opslaan: '+e.message);}
   document.getElementById('savingMsg').style.display='none';
 }
-
 async function editKlus(id){openModal(id);}
+async function deleteKlus(id){
+  if(!confirm('Weet je zeker dat je deze klus wilt verwijderen?'))return;
+  await sbDelete(`klussen?id=eq.${id}`);await loadAll();
+}
+
+// ── DETAIL ──
+function openDetail(id){
+  const k=KLUSSEN.find(x=>x.id===id);if(!k)return;
+  const t1=tijdFromDb(k.vertrek_tijd),t2=tijdFromDb(k.start_opbouw),t3=tijdFromDb(k.start_feest),t4=tijdFromDb(k.einde_feest);
+  const tijdLines=[t1&&`Vertrek: ${t1}`,t2&&`Opbouw: ${t2}`,t3&&`Start feest: ${t3}`,t4&&`Einde feest: ${t4}`].filter(Boolean);
+  const ds=new Date(k.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const dsEind=k.datum_eind?new Date(k.datum_eind).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
+  const datumStr=dsEind&&dsEind!==ds?`${ds} – ${dsEind}`:ds;
+  document.getElementById('detailNaam').textContent=k.naam||k.food||'Klus';
+  document.getElementById('detailTijd').innerHTML=tijdLines.map(t=>`<div style="font-size:14px;font-weight:600">${t}</div>`).join('');
+  document.getElementById('detailDatum').textContent=datumStr;
+  document.getElementById('detailTrucks').innerHTML=k.trucks.map(t=>`<span class="bdg" style="background:${hbg(t.color)};color:${t.color}">${t.label}</span>`).join('');
+  // Food per truck
+  const soortEl=document.getElementById('detailSoort');
+  if(k.truckSoorten&&k.truckSoorten.length){
+    const byTruck={};k.truckSoorten.forEach(ts=>{if(!byTruck[ts.truck.id])byTruck[ts.truck.id]={truck:ts.truck,soorten:[]};byTruck[ts.truck.id].soorten.push(ts.soort.titel);});
+    soortEl.innerHTML=Object.values(byTruck).map(({truck,soorten})=>`<div style="margin-bottom:4px"><span style="font-size:11px;font-weight:600;color:${truck.color}">${truck.label}:</span> <span style="font-size:13px;color:var(--text)">${soorten.join(', ')}</span></div>`).join('');
+  }else{
+    const soortenList=k.soorten&&k.soorten.length?k.soorten:k.food?[{titel:k.food}]:[];
+    soortEl.innerHTML=soortenList.length?soortenList.map(s=>`<span style="font-size:13px;color:var(--text)">${s.titel}</span>`).join(', '):'–';
+  }
+  document.getElementById('detailPersonen').textContent=k.personen+' personen';
+  const ad=document.getElementById('detailAdresSection');ad.style.display=k.adres?'':'none';document.getElementById('detailAdres').textContent=k.adres||'';
+  const cs=document.getElementById('detailContactSection');cs.style.display=(k.contactpersoon||k.telefoon)?'':'none';
+  document.getElementById('detailContact').textContent=k.contactpersoon||'';
+  const tel=document.getElementById('detailTelefoon');tel.style.display=k.telefoon?'':'none';
+  tel.innerHTML=k.telefoon?`<a href="tel:${k.telefoon}" style="color:#2563EB;text-decoration:none">${k.telefoon}</a>`:'';
+  const ps=document.getElementById('detailPersSection');ps.style.display=k.personeel.length?'':'none';document.getElementById('detailPers').textContent=k.personeel.map(p=>p.naam).join(', ');
+  const ns=document.getElementById('detailNotitieSection');ns.style.display=k.notitie?'':'none';document.getElementById('detailNotitie').textContent=k.notitie;
+  const pdfs=document.getElementById('detailPdfSection');pdfs.style.display=k.pdfs&&k.pdfs.length?'':'none';
+  document.getElementById('detailPdfs').innerHTML=k.pdfs?k.pdfs.map(p=>`<span class="detail-pdf-link" onclick="openPdf(\`${p.url}\`,\`${p.naam}\`)">${p.naam}</span>`).join(''):'';
+  document.getElementById('detailEditBtn').onclick=()=>{closeDetail();editKlus(id);};
+  document.getElementById('detailOverlay').classList.add('open');
+}
+function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');}
 
 // ── MEDEDELINGEN ──
-let editMedId=null;
-let medWeekOffset=0;
-let allMededelingen=[];
-
-function getMedWeekDates(){
-  const s=new Date(today);s.setDate(s.getDate()-s.getDay()+1+(medWeekOffset*7));
-  return Array.from({length:7},(_,i)=>{const d=new Date(s);d.setDate(s.getDate()+i);return d});
-}
-function changeMedWeek(dir){
-  medWeekOffset=dir===0?0:medWeekOffset+dir;
-  renderMededelingen(allMededelingen);
-}
-
 function renderMededelingen(meds){
   allMededelingen=meds||[];
   const days=getMedWeekDates();
-  const first=days[0],last=days[6];
-  const opts={day:'numeric',month:'short'};
+  const first=days[0],last=days[6],opts={day:'numeric',month:'short'};
   const wl=document.getElementById('medWeekLabel');
   if(wl)wl.textContent=`${first.toLocaleDateString('nl-NL',opts)} – ${last.toLocaleDateString('nl-NL',opts)}`;
-
   const medsMetDatum=allMededelingen.filter(m=>m.datum);
   const medsZonderDatum=allMededelingen.filter(m=>!m.datum);
   const dagNamen=['Ma','Di','Wo','Do','Vr','Za','Zo'];
-
   const weekGrid=days.map((d,i)=>{
-    const ds=fmt(d);
-    const isToday=ds===todayStr;
+    const ds=fmt(d);const isToday=ds===todayStr;
     const dagMeds=medsMetDatum.filter(m=>m.datum===ds);
-    return`<div class="med-dag">
-      <div class="med-dag-hdr${isToday?' vandaag':''}">
-        <div class="med-dag-naam">${dagNamen[i]}</div>
-        <div class="med-dag-num">${d.getDate()}</div>
-      </div>
-      <div class="med-dag-items">
-        ${dagMeds.length?dagMeds.map(m=>`<div class="med-pill" onclick="openMedModal('${m.id}')">
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.titel}</span>
-          <button class="med-pill-del" onclick="event.stopPropagation();deleteMed('${m.id}')">×</button>
-        </div>`).join(''):`<div class="med-geen">–</div>`}
-      </div>
+    return`<div class="med-dag"><div class="med-dag-hdr${isToday?' vandaag':''}"><div class="med-dag-naam">${dagNamen[i]}</div><div class="med-dag-num">${d.getDate()}</div></div>
+      <div class="med-dag-items">${dagMeds.length?dagMeds.map(m=>`<div class="med-pill" onclick="openMedModal('${m.id}')"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.titel}</span><button class="med-pill-del" onclick="event.stopPropagation();deleteMed('${m.id}')">×</button></div>`).join(''):'<div class="med-geen">–</div>'}</div>
     </div>`;
   }).join('');
-
   let html=`<div class="med-week">${weekGrid}</div>`;
-
   if(medsZonderDatum.length){
-    html+=`<div class="med-zonder-datum">
-      <div class="med-zonder-titel">Zonder datum</div>
-      <div style="display:flex;flex-direction:column;gap:5px">
-        ${medsZonderDatum.map(m=>`<div class="med-item" style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-          <div style="flex:1;min-width:0">
-            <div class="med-titel">${m.titel}</div>
-            ${m.beschrijving?`<div class="med-beschr">${m.beschrijving}</div>`:''}
-          </div>
-          <div class="med-actions">
-            <button class="btn-edit" onclick="openMedModal('${m.id}')">Bewerk</button>
-            <button class="btn-del" onclick="deleteMed('${m.id}')">×</button>
-          </div>
-        </div>`).join('')}
-      </div>
-    </div>`;
+    html+=`<div class="med-zonder-datum"><div class="med-zonder-titel">Zonder datum</div>${medsZonderDatum.map(m=>`<div class="med-item-row"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500">${m.titel}</div>${m.beschrijving?`<div style="font-size:10px;color:var(--muted)">${m.beschrijving}</div>`:''}</div><div class="bi-actions"><button class="btn-edit" onclick="openMedModal('${m.id}')">Bewerk</button><button class="btn-danger-sm" onclick="deleteMed('${m.id}')">×</button></div></div>`).join('')}</div>`;
   }
-
   document.getElementById('medList').innerHTML=html;
 }
-
 function openMedModal(id=null){
   editMedId=id;
   document.getElementById('medModalTitle').textContent=id?'Mededeling bewerken':'Nieuwe mededeling';
-  if(id){
-    sbGet(`mededelingen?id=eq.${id}`).then(([m])=>{
-      document.getElementById('fMedTitel').value=m.titel||'';
-      document.getElementById('fMedDatum').value=m.datum||'';
-      document.getElementById('fMedBeschr').value=m.beschrijving||'';
-    });
-  }else{
-    document.getElementById('fMedTitel').value='';
-    document.getElementById('fMedDatum').value='';
-    document.getElementById('fMedBeschr').value='';
-  }
+  if(id){sbGet(`mededelingen?id=eq.${id}`).then(([m])=>{document.getElementById('fMedTitel').value=m.titel||'';document.getElementById('fMedDatum').value=m.datum||'';document.getElementById('fMedBeschr').value=m.beschrijving||'';});}
+  else{document.getElementById('fMedTitel').value='';document.getElementById('fMedDatum').value='';document.getElementById('fMedBeschr').value='';}
   document.getElementById('medOverlay').classList.add('open');
 }
 function closeMedModal(){document.getElementById('medOverlay').classList.remove('open');}
-
 async function saveMededeling(){
   const titel=document.getElementById('fMedTitel').value.trim();
   const datum=document.getElementById('fMedDatum').value||null;
   const beschrijving=document.getElementById('fMedBeschr').value.trim();
   if(!titel){alert('Vul een titel in.');return;}
   document.getElementById('medSavingMsg').style.display='inline';
-  if(editMedId){
-    await sbPatch(`mededelingen?id=eq.${editMedId}`,{titel,datum,beschrijving});
-  }else{
-    await sbPost('mededelingen',{titel,datum,beschrijving});
-  }
+  if(editMedId)await sbPatch(`mededelingen?id=eq.${editMedId}`,{titel,datum,beschrijving});
+  else await sbPost('mededelingen',{titel,datum,beschrijving});
   document.getElementById('medSavingMsg').style.display='none';
   closeMedModal();
   const meds=await sbGet('mededelingen?select=*&order=datum.asc,aangemaakt_op.asc');
   renderMededelingen(meds);
 }
-
 async function deleteMed(id){
   if(!confirm('Mededeling verwijderen?'))return;
   await sbDelete(`mededelingen?id=eq.${id}`);
@@ -954,112 +984,95 @@ async function deleteMed(id){
   renderMededelingen(meds);
 }
 
-function openDetail(id){
-  const k=KLUSSEN.find(x=>x.id===id);if(!k)return;
-  const fmtT=t=>t?t.slice(0,5).replace(':','.'):'';
-  const v=fmtT(k.vertrek_tijd),e=fmtT(k.eind_tijd);
-  const tijden=v&&e?`${v} – ${e}`:v||e;
-  const ds=new Date(k.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const soort=SOORTEN.find(s=>s.titel===k.food);
-
-  document.getElementById('detailNaam').textContent=k.naam||k.food||'Klus';
-  document.getElementById('detailTijd').textContent=tijden||'–';
-  document.getElementById('detailDatum').textContent=ds;
-  document.getElementById('detailTrucks').innerHTML=k.trucks.map(t=>`<span class="bdg" style="background:${hbg(t.color)};color:${t.color}">${t.label}</span>`).join('');
-  document.getElementById('detailPersonen').textContent=k.personen+' personen';
-
-  const soortEl=document.getElementById('detailSoort');
-  soortEl.innerHTML=k.food?`<span style="font-size:13px;font-weight:500;color:var(--text)">${k.food}</span>${soort&&soort.beschrijving?`<span style="font-size:12px;color:var(--muted)">${soort.beschrijving}</span>`:'`'}`:'–';
-
-  const persSection=document.getElementById('detailPersSection');
-  persSection.style.display=k.personeel.length?'':'none';
-  document.getElementById('detailPers').textContent=k.personeel.map(p=>p.naam).join(', ');
-
-  const adresSection=document.getElementById('detailAdresSection');
-  adresSection.style.display=k.adres?'':'none';
-  document.getElementById('detailAdres').textContent=k.adres||'';
-
-  const contactSection=document.getElementById('detailContactSection');
-  contactSection.style.display=(k.contactpersoon||k.telefoon)?'':'none';
-  document.getElementById('detailContact').textContent=k.contactpersoon||'';
-  const telEl=document.getElementById('detailTelefoon');
-  telEl.style.display=k.telefoon?'':'none';
-  telEl.innerHTML=k.telefoon?`<a href="tel:${k.telefoon}" style="color:#2563EB;text-decoration:none">${k.telefoon}</a>`:'';
-
-  const notitieSection=document.getElementById('detailNotitieSection');
-  notitieSection.style.display=k.notitie?'':'none';
-  document.getElementById('detailNotitie').textContent=k.notitie;
-
-  const pdfSection=document.getElementById('detailPdfSection');
-  pdfSection.style.display=k.pdfs&&k.pdfs.length?'':'none';
-  document.getElementById('detailPdfs').innerHTML=k.pdfs?k.pdfs.map(p=>`<span class="detail-pdf-link" onclick="openPdf(\`${p.url}\`,\`${p.naam}\`)">${p.naam}</span>`).join(''):'';
-
-  document.getElementById('detailEditBtn').onclick=()=>{closeDetail();editKlus(id);};
-  document.getElementById('detailOverlay').classList.add('open');
-}
-function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');}
-async function deleteKlus(id){
-  if(!confirm('Weet je zeker dat je deze klus wilt verwijderen?'))return;
-  await sbDelete(`klussen?id=eq.${id}`);await loadAll();
-}
-
+// ── BEHEER ──
 function renderBeheer(){
-  document.getElementById('truckBeheer').innerHTML=TRUCKS.map(t=>`<div class="bi">
+  document.getElementById('truckBeheer').innerHTML=TRUCKS.map(t=>`<div class="bi" id="tb-${t.id}">
     <div class="bi-left"><div class="bi-name"><div class="cswatch" style="background:${t.color}"></div>${t.label}</div></div>
-    <button class="btn-danger-sm" onclick="deleteTruck('${t.id}')">×</button>
+    <div class="bi-actions"><button class="btn-edit" onclick="startEditTruck('${t.id}')">Bewerk</button><button class="btn-danger-sm" onclick="deleteTruck('${t.id}')">×</button></div>
   </div>`).join('');
-  document.getElementById('personeelBeheer').innerHTML=PERSONEEL.map(p=>`<div class="bi">
+  document.getElementById('personeelBeheer').innerHTML=PERSONEEL.map(p=>`<div class="bi" id="pb-${p.id}">
     <div class="bi-left"><div class="bi-name">${p.naam}</div></div>
-    <button class="btn-danger-sm" onclick="deletePersoneel('${p.id}')">×</button>
+    <div class="bi-actions"><button class="btn-edit" onclick="startEditPers('${p.id}')">Bewerk</button><button class="btn-danger-sm" onclick="deletePersoneel('${p.id}')">×</button></div>
   </div>`).join('');
-  document.getElementById('soortenBeheer').innerHTML=SOORTEN.map(s=>`<div class="bi">
-    <div class="bi-left">
-      <div class="bi-name">${s.titel}</div>
-      ${s.beschrijving?`<div class="bi-desc">${s.beschrijving}</div>`:''}
-    </div>
-    <button class="btn-danger-sm" onclick="deleteSoort('${s.id}')">×</button>
+  document.getElementById('soortenBeheer').innerHTML=SOORTEN.map(s=>`<div class="bi" id="sb-${s.id}">
+    <div class="bi-left"><div class="bi-name">${s.titel}</div>${s.beschrijving?`<div class="bi-desc">${s.beschrijving}</div>`:''}</div>
+    <div class="bi-actions"><button class="btn-edit" onclick="startEditSoort('${s.id}')">Bewerk</button><button class="btn-danger-sm" onclick="deleteSoort('${s.id}')">×</button></div>
   </div>`).join('');
 }
 
-async function addTruck(){
-  const label=document.getElementById('newTruckName').value.trim();
-  const color=document.getElementById('newTruckColor').value;
+// Inline bewerken
+function startEditTruck(id){
+  const t=TRUCKS.find(x=>x.id===id);
+  document.getElementById('tb-'+id).innerHTML=`<div style="flex:1">
+    <div class="bi-edit-form">
+      <div class="bi-edit-row"><input type="color" id="ec-${id}" value="${t.color}" style="width:32px;height:32px;border:1px solid var(--border);border-radius:5px;cursor:pointer;padding:1px"><input type="text" id="en-${id}" value="${t.label}" style="flex:1"></div>
+      <div class="bi-edit-row" style="justify-content:flex-end"><button class="btn-danger-sm" onclick="renderBeheer()">Annuleer</button><button class="btn-sm" onclick="saveTruck('${id}')">Opslaan</button></div>
+    </div>
+  </div>`;
+}
+async function saveTruck(id){
+  const label=document.getElementById('en-'+id).value.trim();
+  const color=document.getElementById('ec-'+id).value;
   if(!label)return;
-  await sbPost('trucks',{label,color,volgorde:TRUCKS.length+1});
-  document.getElementById('newTruckName').value='';
+  await sbPatch(`trucks?id=eq.${id}`,{label,color});
   await loadAll();renderBeheer();
+}
+async function addTruck(){
+  const label=document.getElementById('newTruckName').value.trim();const color=document.getElementById('newTruckColor').value;
+  if(!label)return;await sbPost('trucks',{label,color,volgorde:TRUCKS.length+1});
+  document.getElementById('newTruckName').value='';await loadAll();renderBeheer();
 }
 async function deleteTruck(id){
   if(!confirm('Truck verwijderen?'))return;
-  await sbDelete(`klus_trucks?truck_id=eq.${id}`);
-  await sbDelete(`trucks?id=eq.${id}`);
+  await sbDelete(`klus_trucks?truck_id=eq.${id}`);await sbDelete(`klus_truck_soorten?truck_id=eq.${id}`);await sbDelete(`trucks?id=eq.${id}`);
   await loadAll();renderBeheer();
 }
+
+function startEditPers(id){
+  const p=PERSONEEL.find(x=>x.id===id);
+  document.getElementById('pb-'+id).innerHTML=`<div style="flex:1">
+    <div class="bi-edit-form">
+      <input type="text" id="ep-${id}" value="${p.naam}">
+      <div class="bi-edit-row" style="justify-content:flex-end"><button class="btn-danger-sm" onclick="renderBeheer()">Annuleer</button><button class="btn-sm" onclick="savePers('${id}')">Opslaan</button></div>
+    </div>
+  </div>`;
+}
+async function savePers(id){
+  const naam=document.getElementById('ep-'+id).value.trim();if(!naam)return;
+  await sbPatch(`personeel?id=eq.${id}`,{naam});await loadAll();renderBeheer();
+}
 async function addPersoneelLid(){
-  const naam=document.getElementById('newPersNaam').value.trim();
-  if(!naam)return;
-  await sbPost('personeel',{naam});
-  document.getElementById('newPersNaam').value='';
-  await loadAll();renderBeheer();
+  const naam=document.getElementById('newPersNaam').value.trim();if(!naam)return;
+  await sbPost('personeel',{naam});document.getElementById('newPersNaam').value='';await loadAll();renderBeheer();
 }
 async function deletePersoneel(id){
   if(!confirm('Personeelslid verwijderen?'))return;
-  await sbDelete(`klus_personeel?personeel_id=eq.${id}`);
-  await sbDelete(`personeel?id=eq.${id}`);
-  await loadAll();renderBeheer();
+  await sbDelete(`klus_personeel?personeel_id=eq.${id}`);await sbDelete(`personeel?id=eq.${id}`);await loadAll();renderBeheer();
+}
+
+function startEditSoort(id){
+  const s=SOORTEN.find(x=>x.id===id);
+  document.getElementById('sb-'+id).innerHTML=`<div style="flex:1">
+    <div class="bi-edit-form">
+      <input type="text" id="est-${id}" value="${s.titel}" placeholder="Titel">
+      <textarea id="esb-${id}" placeholder="Beschrijving">${s.beschrijving||''}</textarea>
+      <div class="bi-edit-row" style="justify-content:flex-end"><button class="btn-danger-sm" onclick="renderBeheer()">Annuleer</button><button class="btn-sm" onclick="saveSoort('${id}')">Opslaan</button></div>
+    </div>
+  </div>`;
+}
+async function saveSoort(id){
+  const titel=document.getElementById('est-'+id).value.trim();
+  const beschrijving=document.getElementById('esb-'+id).value.trim();
+  if(!titel)return;await sbPatch(`soorten?id=eq.${id}`,{titel,beschrijving});await loadAll();renderBeheer();
 }
 async function addSoort(){
-  const titel=document.getElementById('newSoortTitel').value.trim();
-  const beschrijving=document.getElementById('newSoortBeschr').value.trim();
-  if(!titel)return;
-  await sbPost('soorten',{titel,beschrijving,volgorde:SOORTEN.length+1});
-  document.getElementById('newSoortTitel').value='';
-  document.getElementById('newSoortBeschr').value='';
-  await loadAll();renderBeheer();
+  const titel=document.getElementById('newSoortTitel').value.trim();const beschrijving=document.getElementById('newSoortBeschr').value.trim();
+  if(!titel)return;await sbPost('soorten',{titel,beschrijving,volgorde:SOORTEN.length+1});
+  document.getElementById('newSoortTitel').value='';document.getElementById('newSoortBeschr').value='';await loadAll();renderBeheer();
 }
 async function deleteSoort(id){
   if(!confirm('Soort verwijderen?'))return;
-  await sbDelete(`soorten?id=eq.${id}`);
+  await sbDelete(`klus_soorten?soort_id=eq.${id}`);await sbDelete(`klus_truck_soorten?soort_id=eq.${id}`);await sbDelete(`soorten?id=eq.${id}`);
   await loadAll();renderBeheer();
 }
 </script>

@@ -36,10 +36,11 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 
 /* Legenda op mobiel: horizontale chips */
 .lgd{margin-top:.875rem}
-.lgd-inner{display:flex;flex-wrap:wrap;gap:6px;margin-top:.4rem}
-.lgr-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;padding:5px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg);-webkit-tap-highlight-color:transparent}
-.lgr-btn:active{background:var(--surface)}
-.lgr-btn.pers{background:var(--surface)}
+.lgd-inner{display:flex;flex-direction:column;gap:3px;margin-top:.4rem}
+.lgr-btn{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);cursor:pointer;padding:6px 8px;border-radius:7px;background:transparent;border:none;text-align:left;width:100%;font-family:var(--font);-webkit-tap-highlight-color:transparent}
+.lgr-btn:active{background:var(--bg)}
+.lgr-btn:hover{background:var(--bg);color:var(--text)}
+.lgr-btn.pers{background:transparent}
 .ls{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 
 /* Section cards */
@@ -165,8 +166,8 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
   .layout{display:grid;grid-template-columns:240px 1fr;height:calc(100vh - 56px);flex-direction:unset}
   .sidebar{border-bottom:none;border-right:1px solid var(--border);padding:1.25rem;overflow-y:auto;height:100%}
   .main{padding:1.5rem;overflow-y:auto;height:100%;gap:1.25rem}
-  .lgd-inner{flex-direction:column;gap:5px}
-  .lgr-btn{border:none;background:transparent;padding:4px 6px;border-radius:6px;font-size:12px}
+  .lgd-inner{flex-direction:column;gap:3px}
+  .lgr-btn{padding:6px 8px;border-radius:7px;font-size:12px;border:none;background:transparent}
   .lgr-btn:hover{background:var(--bg);color:var(--text)}
   .tl-scroll{overflow-x:visible}
   .tl-inner{min-width:unset}
@@ -353,6 +354,20 @@ function toggleDate(ds){selDate=ds===selDate?null:ds;render(cachedTrucks,cachedK
 function clearSel(){selDate=null;render(cachedTrucks,cachedKlussen,cachedSoorten);}
 function toggleSoortDesc(id){const el=document.getElementById('sd-'+id);if(el)el.classList.toggle('open');}
 
+function filterPers(){
+  const q=(document.getElementById('persZoek')?.value||'').toLowerCase();
+  document.querySelectorAll('#persLijst .lgr-btn').forEach(el=>{
+    el.style.display=el.dataset.naam.includes(q)?'':'none';
+  });
+}
+
+function filterTrucks(){
+  const q=(document.getElementById('truckZoek')?.value||'').toLowerCase();
+  document.querySelectorAll('#truckLijst .lgr-btn').forEach(el=>{
+    el.style.display=el.dataset.naam.includes(q)?'':'none';
+  });
+}
+
 let medWeekOffset=0;
 let allMededelingen=[];
 const dagNamen=['Ma','Di','Wo','Do','Vr','Za','Zo'];
@@ -432,7 +447,7 @@ function hbg(hex){return hex+'18'}
 
 async function init(){
   try{
-    const [trucks,personeel,klussen,klusTrucks,klusPersoneel,klusPdfs,soorten,mededelingen]=await Promise.all([
+    const [trucks,personeel,klussen,klusTrucks,klusPersoneel,klusPdfs,soorten,mededelingen,klusSoorten]=await Promise.all([
       get('trucks?select=*&order=volgorde'),
       get('personeel?select=*&order=naam'),
       get('klussen?select=*&order=datum'),
@@ -441,14 +456,17 @@ async function init(){
       get('klus_pdfs?select=*'),
       get('soorten?select=*&order=volgorde'),
       get('mededelingen?select=*&order=datum.asc,aangemaakt_op.asc'),
+      get('klus_soorten?select=*'),
     ]);
     const tMap=Object.fromEntries(trucks.map(t=>[t.id,t]));
     const pMap=Object.fromEntries(personeel.map(p=>[p.id,p]));
+    const sMap=Object.fromEntries(soorten.map(s=>[s.id,s]));
     const enriched=klussen.map(k=>({
       ...k,
       trucks:klusTrucks.filter(x=>x.klus_id===k.id).map(x=>tMap[x.truck_id]).filter(Boolean),
       personeel:klusPersoneel.filter(x=>x.klus_id===k.id).map(x=>pMap[x.personeel_id]).filter(Boolean),
       pdfs:klusPdfs.filter(x=>x.klus_id===k.id),
+      soorten:klusSoorten.filter(x=>x.klus_id===k.id).map(x=>sMap[x.soort_id]).filter(Boolean),
     }));
     cachedTrucks=trucks;cachedKlussen=enriched;cachedSoorten=soorten;cachedPersoneel=personeel;
     renderMededelingen(mededelingen);
@@ -461,7 +479,12 @@ async function init(){
 function render(trucks,klussen,soorten){
   const days=getWeekDates();
   const busyMap={};
-  klussen.forEach(k=>{if(!busyMap[k.datum])busyMap[k.datum]=new Set();k.trucks.forEach(t=>busyMap[k.datum].add(t.id));});
+  function klusDagen(k){
+    const r=[];const s=new Date(k.datum);const e=k.datum_eind?new Date(k.datum_eind):new Date(k.datum);
+    for(let d=new Date(s);d<=e;d.setDate(d.getDate()+1))r.push(fmt(new Date(d)));
+    return r;
+  }
+  klussen.forEach(k=>{klusDagen(k).forEach(ds=>{if(!busyMap[ds])busyMap[ds]=new Set();k.trucks.forEach(t=>busyMap[ds].add(t.id));});});
 
   const first=days[0],last=days[13],opts={day:'numeric',month:'short'};
   const wl=document.getElementById('weekLabel');
@@ -471,13 +494,19 @@ function render(trucks,klussen,soorten){
   document.getElementById('legenda').innerHTML=
     `<div class="lgd-inner">
       <div class="slabel" style="margin-top:.75rem">Trucks</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${trucks.map(t=>`<div class="lgr-btn" onclick="openPlan('truck','${t.id}')"><div class="ls" style="background:${t.color}"></div>${t.label}</div>`).join('')}
+      <div style="position:relative;margin-top:.3rem;margin-bottom:.25rem">
+        <input type="text" id="truckZoek" placeholder="Zoeken..." oninput="filterTrucks()" style="width:100%;font-size:12px;padding:6px 8px 6px 28px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-family:var(--font)">
+        <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted)">&#128269;</span>
       </div>
-      <div class="slabel" style="margin-top:.75rem">Personeel</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${cachedPersoneel.map(p=>`<div class="lgr-btn pers" onclick="openPlan('pers','${p.id}')">${p.naam}</div>`).join('')}
+      <div id="truckLijst">${trucks.map(t=>`<div class="lgr-btn" data-naam="${t.label.toLowerCase()}" onclick="openPlan('truck','${t.id}')"><div class="ls" style="background:${t.color}"></div>${t.label}</div>`).join('')}</div>
+      <div style="margin-top:.75rem;display:flex;align-items:center;justify-content:space-between">
+        <div class="slabel" style="margin:0">Personeel</div>
       </div>
+      <div style="position:relative;margin-top:.4rem">
+        <input type="text" id="persZoek" placeholder="Zoeken..." oninput="filterPers()" style="width:100%;font-size:12px;padding:6px 8px 6px 28px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-family:var(--font)">
+        <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted)">&#128269;</span>
+      </div>
+      <div id="persLijst">${cachedPersoneel.map(p=>`<div class="lgr-btn pers" data-naam="${p.naam.toLowerCase()}" onclick="openPlan('pers','${p.id}')">${p.naam}</div>`).join('')}</div>
     </div>`;
 
   // Kalender
@@ -495,7 +524,7 @@ function render(trucks,klussen,soorten){
   document.getElementById('tlRows').innerHTML=trucks.map(tr=>`<div class="tl-row">
     <div class="tl-name" title="${tr.label}">${tr.label}</div>
     <div class="tl-cells">${days.map(d=>{
-      const ds=fmt(d);const busy=klussen.some(k=>k.datum===ds&&k.trucks.some(t=>t.id===tr.id));
+      const ds=fmt(d);const busy=klussen.some(k=>klusDagen(k).includes(ds)&&k.trucks.some(t=>t.id===tr.id));
       return`<div class="tc${busy?' busy':''}${ds===todayStr?' tod-col':''}${ds===selDate?' sel-col':''}" onclick="toggleDate('${ds}')" style="${busy?`background:${hbg(tr.color)};border-color:${tr.color}`:''}" title="${tr.label} — ${busy?'bezet':'vrij'}"></div>`;
     }).join('')}</div>
   </div>`).join('');
@@ -511,7 +540,7 @@ function render(trucks,klussen,soorten){
   else{cb.className='conflict';}
 
   // Klussen
-  const filtered=selDate?klussen.filter(k=>k.datum===selDate):klussen;
+  const filtered=selDate?klussen.filter(k=>klusDagen(k).includes(selDate)):klussen;
   const klTitle=document.getElementById('klTitle');
   const btnCl=document.getElementById('btnCl');
   if(klTitle)klTitle.textContent=selDate?new Date(selDate).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'}):'Alle klussen';
@@ -520,19 +549,22 @@ function render(trucks,klussen,soorten){
   const sorted=[...filtered].sort((a,b)=>a.datum.localeCompare(b.datum));
   document.getElementById('klusList').innerHTML=sorted.length===0?'<div class="empty">Geen klussen gepland</div>':sorted.map((k,ki)=>{
     const ds=new Date(k.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});
+    const dsEind=k.datum_eind?new Date(k.datum_eind).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'}):'';
+    const datumStr=dsEind&&dsEind!==ds?`${ds} – ${dsEind}`:ds;
     const tB=k.trucks.map(t=>`<span class="bdg" style="background:${hbg(t.color)};color:${t.color}">${t.label}</span>`).join('');
-    const soort=soorten.find(s=>s.titel===k.food);
-    const heeftDesc=soort&&soort.beschrijving;
+    const kSoorten=k.soorten&&k.soorten.length?k.soorten:k.food?[{titel:k.food,beschrijving:''}]:[];
     const fmtT=t=>t?t.slice(0,5).replace(':','.'):'';
     const tv=fmtT(k.vertrek_tijd),te=fmtT(k.eind_tijd);
     const tijden=tv&&te?`${tv} – ${te}`:tv||te;
-    const soortHtml=k.food?`<span class="soort-wrap">
-      <span class="bdg" style="background:#F5F3FF;color:#4C1D95">${k.food}</span>
-      ${heeftDesc?`<button class="soort-toggle" onclick="event.stopPropagation();toggleSoortDesc('${ki}')">&#9660;</button>`:''}
-    </span>
-    ${heeftDesc?`<div class="soort-desc" id="sd-${ki}">${soort.beschrijving}</div>`:''}`:'' ;
+    const soortHtml=kSoorten.length?kSoorten.map((s,si)=>{
+      const hasDesc=s.beschrijving;
+      return`<span class="soort-wrap">
+        <span class="bdg" style="background:#F5F3FF;color:#4C1D95">${s.titel}</span>
+        ${hasDesc?`<button class="soort-toggle" onclick="event.stopPropagation();toggleSoortDesc('${ki}-${si}')">&#9660;</button>`:''}
+      </span>${hasDesc?`<div class="soort-desc" id="sd-${ki}-${si}">${s.beschrijving}</div>`:''}`;
+    }).join(''):'';
     return`<div class="kc" onclick="openDetail('${k.id}')">
-      <div class="kdate">${ds}</div>
+      <div class="kdate">${datumStr}</div>
       ${tijden?`<div class="ktijd">${tijden}</div>`:''}
       ${k.naam?`<div class="knaam">${k.naam}</div>`:''}
       <div class="ktrucks">${tB}</div>
@@ -548,16 +580,19 @@ function openDetail(id){
   const v=fmtT(k.vertrek_tijd),e=fmtT(k.eind_tijd);
   const tijden=v&&e?`${v} – ${e}`:v||e;
   const ds=new Date(k.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const dsEind=k.datum_eind?new Date(k.datum_eind).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
+  const datumStr=dsEind&&dsEind!==ds?`${ds} – ${dsEind}`:ds;
   const soort=cachedSoorten.find(s=>s.titel===k.food);
 
   document.getElementById('detailNaam').textContent=k.naam||k.food||'Klus';
   document.getElementById('detailTijd').textContent=tijden||'–';
-  document.getElementById('detailDatum').textContent=ds;
+  document.getElementById('detailDatum').textContent=datumStr;
   document.getElementById('detailTrucks').innerHTML=k.trucks.map(t=>`<span class="bdg" style="background:${hbg(t.color)};color:${t.color}">${t.label}</span>`).join('');
   document.getElementById('detailPersonen').textContent=k.personen+' personen';
 
   const soortEl=document.getElementById('detailSoort');
-  soortEl.innerHTML=k.food?`<span style="font-size:14px;font-weight:500;color:var(--text)">${k.food}</span>${soort&&soort.beschrijving?`<span style="font-size:12px;color:var(--muted);margin-top:2px;display:block">${soort.beschrijving}</span>`:''}`:'–';
+  const kSoorten=k.soorten&&k.soorten.length?k.soorten:k.food?[{titel:k.food,beschrijving:''}]:[];
+  soortEl.innerHTML=kSoorten.length?kSoorten.map(s=>`<div style="margin-bottom:3px"><span style="font-size:14px;font-weight:500;color:var(--text)">${s.titel}</span>${s.beschrijving?`<span style="font-size:12px;color:var(--muted);display:block;margin-top:1px">${s.beschrijving}</span>`:''}</div>`).join(''):'–';
 
   const adresSection=document.getElementById('detailAdresSection');
   adresSection.style.display=k.adres?'':'none';
