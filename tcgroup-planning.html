@@ -119,7 +119,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 
 /* Beheer */
 .beheer-wrap{padding:2rem;max-width:1000px;margin:0 auto}
-.beheer-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
+.beheer-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
 .bc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
 .bt{font-size:14px;font-weight:600;margin-bottom:1rem}
 .bl{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;max-height:280px;overflow-y:auto}
@@ -377,10 +377,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
         <div class="bc"><div class="bt">Trucks</div><div class="bl" id="truckBeheer"></div>
           <div class="add-form"><div class="add-form-row"><input type="color" id="newTruckColor" value="#2563EB"><input type="text" id="newTruckName" placeholder="Naam truck" style="flex:1"></div><button class="btn-sm" onclick="addTruck()">Toevoegen</button></div>
         </div>
-        <div class="bc"><div class="bt">Personeel</div><div class="bl" id="personeelBeheer"></div>
-          <div class="add-form"><input type="text" id="newPersNaam" placeholder="Naam personeelslid"><button class="btn-sm" onclick="addPersoneelLid()">Toevoegen</button></div>
-        </div>
-        <div class="bc"><div class="bt">Soorten</div><div class="bl" id="soortenBeheer"></div>
+      <div class="bc"><div class="bt">Soorten</div><div class="bl" id="soortenBeheer"></div>
           <div class="add-form"><input type="text" id="newSoortTitel" placeholder="Titel (bv. BBQ)"><textarea id="newSoortBeschr" placeholder="Beschrijving (optioneel)"></textarea><button class="btn-sm" onclick="addSoort()">Toevoegen</button></div>
         </div>
       </div>
@@ -689,14 +686,14 @@ let BESCHIKBAARHEID=[];
 async function loadAll(){
   const [
     {data:trucks},{data:personeel},{data:klussen},{data:klusTrucks},
-    {data:klusPers},{data:klusPdfs},{data:soorten},{data:meds},
+    {data:klusGebruikers},{data:klusPdfs},{data:soorten},{data:meds},
     {data:klusSoorten},{data:klusTruckSoorten},{data:beschData}
   ]=await Promise.all([
     sb.from('trucks').select('*').order('volgorde'),
-    sb.from('personeel').select('*').order('naam'),
+    sb.from('gebruikers').select('id,naam,rol').eq('rol','personeel').order('naam'),
     sb.from('klussen').select('*').order('datum'),
     sb.from('klus_trucks').select('*'),
-    sb.from('klus_personeel').select('*'),
+    sb.from('klus_gebruikers').select('*'),
     sb.from('klus_pdfs').select('*'),
     sb.from('soorten').select('*').order('volgorde'),
     sb.from('mededelingen').select('*').order('datum',{ascending:true}).order('aangemaakt_op',{ascending:true}),
@@ -712,7 +709,7 @@ async function loadAll(){
   KLUSSEN=(klussen||[]).map(k=>({
     ...k,
     trucks:(klusTrucks||[]).filter(x=>x.klus_id===k.id).map(x=>tMap[x.truck_id]).filter(Boolean),
-    personeel:(klusPers||[]).filter(x=>x.klus_id===k.id).map(x=>pMap[x.personeel_id]).filter(Boolean),
+    personeel:(klusGebruikers||[]).filter(x=>x.klus_id===k.id).map(x=>pMap[x.gebruiker_id]).filter(Boolean),
     pdfs:(klusPdfs||[]).filter(x=>x.klus_id===k.id),
     soorten:(klusSoorten||[]).filter(x=>x.klus_id===k.id).map(x=>sMap[x.soort_id]).filter(Boolean),
     truckSoorten:(klusTruckSoorten||[]).filter(x=>x.klus_id===k.id).map(x=>({truck:tMap[x.truck_id],soort:sMap[x.soort_id]})).filter(x=>x.truck&&x.soort),
@@ -843,7 +840,10 @@ function openPlan(type,id){
 function getBezette(datum){
   if(!datum)return{trucks:[],pers:[]};
   const andere=KLUSSEN.filter(k=>k.id!==editId&&klusDagen(k).includes(datum));
-  return{trucks:andere.flatMap(k=>k.trucks.map(t=>t.id)),pers:andere.flatMap(k=>k.personeel.map(p=>p.id))};
+  return{
+    trucks:andere.flatMap(k=>k.trucks.map(t=>t.id)),
+    pers:andere.flatMap(k=>k.personeel.map(p=>p.id)),
+  };
 }
 function renderTruckChips(bezette){
   const tc=document.getElementById('truckChips');if(!tc)return;
@@ -856,12 +856,13 @@ function renderPersChips(bezette){
   pc.innerHTML=PERSONEEL.map(p=>{
     const on=formPers.includes(p.id);
     const warn=bezette.includes(p.id)&&!on;
-    // Check goedgekeurde onbeschikbaarheid — koppel via gebruikers.personeel_id
-    const onbesch=datum&&BESCHIKBAARHEID.some(b=>b.personeel_id===p.id&&b.datum_start<=datum&&b.datum_eind>=datum);
-    const cls='chip'+(on?' on':'')+(warn?' warn':'')+(onbesch&&!on?' warn':'');
-    const title=warn?'Al ingepland':onbesch?'Niet beschikbaar op deze dag':'';
-    const icon=warn?' ⚠':onbesch?' 🚫':'';
-    return`<div class="${cls}" onclick="togglePers('${p.id}')" title="${title}">${p.naam}${icon}</div>`;
+    const onbesch=datum&&BESCHIKBAARHEID.some(b=>b.gebruiker_id===p.id&&b.datum_start<=datum&&b.datum_eind>=datum);
+    if(onbesch&&!on){
+      return`<div class="chip" style="opacity:.45;cursor:not-allowed;border-color:#FECACA;background:#FEF2F2;color:#991B1B" title="Niet beschikbaar op deze dag">${p.naam} 🚫</div>`;
+    }
+    const cls='chip'+(on?' on':'')+(warn?' warn':'');
+    const title=warn?'Al ingepland op deze dag':'';
+    return`<div class="${cls}" onclick="togglePers('${p.id}')" title="${title}">${p.naam}${warn?' ⚠':''}</div>`;
   }).join('');
 }
 function renderTruckSoortBlocks(){
@@ -986,7 +987,7 @@ async function saveKlus(){
     if(editId){
       await sb.from('klussen').update({naam,datum,datum_eind,vertrek_tijd,start_opbouw,start_feest,einde_feest,personen,food:foodLabel,notitie,adres,contactpersoon,telefoon}).eq('id',editId);
       await sb.from('klus_trucks').delete().eq('klus_id',editId);
-      await sb.from('klus_personeel').delete().eq('klus_id',editId);
+      await sb.from('klus_gebruikers').delete().eq('klus_id',editId);
       await sb.from('klus_soorten').delete().eq('klus_id',editId);
       await sb.from('klus_truck_soorten').delete().eq('klus_id',editId);
       const removedPdfs=KLUSSEN.find(k=>k.id===editId)?.pdfs.filter(p=>!existingPdfs.find(e=>e.id===p.id)).map(p=>p.id)||[];
@@ -996,7 +997,7 @@ async function saveKlus(){
       klusId=data[0].id;
     }
     if(formTrucks.length)await sb.from('klus_trucks').insert(formTrucks.map(tid=>({klus_id:klusId,truck_id:tid})));
-    if(formPers.length)await sb.from('klus_personeel').insert(formPers.map(pid=>({klus_id:klusId,personeel_id:pid})));
+    if(formPers.length)await sb.from('klus_gebruikers').insert(formPers.map(gid=>({klus_id:klusId,gebruiker_id:gid})));
     if(allSoortIds.length)await sb.from('klus_soorten').insert(allSoortIds.map(sid=>({klus_id:klusId,soort_id:sid})));
     const truckSoortRows=[];
     Object.entries(formTruckSoorten).forEach(([tid,sids])=>sids.forEach(sid=>truckSoortRows.push({klus_id:klusId,truck_id:tid,soort_id:sid})));
@@ -1116,7 +1117,6 @@ async function deleteMed(id){
 // ── BEHEER ──
 function renderBeheer(){
   document.getElementById('truckBeheer').innerHTML=TRUCKS.map(t=>`<div class="bi" id="tb-${t.id}"><div class="bi-left"><div class="bi-name"><div class="cswatch" style="background:${t.color}"></div>${t.label}</div></div><div class="bi-actions"><button class="btn-edit" onclick="startEditTruck('${t.id}')">Bewerk</button><button class="btn-danger-sm" onclick="deleteTruck('${t.id}')">×</button></div></div>`).join('');
-  document.getElementById('personeelBeheer').innerHTML=PERSONEEL.map(p=>`<div class="bi" id="pb-${p.id}"><div class="bi-left"><div class="bi-name">${p.naam}</div></div><div class="bi-actions"><button class="btn-edit" onclick="startEditPers('${p.id}')">Bewerk</button><button class="btn-danger-sm" onclick="deletePersoneel('${p.id}')">×</button></div></div>`).join('');
   document.getElementById('soortenBeheer').innerHTML=SOORTEN.map(s=>`<div class="bi" id="sb-${s.id}"><div class="bi-left"><div class="bi-name">${s.titel}</div>${s.beschrijving?`<div class="bi-desc">${s.beschrijving}</div>`:''}</div><div class="bi-actions"><button class="btn-edit" onclick="startEditSoort('${s.id}')">Bewerk</button><button class="btn-danger-sm" onclick="deleteSoort('${s.id}')">×</button></div></div>`).join('');
 }
 function startEditTruck(id){
@@ -1146,16 +1146,35 @@ async function loadAccounts(){
   const{data}=await sb.from('gebruikers').select('*').order('naam');
   const acc=document.getElementById('accList');
   if(!data||!data.length){acc.innerHTML='<div class="empty">Geen accounts gevonden</div>';return;}
-  acc.innerHTML=data.map(u=>`<div class="acc-item">
+  acc.innerHTML=data.map(u=>`<div class="acc-item" id="ac-${u.id}">
     <div class="acc-info">
       <div class="acc-naam">${u.naam||'–'}</div>
+      <div class="acc-email" style="font-size:10px;color:var(--muted)">${u.rol}</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <span class="acc-rol ${u.rol}">${u.rol}</span>
-      ${u.rol==='personeel'?`<button class="btn-sm" style="padding:4px 9px;font-size:10px" onclick="maakBeheerder('${u.id}')">Maak beheerder</button>`:''}
+      <button class="btn-edit" onclick="startEditAccount('${u.id}')">Bewerk</button>
+      ${u.rol==='personeel'?`<button class="btn-sm" style="padding:4px 9px;font-size:10px" onclick="maakBeheerder('${u.id}')">→ Beheerder</button>`:''}
       ${u.id!==CURRENT_USER.id?`<button class="btn-danger-sm" onclick="verwijderAccount('${u.id}')">×</button>`:''}
     </div>
   </div>`).join('');
+}
+
+function startEditAccount(id){
+  const u=document.querySelector(`#ac-${id} .acc-naam`);
+  const naam=u?.textContent||'';
+  document.getElementById('ac-'+id).innerHTML=`<div style="flex:1">
+    <div class="bi-edit-form">
+      <input type="text" id="ean-${id}" value="${naam}" placeholder="Naam" style="font-size:12px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;font-family:var(--font)">
+      <div class="bi-edit-row"><button class="btn-danger-sm" onclick="loadAccounts()">Annuleer</button><button class="btn-sm" onclick="saveAccount('${id}')">Opslaan</button></div>
+    </div>
+  </div>`;
+}
+async function saveAccount(id){
+  const naam=document.getElementById('ean-'+id).value.trim();
+  if(!naam)return;
+  await sb.from('gebruikers').update({naam}).eq('id',id);
+  await loadAll();loadAccounts();
 }
 async function maakBeheerder(id){
   if(!confirm('Deze gebruiker beheerder maken?'))return;
