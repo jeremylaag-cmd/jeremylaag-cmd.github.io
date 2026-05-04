@@ -12,7 +12,7 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#F7F6F2;--surface:#fff;--border:#E5E3DB;--text:#1A1917;--muted:#888580;--radius:10px;--font:'DM Sans',sans-serif}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-text-size-adjust:100%}
 
 /* ── AUTH ── */
 .auth-wrap{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:1.5rem}
@@ -240,40 +240,184 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .soort-desc.open{display:block}
 
 /* Med detail overlay */
-.med-detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center}
+.med-detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:flex-end;justify-content:center}
 .med-detail-overlay.open{display:flex}
-@media(min-width:768px){.med-detail-overlay{align-items:center}
-.med-detail-overlay .detail-modal{border-radius:14px;max-width:440px}
-.med-detail-overlay .detail-footer{justify-content:flex-end}}
 
-/* Mobile */
-@media(max-width:767px){
-  header{padding:0 1rem;height:52px}
-  .htab{padding:0 .75rem;font-size:11px}
-  .layout{display:flex;flex-direction:column;height:auto}
-  .sidebar{border-right:none;border-bottom:1px solid var(--border);padding:1rem;overflow-y:visible}
-  .main{padding:1rem;overflow-y:visible}
-  .sc{padding:1rem;margin-bottom:1rem}
-  .beheer-wrap{padding:1rem}
-  .beheer-grid{grid-template-columns:1fr;gap:1rem}
-  .modal-overlay{align-items:flex-end}
-  .modal{border-radius:18px 18px 0 0;width:100%;max-width:100%;max-height:92vh}
-  .modal-drag{display:block}
-  .modal-drag{display:none;width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto .875rem}
-  .two{grid-template-columns:1fr 1fr}
-  .four{grid-template-columns:1fr 1fr}
-  .detail-overlay{align-items:flex-end}
-  .detail-modal{border-radius:18px 18px 0 0;width:100%;max-width:100%;max-height:92vh}
-  .detail-footer{flex-direction:column}
-  .mfooter{flex-direction:column-reverse;gap:8px}
-  .mfooter .btn-ghost,.mfooter .btn-sm{width:100%;text-align:center;padding:10px;font-size:14px}
-  .plan-overlay{align-items:flex-end;justify-content:center}
-  .plan-panel{width:100%;max-width:100%;height:85vh;border-radius:18px 18px 0 0;border-top:1px solid var(--border)}
-  .week-nav-label{min-width:100px;font-size:11px}
-}
+/* ── MOBILE FIRST ── */
+/* Header */
+header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50}
+.logo{font-size:13px}
+.htabs{height:52px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.htabs::-webkit-scrollbar{display:none}
+.htab{padding:0 .875rem;font-size:12px;white-space:nowrap}
+.user-badge{display:none}
+.logout-btn{font-size:11px;padding:5px 8px}
+
+/* Layout: sidebar boven main op mobiel */
+.layout{display:flex;flex-direction:column;height:auto}
+.sidebar{border-right:none;border-bottom:1px solid var(--border);padding:1rem;overflow-y:visible}
+.main{padding:1rem;overflow-y:visible;display:flex;flex-direction:column;gap:.875rem}
+.sc{padding:1rem;margin-bottom:0}
+.sc-header{flex-wrap:wrap;gap:6px}
+.week-nav-label{min-width:90px;font-size:11px}
+.btn-nav{padding:6px 10px;font-size:13px;min-height:36px}
+
+/* Kalender */
+.wh span{font-size:9px}
+.cd{min-height:36px;padding:4px 2px}
+.dn{font-size:12px}
+
+/* Legenda */
+.lgd{margin-top:.875rem}
+.lgr-btn{padding:8px 8px;font-size:13px;min-height:40px;-webkit-tap-highlight-color:transparent}
+
+/* Truckrooster */
+.tl-row{grid-template-columns:70px 1fr;gap:5px}
+.tl-name{font-size:10px}
+.td{font-size:8px}
+.tc{height:22px;border-radius:3px}
+
+/* Klussen */
+.kl{gap:10px}
+.kc{padding:1rem}
+.kc:active{opacity:.85}
+.knaam{font-size:15px}
+.kdate{font-size:11px}
+.kactions{flex-direction:row;gap:6px}
+.btn-edit,.btn-del{padding:7px 12px;font-size:12px;min-height:36px}
+
+/* Mededelingen weekgrid */
+.med-week{gap:4px}
+.med-dag-hdr{padding:4px 5px}
+.med-dag-naam{font-size:8px}
+.med-dag-num{font-size:12px}
+.med-dag-items{padding:3px 4px}
+.med-pill{font-size:9px;padding:3px 4px;min-height:24px;align-items:center;-webkit-tap-highlight-color:transparent}
+
+/* Beschikbaarheid */
+.besch-item{padding:.875rem 1rem}
+.besch-reden{font-size:14px}
+.besch-datum{font-size:12px;margin-top:3px}
+.besch-naam{font-size:12px}
+.besch-actions{flex-wrap:wrap;gap:5px}
+
+/* Beheer */
+.beheer-wrap{padding:1rem}
+.beheer-grid{grid-template-columns:1fr;gap:1rem}
+.bt{font-size:15px}
+.bi{padding:10px 12px}
+.bi-name{font-size:13px}
+.btn-sm,.btn-danger-sm{min-height:36px;padding:7px 12px;font-size:12px}
+
+/* Accounts */
+.acc-item{padding:10px 12px}
+.acc-naam{font-size:14px}
+
+/* Modals: slide up van onderaf */
+.modal-overlay{align-items:flex-end}
+.modal{border-radius:20px 20px 0 0;width:100%;max-width:100%;max-height:92vh;padding:0 1.25rem 2rem}
+.modal-drag{display:block;width:36px;height:4px;background:var(--border);border-radius:2px;margin:.875rem auto .875rem}
+.modal-title{font-size:16px;margin-bottom:1rem}
+.fr input[type=text],.fr input[type=number],.fr input[type=date],.fr select,.fr textarea{font-size:16px;padding:10px 12px;min-height:44px} /* 16px voorkomt zoom op iOS */
+.tijd-input{font-size:16px;padding:10px 12px;min-height:44px}
+.two{grid-template-columns:1fr 1fr;gap:8px}
+.four{grid-template-columns:1fr 1fr;gap:8px}
+.chip{font-size:12px;padding:8px 14px;min-height:36px;-webkit-tap-highlight-color:transparent}
+.bij{padding:16px;font-size:13px;min-height:52px;display:flex;align-items:center;justify-content:center}
+.mfooter{flex-direction:column-reverse;gap:8px;padding-top:1rem;margin-top:1rem}
+.mfooter .btn-ghost,.mfooter .btn-sm{width:100%;text-align:center;padding:13px;font-size:15px;border-radius:10px}
+.warn-box{font-size:13px;padding:.75rem 1rem}
+
+/* Plan paneel: slide up */
+.plan-overlay{align-items:flex-end;justify-content:center}
+.plan-panel{width:100%;max-width:100%;height:85vh;border-radius:20px 20px 0 0;border-top:1px solid var(--border)}
+.plan-header{padding:1.25rem 1.25rem 1rem}
+.plan-body{padding:1.25rem 1.25rem 2rem}
+.plan-klus{padding:.875rem 1rem;margin-bottom:8px;-webkit-tap-highlight-color:transparent}
+.plan-klus:active{opacity:.8}
+.plan-klus-date{font-size:11px}
+.plan-klus-naam{font-size:14px}
+.plan-klus-meta{font-size:12px}
+
+/* Detail modal: slide up */
+.detail-overlay{align-items:flex-end}
+.detail-modal{border-radius:20px 20px 0 0;width:100%;max-width:100%;max-height:92vh}
+.detail-header{padding:1.25rem 1.25rem 1rem}
+.detail-naam{font-size:20px}
+.detail-body{padding:1rem 1.25rem}
+.detail-label{font-size:11px}
+.detail-value{font-size:14px}
+.detail-footer{padding:.875rem 1.25rem 2rem;flex-direction:column;gap:8px}
+.detail-footer .btn-ghost,.detail-footer .btn-edit{width:100%;text-align:center;padding:13px;font-size:15px;border-radius:10px}
+
+/* Med detail */
+.med-detail-overlay{align-items:flex-end}
+.med-detail-overlay .detail-modal{border-radius:20px 20px 0 0}
+.med-detail-overlay .detail-footer{flex-direction:column;padding:.875rem 1.25rem 2rem}
+.med-detail-overlay .detail-footer .btn-ghost{width:100%;padding:13px;font-size:15px;border-radius:10px}
+
+/* Auth */
+.auth-box{padding:1.75rem 1.5rem}
+.auth-btn{padding:13px;font-size:15px;border-radius:10px;min-height:48px}
+.auth-field input{font-size:16px;padding:11px 12px;min-height:44px} /* 16px voorkomt zoom */
+
+/* Btn add */
+.btn-add{min-height:44px;font-size:14px;border-radius:10px;margin-top:1rem}
+
+/* ── DESKTOP OVERRIDE ── */
 @media(min-width:768px){
+  header{padding:0 2rem;height:56px}
+  .logo{font-size:15px}
+  .htabs{height:56px;overflow-x:visible}
+  .htab{padding:0 1.25rem;font-size:13px}
+  .user-badge{display:inline}
+  .layout{display:grid;grid-template-columns:240px 1fr;height:calc(100vh - 56px);flex-direction:unset}
+  .sidebar{border-right:1px solid var(--border);border-bottom:none;padding:1.25rem;overflow-y:auto;height:100%}
+  .main{padding:1.5rem;overflow-y:auto;height:100%;gap:1.25rem}
+  .sc{padding:1.25rem;margin-bottom:0}
+  .week-nav-label{min-width:130px;font-size:12px}
+  .lgr-btn{padding:6px 8px;font-size:12px;min-height:unset}
+  .tl-row{grid-template-columns:80px 1fr;gap:8px}
+  .tl-name{font-size:11px}
+  .td{font-size:9px}
+  .tc{height:24px;border-radius:4px}
+  .kc{padding:.875rem 1rem}
+  .knaam{font-size:13px}
+  .kdate{font-size:10px}
+  .kactions{flex-direction:row}
+  .btn-edit,.btn-del{padding:4px 10px;font-size:11px;min-height:unset}
+  .beheer-wrap{padding:2rem}
+  .beheer-grid{grid-template-columns:1fr 1fr;gap:1.25rem}
+  .modal-overlay{align-items:center}
+  .modal{border-radius:14px;width:560px;max-width:95vw;max-height:90vh;padding:1.5rem}
+  .modal-drag{display:none}
+  .modal-title{font-size:15px;margin-bottom:1.25rem}
+  .fr input[type=text],.fr input[type=number],.fr input[type=date],.fr select,.fr textarea{font-size:13px;padding:8px 10px;min-height:unset}
+  .tijd-input{font-size:13px;padding:8px 10px;min-height:unset}
+  .chip{font-size:11px;padding:5px 12px;min-height:unset}
+  .bij{padding:12px;font-size:12px;min-height:unset}
+  .mfooter{flex-direction:row;justify-content:flex-end;gap:8px}
+  .mfooter .btn-ghost,.mfooter .btn-sm{width:auto;padding:7px 13px;font-size:11px;border-radius:6px}
   .plan-overlay{align-items:flex-start;justify-content:flex-end}
-  .plan-panel{width:380px;height:100%;border-radius:0;border-left:1px solid var(--border)}
+  .plan-panel{width:380px;height:100%;border-radius:0;border-top:none;border-left:1px solid var(--border)}
+  .plan-header{padding:1.25rem}
+  .plan-body{padding:1.25rem}
+  .detail-overlay{align-items:center}
+  .detail-modal{border-radius:14px;width:480px;max-width:95vw;max-height:88vh}
+  .detail-header{padding:1.25rem 1.5rem 1rem}
+  .detail-naam{font-size:18px}
+  .detail-body{padding:1.25rem 1.5rem}
+  .detail-footer{padding:.875rem 1.5rem 1.25rem;flex-direction:row;gap:8px}
+  .detail-footer .btn-ghost,.detail-footer .btn-edit{width:auto;padding:5px 14px;font-size:12px;border-radius:6px}
+  .med-detail-overlay{align-items:center}
+  .med-detail-overlay .detail-modal{border-radius:14px;max-width:440px}
+  .med-detail-overlay .detail-footer{flex-direction:row;padding:.875rem 1.5rem 1.25rem}
+  .med-detail-overlay .detail-footer .btn-ghost{width:auto;padding:5px 14px;font-size:12px;border-radius:6px}
+  .btn-add{min-height:unset;font-size:12px;border-radius:8px;margin-top:.875rem}
+  .auth-btn{padding:10px;font-size:14px;border-radius:8px;min-height:unset}
+  .auth-field input{font-size:14px;padding:10px 12px;min-height:unset}
+  .besch-reden{font-size:13px}
+  .besch-datum{font-size:11px}
 }
 </style>
 </head>
