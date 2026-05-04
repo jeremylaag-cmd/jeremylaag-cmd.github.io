@@ -243,6 +243,36 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .med-detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:flex-end;justify-content:center}
 .med-detail-overlay.open{display:flex}
 
+/* ── DRAWER (mobiel) ── */
+.mob-topbar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;background:var(--surface);border-bottom:1px solid var(--border)}
+.mob-drawer-btn{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;font-family:var(--font);-webkit-tap-highlight-color:transparent}
+.mob-drawer-icon{font-size:16px}
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:85%;max-width:320px;background:var(--surface);z-index:210;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.drawer.open{transform:translateX(0)}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.25rem 1rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1}
+.drawer-close{background:none;border:none;cursor:pointer;font-size:20px;color:var(--muted);line-height:1;padding:4px}
+.drawer-body{padding:1.25rem 1.25rem 2rem}
+.desk-only{display:none !important}
+
+/* ── MEDEDELINGEN MOBIEL ── */
+.med-week-mob{display:flex;flex-direction:column;gap:6px}
+.med-dag-mob{background:var(--surface);border-radius:10px;border:1px solid var(--border);overflow:hidden}
+.med-dag-mob-hdr{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.med-dag-mob-hdr:active{background:var(--bg)}
+.med-dag-mob-date{font-size:13px;font-weight:600;color:var(--text);flex:1}
+.med-dag-mob-vandaag{color:#1E40AF}
+.med-dag-mob-count{font-size:11px;background:#EFF6FF;color:#1E40AF;border-radius:20px;padding:2px 8px;font-weight:500}
+.med-dag-mob-leeg{font-size:12px;color:var(--muted);font-style:italic}
+.med-dag-mob-items{border-top:1px solid var(--border)}
+.med-dag-mob-item{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.med-dag-mob-item:last-child{border-bottom:none}
+.med-dag-mob-item:active{background:var(--bg)}
+.med-dag-mob-titel{font-size:14px;font-weight:500;color:var(--text)}
+.med-dag-mob-beschr{font-size:12px;color:var(--muted);margin-top:2px}
+.med-dag-mob-chevron{font-size:14px;color:var(--muted)}
+
 /* ── MOBILE FIRST ── */
 /* Header */
 header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50}
@@ -253,9 +283,9 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50}
 .user-badge{display:none}
 .logout-btn{font-size:11px;padding:5px 8px}
 
-/* Layout: sidebar boven main op mobiel */
+/* Layout: geen sidebar op mobiel */
 .layout{display:flex;flex-direction:column;height:auto}
-.sidebar{border-right:none;border-bottom:1px solid var(--border);padding:1rem;overflow-y:visible}
+.sidebar{display:none}
 .main{padding:1rem;overflow-y:visible;display:flex;flex-direction:column;gap:.875rem}
 .sc{padding:1rem;margin-bottom:0}
 .sc-header{flex-wrap:wrap;gap:6px}
@@ -366,6 +396,10 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50}
 
 /* ── DESKTOP OVERRIDE ── */
 @media(min-width:768px){
+  .mob-topbar{display:none}
+  .drawer-overlay,.drawer{display:none !important}
+  .desk-only{display:block !important}
+  .sidebar{display:block !important}
   header{padding:0 2rem;height:56px}
   .logo{font-size:15px}
   .htabs{height:56px;overflow-x:visible}
@@ -461,13 +495,44 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50}
 
   <!-- ROOSTER (gedeeld) -->
   <div id="page-rooster" class="page active">
-    <div class="layout">
-      <div class="sidebar">
+
+    <!-- MOBIELE TOPBAR met drawer knop -->
+    <div class="mob-topbar" id="mobTopbar">
+      <button class="mob-drawer-btn" onclick="openDrawer()">
+        <span class="mob-drawer-icon">☰</span>
+        <span>Agenda & Overzicht</span>
+      </button>
+      <div id="addKlusBtnMob" style="display:none">
+        <button class="btn-sm" onclick="openModal()" style="padding:8px 14px;font-size:13px">+ Klus</button>
+      </div>
+    </div>
+
+    <!-- DRAWER OVERLAY -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+    <!-- DRAWER -->
+    <div class="drawer" id="drawer">
+      <div class="drawer-header">
+        <div style="font-size:15px;font-weight:600">Agenda & Overzicht</div>
+        <button class="drawer-close" onclick="closeDrawer()">&#x2715;</button>
+      </div>
+      <div class="drawer-body">
         <div class="slabel">Agenda</div>
         <div class="wh"><span>Ma</span><span>Di</span><span>Wo</span><span>Do</span><span>Vr</span><span>Za</span><span>Zo</span></div>
         <div class="cg" id="calGrid"></div>
         <div class="lgd" id="legenda"></div>
-        <div id="addKlusBtn" style="display:none"><button class="btn-add" onclick="openModal()">+ Klus aanmaken</button></div>
+        <div id="addKlusBtn" style="display:none"><button class="btn-add" onclick="openModal();closeDrawer()">+ Klus aanmaken</button></div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- DESKTOP SIDEBAR (verborgen op mobiel) -->
+      <div class="sidebar desk-only">
+        <div class="slabel">Agenda</div>
+        <div class="wh"><span>Ma</span><span>Di</span><span>Wo</span><span>Do</span><span>Vr</span><span>Za</span><span>Zo</span></div>
+        <div class="cg" id="calGridDesk"></div>
+        <div class="lgd" id="legendaDesk"></div>
+        <div id="addKlusBtnDesk" style="display:none"><button class="btn-add" onclick="openModal()">+ Klus aanmaken</button></div>
       </div>
       <div class="main">
         <div class="conflict" id="conflictBanner"></div>
@@ -700,6 +765,18 @@ let allMededelingen=[],editMedId=null;
 let CURRENT_USER=null,CURRENT_ROL=null,CURRENT_NAAM=null;
 const today=new Date();const todayStr=fmt(today);
 
+// ── DRAWER ──
+function openDrawer(){
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
 // ── AUTH ──
 function switchAuthTab(tab){
   document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',i===(tab==='login'?0:1)));
@@ -774,6 +851,8 @@ async function initApp(user){
       <button class="htab" onclick="showPage('beschikbaarheid-beheer',this)">Beschikbaarheid</button>
       <button class="htab" onclick="showPage('accounts',this)">Accounts</button>`;
     document.getElementById('addKlusBtn').style.display='';
+    document.getElementById('addKlusBtnDesk').style.display='';
+    document.getElementById('addKlusBtnMob').style.display='';
     document.getElementById('addMedBtn').style.display='';
   }else{
     tabs.innerHTML=`<button class="htab active" onclick="showPage('rooster',this)">Rooster</button>
@@ -870,24 +949,30 @@ function renderAll(){
   const wl=document.getElementById('weekLabel');
   if(wl)wl.textContent=`${first.toLocaleDateString('nl-NL',opts)} – ${last.toLocaleDateString('nl-NL',opts)}`;
 
-  // Legenda
-  document.getElementById('legenda').innerHTML=
+  // Legenda HTML (gedeeld tussen drawer en desktop)
+  const legendaHTML=
     `<div class="slabel" style="margin-top:.5rem">Trucks</div>
     <div class="zoek-wrap"><span class="zoek-icon">&#128269;</span><input type="text" placeholder="Zoeken..." oninput="filterLgd('bTruck',this.value)"></div>
-    <div id="bTruckLijst">${TRUCKS.map(t=>`<div class="lgr-btn" data-naam="${t.label.toLowerCase()}" onclick="openPlan('truck','${t.id}')"><div class="ls" style="background:${t.color}"></div>${t.label}</div>`).join('')}</div>
+    <div id="bTruckLijst">${TRUCKS.map(t=>`<div class="lgr-btn" data-naam="${t.label.toLowerCase()}" onclick="openPlan('truck','${t.id}');closeDrawer()"><div class="ls" style="background:${t.color}"></div>${t.label}</div>`).join('')}</div>
     <div class="slabel" style="margin-top:.75rem">Personeel</div>
     <div class="zoek-wrap"><span class="zoek-icon">&#128269;</span><input type="text" placeholder="Zoeken..." oninput="filterLgd('bPers',this.value)"></div>
-    <div id="bPersLijst">${PERSONEEL.map(p=>`<div class="lgr-btn" data-naam="${p.naam.toLowerCase()}" onclick="openPlan('pers','${p.id}')">${p.naam}</div>`).join('')}</div>`;
+    <div id="bPersLijst">${PERSONEEL.map(p=>`<div class="lgr-btn" data-naam="${p.naam.toLowerCase()}" onclick="openPlan('pers','${p.id}');closeDrawer()">${p.naam}</div>`).join('')}</div>`;
+  document.getElementById('legenda').innerHTML=legendaHTML;
+  const legendaDesk=document.getElementById('legendaDesk');
+  if(legendaDesk)legendaDesk.innerHTML=legendaHTML;
 
-  // Kalender
-  document.getElementById('calGrid').innerHTML=days.map((d,i)=>{
+  // Kalender HTML (gedeeld)
+  const calHTML=days.map((d,i)=>{
     const ds=fmt(d);const dots=[...(busyMap[ds]||[])];
     return(i===7?'<div class="wdiv"></div>':'')+
-      `<div class="cd${ds===todayStr?' today':''}${ds===selDate?' sel':''}${dots.length?' has-klus':''}" onclick="toggleDate('${ds}')">
+      `<div class="cd${ds===todayStr?' today':''}${ds===selDate?' sel':''}${dots.length?' has-klus':''}" onclick="toggleDate('${ds}');closeDrawer()">
         <div class="dn">${d.getDate()}</div>
         ${dots.length?`<div class="dr">${dots.map(tid=>{const t=TRUCKS.find(x=>x.id===tid);return t?`<div class="dot" style="background:${t.color}"></div>`:''}).join('')}</div>`:''}
       </div>`;
   }).join('');
+  document.getElementById('calGrid').innerHTML=calHTML;
+  const calDesk=document.getElementById('calGridDesk');
+  if(calDesk)calDesk.innerHTML=calHTML;
 
   // Timeline
   document.getElementById('tlDates').innerHTML=days.map(d=>`<div class="td${fmt(d)===todayStr?' tod':''}">${d.getDate()}</div>`).join('');
@@ -1204,20 +1289,61 @@ function renderMededelingen(meds){
   const medsZonderDatum=allMededelingen.filter(m=>!m.datum);
   const dagNamen=['Ma','Di','Wo','Do','Vr','Za','Zo'];
   const isBeheerder=CURRENT_ROL==='beheerder';
-  const weekGrid=days.map((d,i)=>{
-    const ds=fmt(d);const isToday=ds===todayStr;
-    const dagMeds=medsMetDatum.filter(m=>m.datum===ds);
-    return`<div class="med-dag"><div class="med-dag-hdr${isToday?' vandaag':''}"><div class="med-dag-naam">${dagNamen[i]}</div><div class="med-dag-num">${d.getDate()}</div></div>
-      <div class="med-dag-items">${dagMeds.length?dagMeds.map(m=>`<div class="med-pill" onclick="${isBeheerder?`openMedModal('${m.id}')`:`openMedDetail('${m.id}')`}"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.titel}</span>${isBeheerder?`<button class="med-pill-del" onclick="event.stopPropagation();deleteMed('${m.id}')">×</button>`:''}</div>`).join(''):'<div class="med-geen">–</div>'}</div>
-    </div>`;
-  }).join('');
-  let html=`<div class="med-week">${weekGrid}</div>`;
-  if(medsZonderDatum.length){
-    html+=`<div class="med-zonder-datum"><div class="med-zonder-titel">Zonder datum</div>${medsZonderDatum.map(m=>`<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:6px 9px;background:var(--bg);border-radius:7px;gap:6px;margin-bottom:5px">
-      <div style="flex:1;cursor:pointer" onclick="${isBeheerder?`openMedModal('${m.id}')`:`openMedDetail('${m.id}')`}"><div style="font-size:12px;font-weight:500">${m.titel}</div>${m.beschrijving?`<div style="font-size:10px;color:var(--muted)">${m.beschrijving}</div>`:''}</div>
-      ${isBeheerder?`<button class="btn-danger-sm" onclick="deleteMed('${m.id}')">×</button>`:''}
-    </div>`).join('')}</div>`;
+  const isMobiel=window.innerWidth<768;
+
+  let html='';
+
+  if(isMobiel){
+    // Mobiele weergave: verticale lijst per dag met mededelingen
+    const dagItems=days.map((d,i)=>{
+      const ds=fmt(d);const isToday=ds===todayStr;
+      const dagMeds=medsMetDatum.filter(m=>m.datum===ds);
+      if(!dagMeds.length)return'';
+      const dagLabel=d.toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});
+      return`<div class="med-dag-mob">
+        <div class="med-dag-mob-hdr">
+          <div class="med-dag-mob-date${isToday?' med-dag-mob-vandaag':''}">${dagLabel}</div>
+          <span class="med-dag-mob-count">${dagMeds.length}</span>
+        </div>
+        <div class="med-dag-mob-items">${dagMeds.map(m=>`<div class="med-dag-mob-item" onclick="${isBeheerder?`openMedModal('${m.id}')`:`openMedDetail('${m.id}')`}">
+          <div style="flex:1;min-width:0">
+            <div class="med-dag-mob-titel">${m.titel}</div>
+            ${m.beschrijving?`<div class="med-dag-mob-beschr">${m.beschrijving}</div>`:''}
+          </div>
+          ${isBeheerder?`<button class="med-pill-del" style="font-size:18px;color:var(--muted);padding:4px 8px" onclick="event.stopPropagation();deleteMed('${m.id}')">×</button>`:`<span class="med-dag-mob-chevron">›</span>`}
+        </div>`).join('')}</div>
+      </div>`;
+    }).filter(Boolean).join('');
+
+    if(!dagItems&&!medsZonderDatum.length){
+      html='<div class="empty" style="padding:1.5rem 0">Geen mededelingen deze week</div>';
+    }else{
+      html=`<div class="med-week-mob">${dagItems}</div>`;
+    }
+  }else{
+    // Desktop weergave: 7-kolommen grid
+    const weekGrid=days.map((d,i)=>{
+      const ds=fmt(d);const isToday=ds===todayStr;
+      const dagMeds=medsMetDatum.filter(m=>m.datum===ds);
+      return`<div class="med-dag"><div class="med-dag-hdr${isToday?' vandaag':''}"><div class="med-dag-naam">${dagNamen[i]}</div><div class="med-dag-num">${d.getDate()}</div></div>
+        <div class="med-dag-items">${dagMeds.length?dagMeds.map(m=>`<div class="med-pill" onclick="${isBeheerder?`openMedModal('${m.id}')`:`openMedDetail('${m.id}')`}"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.titel}</span>${isBeheerder?`<button class="med-pill-del" onclick="event.stopPropagation();deleteMed('${m.id}')">×</button>`:''}</div>`).join(''):'<div class="med-geen">–</div>'}</div>
+      </div>`;
+    }).join('');
+    html=`<div class="med-week">${weekGrid}</div>`;
   }
+
+  if(medsZonderDatum.length){
+    html+=`<div class="med-zonder-datum"><div class="med-zonder-titel">Zonder datum</div>
+      ${medsZonderDatum.map(m=>`<div class="${isMobiel?'med-dag-mob-item':''}style="display:flex;align-items:flex-start;justify-content:space-between;padding:${isMobiel?'0':'6px 9px'};background:${isMobiel?'transparent':'var(--bg)'};border-radius:7px;gap:8px;margin-bottom:${isMobiel?'0':'5px'}">
+        <div style="flex:1;cursor:pointer;padding:${isMobiel?'.75rem 1rem':0}" onclick="${isBeheerder?`openMedModal('${m.id}')`:`openMedDetail('${m.id}')`}">
+          <div style="font-size:${isMobiel?'14':'12'}px;font-weight:500">${m.titel}</div>
+          ${m.beschrijving?`<div style="font-size:${isMobiel?'12':'10'}px;color:var(--muted);margin-top:2px">${m.beschrijving}</div>`:''}
+        </div>
+        ${isBeheerder?`<button class="${isMobiel?'btn-danger-sm':'btn-danger-sm'}" style="${isMobiel?'margin:.75rem .75rem 0 0;align-self:flex-start':''}" onclick="deleteMed('${m.id}')">×</button>`:''}
+      </div>`).join('')}
+    </div>`;
+  }
+
   document.getElementById('medList').innerHTML=html;
 }
 function openMedDetail(id){
