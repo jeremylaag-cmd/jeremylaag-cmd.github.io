@@ -541,10 +541,19 @@ async function doLogout(){
 
 async function initApp(user){
   CURRENT_USER=user;
-  // Haal rol op
-  const{data}=await sb.from('gebruikers').select('rol,naam').eq('id',user.id).single();
-  CURRENT_ROL=data?.rol||'personeel';
-  CURRENT_NAAM=data?.naam||user.email;
+  // Haal rol op — probeer meerdere keren als nodig
+  let rol='personeel',naam=user.email;
+  try{
+    const{data,error}=await sb.from('gebruikers').select('rol,naam').eq('id',user.id).single();
+    if(data){rol=data.rol||'personeel';naam=data.naam||user.email;}
+    else if(error){
+      // Probeer opnieuw zonder single()
+      const{data:rows}=await sb.from('gebruikers').select('rol,naam').eq('id',user.id);
+      if(rows&&rows.length>0){rol=rows[0].rol||'personeel';naam=rows[0].naam||user.email;}
+    }
+  }catch(e){console.error('Rol ophalen mislukt:',e);}
+  CURRENT_ROL=rol;
+  CURRENT_NAAM=naam;
   document.getElementById('authWrap').style.display='none';
   document.getElementById('appWrap').style.display='block';
   // Tabs op basis van rol
