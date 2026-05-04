@@ -218,6 +218,21 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .zoek-wrap input:focus{outline:none;border-color:var(--text)}
 .zoek-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted)}
 
+/* Beschikbaarheid */
+.besch-item{display:flex;align-items:flex-start;justify-content:space-between;padding:.75rem 1rem;background:var(--bg);border-radius:8px;margin-bottom:6px;gap:8px;border-left:3px solid var(--border)}
+.besch-item.wacht{border-left-color:#F59E0B}
+.besch-item.goedgekeurd{border-left-color:#059669}
+.besch-item.afgewezen{border-left-color:#DC2626;opacity:.7}
+.besch-info{flex:1;min-width:0}
+.besch-reden{font-size:13px;font-weight:500;color:var(--text)}
+.besch-datum{font-size:11px;color:var(--muted);margin-top:2px}
+.besch-naam{font-size:11px;color:var(--muted);margin-top:2px;font-weight:500}
+.besch-status{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap;flex-shrink:0}
+.besch-status.wacht{background:#FFFBEB;color:#92400E}
+.besch-status.goedgekeurd{background:#F0FDF4;color:#166534}
+.besch-status.afgewezen{background:#FEF2F2;color:#991B1B}
+.besch-actions{display:flex;gap:4px;flex-shrink:0}
+
 /* Soort beschrijving uitklap */
 .soort-wrap{display:inline-flex;align-items:center;gap:0}
 .soort-toggle{background:none;border:none;cursor:pointer;padding:0 3px;font-size:10px;color:#4C1D95;line-height:1;font-family:var(--font)}
@@ -243,7 +258,8 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
   .beheer-grid{grid-template-columns:1fr;gap:1rem}
   .modal-overlay{align-items:flex-end}
   .modal{border-radius:18px 18px 0 0;width:100%;max-width:100%;max-height:92vh}
-  .modal::before{content:'';display:block;width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto .875rem}
+  .modal-drag{display:block}
+  .modal-drag{display:none;width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto .875rem}
   .two{grid-template-columns:1fr 1fr}
   .four{grid-template-columns:1fr 1fr}
   .detail-overlay{align-items:flex-end}
@@ -380,11 +396,35 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
       </div>
     </div>
   </div>
+
+  <!-- BESCHIKBAARHEID (personeel: eigen invoer) -->
+  <div id="page-beschikbaarheid" class="page">
+    <div class="beheer-wrap" style="max-width:700px">
+      <div class="bc" style="margin-bottom:1.25rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+          <div class="bt" style="margin:0">Mijn onbeschikbaarheid</div>
+          <button class="btn-sm" onclick="openBeschModal()">+ Toevoegen</button>
+        </div>
+        <div id="mijnBeschList"><div class="spin">Laden...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BESCHIKBAARHEID OVERZICHT (beheerder: alle verzoeken) -->
+  <div id="page-beschikbaarheid-beheer" class="page">
+    <div class="beheer-wrap" style="max-width:800px">
+      <div class="bc">
+        <div class="bt">Beschikbaarheidsverzoeken</div>
+        <div id="alleBeschList"><div class="spin">Laden...</div></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- MODALS -->
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
+    <div class="modal-drag"></div>
     <div class="modal-title" id="modalTitle">Nieuwe klus</div>
     <div class="fr"><span class="fl">Naam klus</span><input type="text" id="fNaam" placeholder="bv. Bruiloft Janssen"></div>
     <div class="fr"><span class="fl">Trucks (meerdere mogelijk)</span><div class="chips" id="truckChips"></div><div class="chip-warn" id="truckWarn"></div></div>
@@ -419,6 +459,32 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
       <span class="saving-msg" id="savingMsg" style="display:none">Opslaan...</span>
       <button class="btn-ghost" onclick="closeModal()">Annuleren</button>
       <button class="btn-sm" onclick="saveKlus()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="beschModal" onclick="if(event.target===this)closeBeschModal()">
+  <div class="modal">
+    <div class="modal-title" id="beschModalTitle">Onbeschikbaarheid toevoegen</div>
+    <div class="fr"><span class="fl">Reden</span>
+      <input type="text" id="bReden" placeholder="bv. Vakantie, Ziek, Vrij, Bruiloft...">
+    </div>
+    <div class="two">
+      <div class="fr"><span class="fl">Startdatum</span><input type="date" id="bStart"></div>
+      <div class="fr"><span class="fl">Einddatum</span><input type="date" id="bEind"></div>
+    </div>
+    <div class="fr">
+      <span class="fl">Tijdstip <span style="color:var(--muted);font-weight:400">(optioneel — laat leeg voor hele dag)</span></span>
+      <div class="two">
+        <div><span class="fl" style="font-size:10px">Vanaf</span><input type="text" class="tijd-input" id="bTijdStart" placeholder="09.00" maxlength="5" oninput="formatTijd(this)"></div>
+        <div><span class="fl" style="font-size:10px">Tot</span><input type="text" class="tijd-input" id="bTijdEind" placeholder="17.00" maxlength="5" oninput="formatTijd(this)"></div>
+      </div>
+    </div>
+    <div class="warn-box" id="beschWarnBox"></div>
+    <div class="mfooter">
+      <span class="saving-msg" id="beschSavingMsg" style="display:none">Opslaan...</span>
+      <button class="btn-ghost" onclick="closeBeschModal()">Annuleren</button>
+      <button class="btn-sm" onclick="saveBeschikbaarheid()">Opslaan</button>
     </div>
   </div>
 </div>
@@ -523,9 +589,12 @@ async function doRegister(){
   if(pw.length<6){err.textContent='Wachtwoord moet minimaal 6 tekens zijn.';err.style.display='block';return;}
   const{data,error}=await sb.auth.signUp({email,password:pw,options:{data:{naam}}});
   if(error){err.textContent=error.message;err.style.display='block';return;}
-  // Sla gebruiker op in gebruikers tabel
+  // Sla gebruiker op in gebruikers tabel en koppel aan personeelslijst
   if(data.user){
-    await sb.from('gebruikers').insert({id:data.user.id,rol:'personeel',naam});
+    // Zoek of er een personeelslid is met dezelfde naam
+    const{data:persData}=await sb.from('personeel').select('id').ilike('naam',naam);
+    const personeel_id=persData&&persData.length?persData[0].id:null;
+    await sb.from('gebruikers').insert({id:data.user.id,rol:'personeel',naam,personeel_id});
   }
   msg.textContent='Account aangemaakt! Je kunt nu inloggen.';
   msg.style.display='block';
@@ -561,11 +630,13 @@ async function initApp(user){
   if(CURRENT_ROL==='beheerder'){
     tabs.innerHTML=`<button class="htab active" onclick="showPage('rooster',this)">Rooster</button>
       <button class="htab" onclick="showPage('beheer',this)">Beheer</button>
+      <button class="htab" onclick="showPage('beschikbaarheid-beheer',this)">Beschikbaarheid</button>
       <button class="htab" onclick="showPage('accounts',this)">Accounts</button>`;
     document.getElementById('addKlusBtn').style.display='';
     document.getElementById('addMedBtn').style.display='';
   }else{
-    tabs.innerHTML=`<button class="htab active" onclick="showPage('rooster',this)">Rooster</button>`;
+    tabs.innerHTML=`<button class="htab active" onclick="showPage('rooster',this)">Rooster</button>
+      <button class="htab" onclick="showPage('beschikbaarheid',this)">Mijn beschikbaarheid</button>`;
     document.getElementById('addKlusBtn').style.display='none';
     document.getElementById('addMedBtn').style.display='none';
   }
@@ -608,14 +679,18 @@ function showPage(id,btn){
   if(btn)btn.classList.add('active');
   if(id==='beheer')renderBeheer();
   if(id==='accounts')loadAccounts();
+  if(id==='beschikbaarheid')loadMijnBeschikbaarheid();
+  if(id==='beschikbaarheid-beheer')loadAlleBeschikbaarheid();
 }
 
 // ── API via Supabase JS SDK ──
+let BESCHIKBAARHEID=[];
+
 async function loadAll(){
   const [
     {data:trucks},{data:personeel},{data:klussen},{data:klusTrucks},
     {data:klusPers},{data:klusPdfs},{data:soorten},{data:meds},
-    {data:klusSoorten},{data:klusTruckSoorten}
+    {data:klusSoorten},{data:klusTruckSoorten},{data:beschData}
   ]=await Promise.all([
     sb.from('trucks').select('*').order('volgorde'),
     sb.from('personeel').select('*').order('naam'),
@@ -627,8 +702,10 @@ async function loadAll(){
     sb.from('mededelingen').select('*').order('datum',{ascending:true}).order('aangemaakt_op',{ascending:true}),
     sb.from('klus_soorten').select('*'),
     sb.from('klus_truck_soorten').select('*'),
+    sb.from('beschikbaarheid').select('*').eq('status','goedgekeurd'),
   ]);
   TRUCKS=trucks||[];PERSONEEL=personeel||[];SOORTEN=soorten||[];
+  BESCHIKBAARHEID=beschData||[];
   const tMap=Object.fromEntries(TRUCKS.map(t=>[t.id,t]));
   const pMap=Object.fromEntries(PERSONEEL.map(p=>[p.id,p]));
   const sMap=Object.fromEntries(SOORTEN.map(s=>[s.id,s]));
@@ -775,8 +852,17 @@ function renderTruckChips(bezette){
 }
 function renderPersChips(bezette){
   const pc=document.getElementById('persChips');if(!pc)return;
-  pc.innerHTML=PERSONEEL.map(p=>{const on=formPers.includes(p.id);const warn=bezette.includes(p.id)&&!on;
-    return`<div class="chip${on?' on':''}${warn?' warn':''}" onclick="togglePers('${p.id}')">${p.naam}${warn?' ⚠':''}</div>`;}).join('');
+  const datum=document.getElementById('fDatum')?.value||'';
+  pc.innerHTML=PERSONEEL.map(p=>{
+    const on=formPers.includes(p.id);
+    const warn=bezette.includes(p.id)&&!on;
+    // Check goedgekeurde onbeschikbaarheid — koppel via gebruikers.personeel_id
+    const onbesch=datum&&BESCHIKBAARHEID.some(b=>b.personeel_id===p.id&&b.datum_start<=datum&&b.datum_eind>=datum);
+    const cls='chip'+(on?' on':'')+(warn?' warn':'')+(onbesch&&!on?' warn':'');
+    const title=warn?'Al ingepland':onbesch?'Niet beschikbaar op deze dag':'';
+    const icon=warn?' ⚠':onbesch?' 🚫':'';
+    return`<div class="${cls}" onclick="togglePers('${p.id}')" title="${title}">${p.naam}${icon}</div>`;
+  }).join('');
 }
 function renderTruckSoortBlocks(){
   const el=document.getElementById('truckSoortBlocks');if(!el)return;
@@ -1080,6 +1166,118 @@ async function verwijderAccount(id){
   if(!confirm('Account verwijderen?'))return;
   await sb.from('gebruikers').delete().eq('id',id);
   loadAccounts();
+}
+
+// ── BESCHIKBAARHEID ──
+let editBeschId=null;
+
+function fmtDatum(d){if(!d)return'';return new Date(d).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short',year:'numeric'});}
+function fmtTijdRange(ts,te){
+  const v=ts?ts.slice(0,5).replace(':','.'):'';
+  const e=te?te.slice(0,5).replace(':','.'):'';
+  if(v&&e)return` · ${v} – ${e}`;
+  if(v)return` · vanaf ${v}`;
+  return' · Hele dag';
+}
+
+async function loadMijnBeschikbaarheid(){
+  const el=document.getElementById('mijnBeschList');
+  el.innerHTML='<div class="spin">Laden...</div>';
+  const{data}=await sb.from('beschikbaarheid').select('*').eq('gebruiker_id',CURRENT_USER.id).order('datum_start',{ascending:true});
+  if(!data||!data.length){el.innerHTML='<div class="empty">Geen onbeschikbaarheid ingevoerd — je staat overal op beschikbaar</div>';return;}
+  el.innerHTML=data.map(b=>`<div class="besch-item ${b.status}">
+    <div class="besch-info">
+      <div class="besch-reden">${b.reden||'Onbeschikbaar'}</div>
+      <div class="besch-datum">${fmtDatum(b.datum_start)}${b.datum_eind&&b.datum_eind!==b.datum_start?` – ${fmtDatum(b.datum_eind)}`:''}`+fmtTijdRange(b.tijd_start,b.tijd_eind)+`</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+      <span class="besch-status ${b.status}">${b.status==='wacht'?'In afwachting':b.status==='goedgekeurd'?'Goedgekeurd':'Afgewezen'}</span>
+      ${b.status==='wacht'?`<button class="btn-edit" onclick="openBeschModal('${b.id}')">Bewerk</button>`:''}
+      <button class="btn-danger-sm" onclick="deleteBeschikbaarheid('${b.id}')">×</button>
+    </div>
+  </div>`).join('');
+}
+
+async function loadAlleBeschikbaarheid(){
+  const el=document.getElementById('alleBeschList');
+  el.innerHTML='<div class="spin">Laden...</div>';
+  const{data:beschData}=await sb.from('beschikbaarheid').select('*').order('datum_start',{ascending:true});
+  const{data:gebruikers}=await sb.from('gebruikers').select('id,naam');
+  if(!beschData||!beschData.length){el.innerHTML='<div class="empty">Geen verzoeken ingediend</div>';return;}
+  const gMap=Object.fromEntries((gebruikers||[]).map(g=>[g.id,g.naam]));
+  // Groepeer per status: wacht eerst
+  const wacht=beschData.filter(b=>b.status==='wacht');
+  const rest=beschData.filter(b=>b.status!=='wacht');
+  const renderItem=b=>`<div class="besch-item ${b.status}">
+    <div class="besch-info">
+      <div class="besch-naam">${gMap[b.gebruiker_id]||'Onbekend'}</div>
+      <div class="besch-reden">${b.reden||'Onbeschikbaar'}</div>
+      <div class="besch-datum">${fmtDatum(b.datum_start)}${b.datum_eind&&b.datum_eind!==b.datum_start?` – ${fmtDatum(b.datum_eind)}`:''}`+fmtTijdRange(b.tijd_start,b.tijd_eind)+`</div>
+    </div>
+    <div class="besch-actions">
+      <span class="besch-status ${b.status}">${b.status==='wacht'?'Wacht':b.status==='goedgekeurd'?'✓ Goed':'✗ Af'}</span>
+      ${b.status==='wacht'?`<button class="btn-sm" style="background:#059669;padding:4px 9px;font-size:10px" onclick="keurBeschikbaarheid('${b.id}','goedgekeurd')">Goed</button><button class="btn-danger-sm" onclick="keurBeschikbaarheid('${b.id}','afgewezen')">Af</button>`:''}
+      <button class="btn-danger-sm" onclick="deleteBeschikbaarheid('${b.id}')">×</button>
+    </div>
+  </div>`;
+  let html='';
+  if(wacht.length)html+=`<div class="slabel" style="margin-bottom:.5rem">In afwachting (${wacht.length})</div>${wacht.map(renderItem).join('')}`;
+  if(rest.length)html+=`<div class="slabel" style="margin:.875rem 0 .5rem">Eerder behandeld</div>${rest.map(renderItem).join('')}`;
+  el.innerHTML=html;
+}
+
+function openBeschModal(id=null){
+  editBeschId=id;
+  document.getElementById('beschModalTitle').textContent=id?'Onbeschikbaarheid bewerken':'Onbeschikbaarheid toevoegen';
+  document.getElementById('beschWarnBox').className='warn-box';
+  if(id){
+    sb.from('beschikbaarheid').select('*').eq('id',id).single().then(({data:b})=>{
+      document.getElementById('bReden').value=b.reden||'';
+      document.getElementById('bStart').value=b.datum_start||'';
+      document.getElementById('bEind').value=b.datum_eind||b.datum_start||'';
+      document.getElementById('bTijdStart').value=b.tijd_start?b.tijd_start.slice(0,5).replace(':','.'):'';
+      document.getElementById('bTijdEind').value=b.tijd_eind?b.tijd_eind.slice(0,5).replace(':','.'):'';
+    });
+  }else{
+    document.getElementById('bReden').value='';
+    document.getElementById('bStart').value='';
+    document.getElementById('bEind').value='';
+    document.getElementById('bTijdStart').value='';
+    document.getElementById('bTijdEind').value='';
+  }
+  document.getElementById('beschModal').classList.add('open');
+}
+function closeBeschModal(){document.getElementById('beschModal').classList.remove('open');}
+
+async function saveBeschikbaarheid(){
+  const reden=document.getElementById('bReden').value.trim();
+  const datum_start=document.getElementById('bStart').value;
+  const datum_eind=document.getElementById('bEind').value||datum_start;
+  const tijd_start=tijdToDb(document.getElementById('bTijdStart').value);
+  const tijd_eind=tijdToDb(document.getElementById('bTijdEind').value);
+  const wb=document.getElementById('beschWarnBox');
+  if(!datum_start){wb.textContent='Vul een startdatum in.';wb.className='warn-box show';return;}
+  if(datum_eind<datum_start){wb.textContent='Einddatum moet na startdatum liggen.';wb.className='warn-box show';return;}
+  document.getElementById('beschSavingMsg').style.display='inline';
+  if(editBeschId){
+    await sb.from('beschikbaarheid').update({reden,datum_start,datum_eind,tijd_start,tijd_eind,status:'wacht'}).eq('id',editBeschId);
+  }else{
+    await sb.from('beschikbaarheid').insert({gebruiker_id:CURRENT_USER.id,reden,datum_start,datum_eind,tijd_start,tijd_eind,status:'wacht'});
+  }
+  document.getElementById('beschSavingMsg').style.display='none';
+  closeBeschModal();loadMijnBeschikbaarheid();
+}
+
+async function deleteBeschikbaarheid(id){
+  if(!confirm('Verwijderen?'))return;
+  await sb.from('beschikbaarheid').delete().eq('id',id);
+  if(CURRENT_ROL==='beheerder')loadAlleBeschikbaarheid();
+  else loadMijnBeschikbaarheid();
+}
+
+async function keurBeschikbaarheid(id,status){
+  await sb.from('beschikbaarheid').update({status}).eq('id',id);
+  loadAlleBeschikbaarheid();
 }
 </script>
 </body>
