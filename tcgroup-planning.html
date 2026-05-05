@@ -1168,9 +1168,13 @@ function openModal(id=null){
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
 
 function handlePdf(){
-  [...document.getElementById('fPdf').files].forEach(file=>{
-    const r=new FileReader();r.onload=e=>{formPdfs.push({naam:file.name,url:e.target.result});renderPdfList();};r.readAsDataURL(file);
-  });document.getElementById('fPdf').value='';
+  const files=[...document.getElementById('fPdf').files];
+  files.forEach(file=>{
+    // Sla het File object op, niet base64
+    formPdfs.push({naam:file.name,file:file,url:null});
+    renderPdfList();
+  });
+  document.getElementById('fPdf').value='';
 }
 function renderPdfList(){
   const all=[...existingPdfs,...formPdfs];
@@ -1179,19 +1183,24 @@ function renderPdfList(){
   z.className='bij'+(all.length?' has':'');
   const pl=document.getElementById('pdfList');if(!pl)return;
   pl.innerHTML=[
-    ...existingPdfs.map(p=>`<div class="pdf-item"><span class="pdf-name" onclick="openPdf(\`${p.url}\`,\`${p.naam}\`)">${p.naam}</span><button class="btn-danger-sm" onclick="removeExistingPdf('${p.id}')">×</button></div>`),
-    ...formPdfs.map((p,i)=>`<div class="pdf-item"><span class="pdf-name" onclick="openPdf(\`${p.url}\`,\`${p.naam}\`)">${p.naam}</span><button class="btn-danger-sm" onclick="removeNewPdf(${i})">×</button></div>`),
+    ...existingPdfs.map(p=>`<div class="pdf-item"><span class="pdf-name" onclick="openPdf('${p.url}','${p.naam}')">${p.naam}</span><button class="btn-danger-sm" onclick="removeExistingPdf('${p.id}')">×</button></div>`),
+    ...formPdfs.map((p,i)=>`<div class="pdf-item"><span class="pdf-name" style="color:var(--muted)">${p.naam} (wordt opgeslagen...)</span><button class="btn-danger-sm" onclick="removeNewPdf(${i})">×</button></div>`),
   ].join('');
 }
 function removeExistingPdf(id){existingPdfs=existingPdfs.filter(p=>p.id!==id);renderPdfList();}
 function removeNewPdf(i){formPdfs.splice(i,1);renderPdfList();}
 function openPdf(url,naam){
+  if(!url)return;
   if(url.startsWith('data:')){
+    // Oude base64 PDFs (backwards compat)
     const arr=url.split(',');const mime=arr[0].match(/:(.*?);/)[1];
     const bstr=atob(arr[1]);let n=bstr.length;const u8=new Uint8Array(n);
     while(n--)u8[n]=bstr.charCodeAt(n);
     window.open(URL.createObjectURL(new Blob([u8],{type:mime})),'_blank');
-  }else window.open(url,'_blank');
+  }else{
+    // Storage URL — gewoon openen
+    window.open(url,'_blank');
+  }
 }
 
 async function saveKlus(){
@@ -1219,10 +1228,18 @@ async function saveKlus(){
       await sb.from('klus_gebruikers').delete().eq('klus_id',editId);
       await sb.from('klus_soorten').delete().eq('klus_id',editId);
       await sb.from('klus_truck_soorten').delete().eq('klus_id',editId);
-      const removedPdfs=KLUSSEN.find(k=>k.id===editId)?.pdfs.filter(p=>!existingPdfs.find(e=>e.id===p.id)).map(p=>p.id)||[];
-      for(const rid of removedPdfs)await sb.from('klus_pdfs').delete().eq('id',rid);
+      const removedPdfs=KLUSSEN.find(k=>k.id===editId)?.pdfs.filter(p=>!existingPdfs.find(e=>e.id===p.id))||[];
+      for(const p of removedPdfs){
+        // Verwijder uit Storage als het een Storage URL is
+        if(p.url&&p.url.includes('/storage/v1/object/public/pdfs/')){
+          const path=p.url.split('/storage/v1/object/public/pdfs/')[1];
+          await sb.storage.from('pdfs').remove([path]);
+        }
+        await sb.from('klus_pdfs').delete().eq('id',p.id);
+      }
     }else{
-      const{data}=await sb.from('klussen').insert({naam,datum,datum_eind,vertrek_tijd,start_opbouw,start_feest,einde_feest,personen,food:foodLabel,notitie,adres,contactpersoon,telefoon}).select();
+      const{data,error}=await sb.from('klussen').insert({naam,datum,datum_eind,vertrek_tijd,start_opbouw,start_feest,einde_feest,personen,food:foodLabel,notitie,adres,contactpersoon,telefoon}).select('id');
+      if(error||!data||!data.length)throw new Error(error?.message||'Insert mislukt');
       klusId=data[0].id;
     }
     if(formTrucks.length)await sb.from('klus_trucks').insert(formTrucks.map(tid=>({klus_id:klusId,truck_id:tid})));
@@ -1231,7 +1248,15 @@ async function saveKlus(){
     const truckSoortRows=[];
     Object.entries(formTruckSoorten).forEach(([tid,sids])=>sids.forEach(sid=>truckSoortRows.push({klus_id:klusId,truck_id:tid,soort_id:sid})));
     if(truckSoortRows.length)await sb.from('klus_truck_soorten').insert(truckSoortRows);
-    if(formPdfs.length)await sb.from('klus_pdfs').insert(formPdfs.map(p=>({klus_id:klusId,naam:p.naam,url:p.url})));
+    // Upload PDFs naar Storage
+    for(const p of formPdfs){
+      const ext=p.naam.split('.').pop();
+      const path=`${klusId}/${Date.now()}-${p.naam.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+      const{data:upData,error:upErr}=await sb.storage.from('pdfs').upload(path,p.file,{contentType:'application/pdf',upsert:false});
+      if(upErr){showWarn('PDF upload mislukt: '+upErr.message);continue;}
+      const{data:{publicUrl}}=sb.storage.from('pdfs').getPublicUrl(path);
+      await sb.from('klus_pdfs').insert({klus_id:klusId,naam:p.naam,url:publicUrl});
+    }
     closeModal();await loadAll();
   }catch(e){showWarn('Fout bij opslaan: '+e.message);}
   document.getElementById('savingMsg').style.display='none';
