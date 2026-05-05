@@ -644,8 +644,8 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50}
           <div class="st">Onbeschikbaarheid overzicht</div>
           <div class="week-nav">
             <button class="btn-nav" onclick="changeBeschWeek(-1)">&#8592;</button>
-            <span class="week-nav-label" id="beschWeekLabel"></span>
-            <button class="btn-nav" onclick="changeBeschWeek(0)" style="font-size:11px">Nu</button>
+            <span class="week-nav-label" id="beschWeekLabel" style="min-width:140px"></span>
+            <button class="btn-nav" onclick="changeBeschWeek(0)" style="font-size:11px">Deze maand</button>
             <button class="btn-nav" onclick="changeBeschWeek(1)">&#8594;</button>
           </div>
         </div>
@@ -1574,9 +1574,22 @@ function changeBeschWeek(dir){
   loadAlleBeschikbaarheid();
 }
 
-function getBeschWeekDates(){
-  const s=new Date(today);s.setDate(s.getDate()-s.getDay()+1+(beschWeekOffset*7));
-  return Array.from({length:7},(_,i)=>{const d=new Date(s);d.setDate(s.getDate()+i);return d});
+function getBeschMonthDates(){
+  const now=new Date(today);
+  now.setMonth(now.getMonth()+beschWeekOffset);
+  const year=now.getFullYear();
+  const month=now.getMonth();
+  const firstDay=new Date(year,month,1);
+  const lastDay=new Date(year,month+1,0);
+  // Begin op maandag
+  const startOffset=(firstDay.getDay()+6)%7;
+  const start=new Date(firstDay);start.setDate(start.getDate()-startOffset);
+  // Eindig op zondag
+  const endOffset=(7-lastDay.getDay())%7;
+  const end=new Date(lastDay);end.setDate(end.getDate()+endOffset);
+  const days=[];let d=new Date(start);
+  while(d<=end){days.push(new Date(d));d.setDate(d.getDate()+1);}
+  return{days,month,year};
 }
 
 async function loadAlleBeschikbaarheid(){
@@ -1588,66 +1601,80 @@ async function loadAlleBeschikbaarheid(){
   const{data:gebruikers}=await sb.from('gebruikers').select('id,naam').eq('rol','personeel');
   const gMap=Object.fromEntries((gebruikers||[]).map(g=>[g.id,g]));
 
-  const days=getBeschWeekDates();
-  const first=days[0],last=days[6],opts={day:'numeric',month:'short'};
+  const{days,month,year}=getBeschMonthDates();
+  const maandNamen=['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
   const wl=document.getElementById('beschWeekLabel');
-  if(wl)wl.textContent=`${first.toLocaleDateString('nl-NL',opts)} – ${last.toLocaleDateString('nl-NL',opts)}`;
+  if(wl)wl.textContent=`${maandNamen[month]} ${year}`;
 
   const goedgekeurd=(beschData||[]).filter(b=>b.status==='goedgekeurd');
   const dagNamen=['Ma','Di','Wo','Do','Vr','Za','Zo'];
-
-  // Genereer unieke kleur per persoon
   const kleuren=['#2563EB','#059669','#DC2626','#7C3AED','#D97706','#0891B2','#BE185D','#65A30D'];
   const persKleur={};
   (gebruikers||[]).forEach((g,i)=>{persKleur[g.id]=kleuren[i%kleuren.length];});
 
-  // Agenda grid
-  const agendaHTML=days.map((d,i)=>{
+  // Maand grid
+  const hdrHTML=dagNamen.map(n=>`<div style="font-size:9px;font-weight:600;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.05em;padding:4px 0">${n}</div>`).join('');
+  const celHTML=days.map(d=>{
     const ds=fmt(d);
     const isToday=ds===todayStr;
+    const isHuidigeMaand=d.getMonth()===month;
     const dagBesch=goedgekeurd.filter(b=>b.datum_start<=ds&&b.datum_eind>=ds);
-    const dagNaam=d.toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});
-    return`<div class="besch-dag">
-      <div class="besch-dag-hdr${isToday?' vandaag':''}">
-        <div class="besch-dag-naam">${dagNamen[i]}</div>
-        <div class="besch-dag-num">${d.getDate()}</div>
-      </div>
-      <div class="besch-dag-items">
-        ${dagBesch.length?dagBesch.map(b=>{
+    return`<div style="border-radius:8px;border:1px solid var(--border);padding:5px 6px;min-height:64px;background:${isHuidigeMaand?'var(--surface)':'var(--bg)'}">
+      <div style="font-size:12px;font-weight:${isToday?'700':'500'};color:${isToday?'#1E40AF':isHuidigeMaand?'var(--text)':'var(--muted)'};margin-bottom:3px;${isToday?'background:#EFF6FF;border-radius:4px;padding:1px 4px;display:inline-block':''}">${d.getDate()}</div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        ${dagBesch.map(b=>{
           const g=gMap[b.gebruiker_id];
           const kleur=persKleur[b.gebruiker_id]||'#888';
-          const tijdStr=b.tijd_start?` · ${b.tijd_start.slice(0,5)}–${b.tijd_eind?b.tijd_eind.slice(0,5):'?'}`:'';
-          const tooltip=`${g?.naam||'?'}${tijdStr}${b.reden?' — '+b.reden:''}`;
-          return`<div class="besch-persoon-pill" style="background:${kleur}18;color:${kleur}" title="${tooltip}">${g?.naam||'?'}${tijdStr}</div>`;
-        }).join(''):`<div class="besch-dag-leeg">–</div>`}
+          const tijdStr=b.tijd_start?` ${b.tijd_start.slice(0,5)}–${b.tijd_eind?b.tijd_eind.slice(0,5):'?'}`:'';
+          return`<div style="font-size:9px;font-weight:500;border-radius:3px;padding:2px 4px;background:${kleur}20;color:${kleur};white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${g?.naam||'?'}${tijdStr}${b.reden?' — '+b.reden:''}">${g?.naam?.split(' ')[0]||'?'}${tijdStr}</div>`;
+        }).join('')}
       </div>
     </div>`;
   }).join('');
-  agendaEl.innerHTML=`<div class="besch-week">${agendaHTML}</div>`;
 
-  // Openstaande verzoeken
+  agendaEl.innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px">${hdrHTML}</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${celHTML}</div>`;
+
+  // Verzoeken
   const wacht=(beschData||[]).filter(b=>b.status==='wacht');
-  if(!wacht.length){
-    lijstEl.innerHTML='<div class="empty" style="padding:1rem 0">Geen openstaande verzoeken</div>';
-  }else{
-    lijstEl.innerHTML=wacht.map(b=>{
-      const g=gMap[b.gebruiker_id];
-      const ds=new Date(b.datum_start).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
-      const de=b.datum_eind&&b.datum_eind!==b.datum_start?` – ${new Date(b.datum_eind).toLocaleDateString('nl-NL',{day:'numeric',month:'short'})}`:'';
-      const tijdStr=b.tijd_start?` · ${b.tijd_start.slice(0,5)}–${b.tijd_eind?b.tijd_eind.slice(0,5):'?'}`:'';
-      return`<div class="besch-item wacht">
-        <div class="besch-info">
-          <div class="besch-naam">${g?.naam||'Onbekend'}</div>
-          <div class="besch-reden">${b.reden||'Onbeschikbaar'}</div>
-          <div class="besch-datum">${ds}${de}${tijdStr}</div>
-        </div>
-        <div class="besch-actions">
+  const goed=(beschData||[]).filter(b=>b.status==='goedgekeurd');
+  const afgewezen=(beschData||[]).filter(b=>b.status==='afgewezen');
+
+  function renderVerzoek(b,toonKnoppen){
+    const g=gMap[b.gebruiker_id];
+    const ds=new Date(b.datum_start).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
+    const de=b.datum_eind&&b.datum_eind!==b.datum_start?` – ${new Date(b.datum_eind).toLocaleDateString('nl-NL',{day:'numeric',month:'short'})}`:'';
+    const tijdStr=b.tijd_start?` · ${b.tijd_start.slice(0,5)}–${b.tijd_eind?b.tijd_eind.slice(0,5):'?'}`:'';
+    return`<div class="besch-item ${b.status}">
+      <div class="besch-info">
+        <div class="besch-naam">${g?.naam||'Onbekend'}</div>
+        <div class="besch-reden">${b.reden||'Onbeschikbaar'}</div>
+        <div class="besch-datum">${ds}${de}${tijdStr}</div>
+      </div>
+      <div class="besch-actions">
+        ${toonKnoppen?`
           <button class="btn-sm" style="background:#059669;padding:6px 12px;font-size:12px" onclick="keurBeschikbaarheid('${b.id}','goedgekeurd')">✓ Goed</button>
           <button class="btn-danger-sm" style="padding:6px 12px;font-size:12px" onclick="keurBeschikbaarheid('${b.id}','afgewezen')">✗ Af</button>
-        </div>
-      </div>`;
-    }).join('');
+        `:`<span class="besch-status ${b.status}">${b.status==='goedgekeurd'?'✓ Goedgekeurd':'✗ Afgewezen'}</span>`}
+        <button class="btn-danger-sm" onclick="deleteBeschikbaarheid('${b.id}')">×</button>
+      </div>
+    </div>`;
   }
+
+  let html='';
+  if(wacht.length){
+    html+=`<div class="slabel" style="margin-bottom:.625rem">⏳ Openstaand (${wacht.length})</div>${wacht.map(b=>renderVerzoek(b,true)).join('')}`;
+  }else{
+    html+='<div class="empty" style="padding:.75rem 0;font-size:12px">Geen openstaande verzoeken</div>';
+  }
+  if(goed.length){
+    html+=`<div class="slabel" style="margin:1rem 0 .625rem">✓ Goedgekeurd (${goed.length})</div>${goed.map(b=>renderVerzoek(b,false)).join('')}`;
+  }
+  if(afgewezen.length){
+    html+=`<div class="slabel" style="margin:1rem 0 .625rem">✗ Afgewezen (${afgewezen.length})</div>${afgewezen.map(b=>renderVerzoek(b,false)).join('')}`;
+  }
+  lijstEl.innerHTML=html;
 }
 
 function openBeschModal(id=null){
