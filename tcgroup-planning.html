@@ -587,13 +587,6 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
       <div class="main">
         <div class="conflict" id="conflictBanner"></div>
 
-        <!-- Mijn schema — alleen zichtbaar voor personeel -->
-        <div class="sc" id="mijnSchemaSection" style="display:none">
-          <div class="st" style="margin-bottom:.875rem">Mijn schema</div>
-          <div id="persWeek1Rooster" style="margin-bottom:1rem"></div>
-          <div id="persWeek2Rooster"></div>
-        </div>
-
         <div class="sc">
           <div class="sc-header" style="margin-bottom:.5rem">
             <div class="st">Mededelingen</div>
@@ -652,6 +645,35 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
   </div>
 
   <!-- ACCOUNTS (alleen beheerder) -->
+  <!-- PROFIEL PAGINA -->
+  <div id="page-profiel" class="page">
+    <div style="padding:1.5rem;max-width:480px;margin:0 auto">
+      <div class="sc">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
+          <div id="profielAvatar" style="width:52px;height:52px;border-radius:50%;background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;flex-shrink:0"></div>
+          <div>
+            <div id="profielNaam" style="font-size:17px;font-weight:600;color:var(--text)"></div>
+            <div id="profielRol" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
+          </div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-label">E-mailadres</div>
+          <div id="profielEmail" class="detail-value"></div>
+        </div>
+        <div class="detail-section" id="profielNaamSection">
+          <div class="detail-label">Naam wijzigen</div>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <input type="text" id="profielNaamInput" style="flex:1;font-size:14px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);background:var(--surface);color:var(--text)">
+            <button class="btn-sm" onclick="saveProfielNaam()" style="flex-shrink:0">Opslaan</button>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border)">
+          <button onclick="doLogout()" style="width:100%;background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;border-radius:10px;padding:13px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font)">Uitloggen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="page-accounts" class="page">
     <div class="beheer-wrap" style="max-width:600px">
       <div class="bc">
@@ -963,7 +985,7 @@ async function initApp(user){
   // Avatar initialen
   const initials=CURRENT_NAAM.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
   const av=document.getElementById('mobAvatar');
-  if(av)av.textContent=initials;
+  if(av){av.textContent=initials;av.onclick=()=>switchNav('profiel',null);av.title='Profiel';}
 
   // Bottom nav bouwen
   const bn=document.getElementById('bottomNav');
@@ -996,6 +1018,10 @@ async function initApp(user){
         <button class="bnav-item" onclick="switchNav('rooster',this)">
           <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><rect class="ni" x="3" y="3" width="7" height="7"/><rect class="ni" x="14" y="3" width="7" height="7"/><rect class="ni" x="14" y="14" width="7" height="7"/><rect class="ni" x="3" y="14" width="7" height="7"/></svg></div>
           <span class="bnav-label">Rooster</span>
+        </button>
+        <button class="bnav-item" onclick="switchNav('profiel',this)">
+          <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><path class="ni" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle class="ni" cx="12" cy="7" r="4"/></svg></div>
+          <span class="bnav-label">Profiel</span>
         </button>`;
     }
   }
@@ -1047,6 +1073,7 @@ function showPage(id,btn){
   if(id==='accounts')loadAccounts();
   if(id==='beschikbaarheid')loadPersoonlijkSchema();
   if(id==='beschikbaarheid-beheer')loadAlleBeschikbaarheid();
+  if(id==='profiel')loadProfiel();
   if(id==='rooster'&&CURRENT_ROL!=='beheerder')loadPersoonlijkSchemaRooster();
 }
 
@@ -1661,6 +1688,27 @@ async function verwijderAccount(id){
   if(!confirm('Account verwijderen?'))return;
   await sb.from('gebruikers').delete().eq('id',id);
   loadAccounts();
+}
+
+function loadProfiel(){
+  const initials=CURRENT_NAAM.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('profielAvatar').textContent=initials;
+  document.getElementById('profielNaam').textContent=CURRENT_NAAM;
+  document.getElementById('profielRol').textContent=CURRENT_ROL==='beheerder'?'Beheerder':'Personeelslid';
+  document.getElementById('profielEmail').textContent=CURRENT_USER.email||'–';
+  document.getElementById('profielNaamInput').value=CURRENT_NAAM;
+}
+
+async function saveProfielNaam(){
+  const naam=document.getElementById('profielNaamInput').value.trim();
+  if(!naam)return;
+  await sb.from('gebruikers').update({naam}).eq('id',CURRENT_USER.id);
+  CURRENT_NAAM=naam;
+  document.getElementById('userBadge').textContent=naam;
+  document.getElementById('profielNaam').textContent=naam;
+  const initials=naam.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('profielAvatar').textContent=initials;
+  const av=document.getElementById('mobAvatar');if(av)av.textContent=initials;
 }
 
 // ── BESCHIKBAARHEID ──
