@@ -1184,7 +1184,7 @@ function renderPdfList(){
   const pl=document.getElementById('pdfList');if(!pl)return;
   pl.innerHTML=[
     ...existingPdfs.map(p=>`<div class="pdf-item"><span class="pdf-name" onclick="openPdf('${p.url}','${p.naam}')">${p.naam}</span><button class="btn-danger-sm" onclick="removeExistingPdf('${p.id}')">×</button></div>`),
-    ...formPdfs.map((p,i)=>`<div class="pdf-item"><span class="pdf-name" style="color:var(--muted)">${p.naam} (wordt opgeslagen...)</span><button class="btn-danger-sm" onclick="removeNewPdf(${i})">×</button></div>`),
+    ...formPdfs.map((p,i)=>`<div class="pdf-item"><span class="pdf-name" style="color:var(--text)">${p.naam} ✓ klaar om op te slaan</span><button class="btn-danger-sm" onclick="removeNewPdf(${i})">×</button></div>`),
   ].join('');
 }
 function removeExistingPdf(id){existingPdfs=existingPdfs.filter(p=>p.id!==id);renderPdfList();}
