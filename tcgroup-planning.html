@@ -374,6 +374,31 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
 .med-dag-items{padding:3px 4px}
 .med-pill{font-size:9px;padding:3px 4px;min-height:24px;align-items:center;-webkit-tap-highlight-color:transparent}
 
+/* Uren registratie */
+.uur-btn{width:100%;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--font);margin-top:.5rem;-webkit-tap-highlight-color:transparent}
+.uur-btn-in{background:#1A1917;color:#fff}
+.uur-btn-out{background:#DC2626;color:#fff}
+.uur-btn:active{opacity:.85}
+.uur-timer{text-align:center;padding:12px 0}
+.uur-timer-num{font-size:40px;font-weight:700;color:var(--text);letter-spacing:3px;font-variant-numeric:tabular-nums}
+.uur-timer-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.uur-loc{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.uur-loc-dot{width:8px;height:8px;border-radius:50%;background:#059669;flex-shrink:0}
+.uur-loc-txt{font-size:12px;color:var(--muted);line-height:1.4}
+.uur-item{display:flex;align-items:flex-start;justify-content:space-between;padding:.75rem 1rem;background:var(--bg);border-radius:8px;margin-bottom:6px;gap:8px}
+.uur-item-info{flex:1;min-width:0}
+.uur-item-naam{font-size:13px;font-weight:500;color:var(--text)}
+.uur-item-sub{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.uur-item-tijd{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap}
+.uur-acc-btns{display:flex;gap:5px;flex-shrink:0}
+.btn-uur-ok{background:#059669;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font)}
+.btn-uur-af{background:#DC2626;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font)}
+.uur-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.uur-tbl th{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:6px 8px;text-align:left;background:var(--bg);border-bottom:1px solid var(--border)}
+.uur-tbl td{padding:9px 8px;border-bottom:1px solid var(--border);color:var(--text)}
+.uur-tbl tr:last-child td{border-bottom:none}
+.uur-tbl .totaal{font-weight:600;background:var(--bg)}
+
 /* Beschikbaarheid */
 .besch-item{padding:.875rem 1rem}
 .besch-reden{font-size:14px}
@@ -757,6 +782,47 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
     </div>
   </div>
 
+  <!-- UREN — PERSONEEL -->
+  <div id="page-uren" class="page">
+    <div style="padding:1.25rem;max-width:600px;margin:0 auto">
+      <div class="sc" id="uurKlusCard" style="margin-bottom:1rem"></div>
+      <div class="sc" id="uurRegistratieCard"></div>
+      <div class="sc" style="margin-top:1rem">
+        <div class="st" style="margin-bottom:.875rem">Mijn registraties</div>
+        <div id="mijnUrenList"><div class="spin">Laden...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UREN — BEHEERDER -->
+  <div id="page-uren-beheer" class="page">
+    <div style="padding:1.25rem;max-width:900px;margin:0 auto">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+        <div class="sc">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">
+            <div class="st">Te accorderen</div>
+            <span id="urenWachtCount" style="font-size:11px;background:#FFFBEB;color:#92400E;border-radius:20px;padding:2px 8px;font-weight:600"></span>
+          </div>
+          <div id="urenAccordeerList"><div class="spin">Laden...</div></div>
+        </div>
+        <div class="sc">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">
+            <div class="st" id="urenMaandTitel">Maandoverzicht</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div class="week-nav">
+                <button class="btn-nav" onclick="changeUrenMaand(-1)">&#8592;</button>
+                <span class="week-nav-label" id="urenMaandLabel" style="min-width:110px"></span>
+                <button class="btn-nav" onclick="changeUrenMaand(1)">&#8594;</button>
+              </div>
+              <button class="btn-sm" onclick="exportUrenCSV()" style="font-size:11px;padding:5px 12px">CSV</button>
+            </div>
+          </div>
+          <div id="urenMaandList"><div class="spin">Laden...</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- MOBIELE BOTTOM NAV — binnen app div zodat flex layout werkt -->
   <nav class="bottom-nav" id="bottomNav"></nav>
 </div>
@@ -993,6 +1059,7 @@ async function initApp(user){
   const tabs=document.getElementById('headerTabs');
   if(CURRENT_ROL==='beheerder'){
     tabs.innerHTML=`<button class="htab active" onclick="showPage('rooster',this)">Rooster</button>
+      <button class="htab" onclick="showPage('uren-beheer',this)">Uren</button>
       <button class="htab" onclick="showPage('beheer',this)">Beheer</button>
       <button class="htab" onclick="showPage('beschikbaarheid-beheer',this)">Beschikbaarheid</button>
       <button class="htab" onclick="showPage('accounts',this)">Accounts</button>`;
@@ -1001,8 +1068,9 @@ async function initApp(user){
     document.getElementById('addKlusBtnMob').style.display='';
     document.getElementById('addMedBtn').style.display='';
   }else{
-    tabs.innerHTML=`<button class="htab active" onclick="showPage('rooster',this)">Rooster</button>
-      <button class="htab" onclick="showPage('beschikbaarheid',this)">Beschikbaarheid</button>`;
+    tabs.innerHTML=`<button class="htab active" onclick="showPage('beschikbaarheid',this)">Mijn schema</button>
+      <button class="htab" onclick="showPage('uren',this)">Uren</button>
+      <button class="htab" onclick="showPage('rooster',this)">Rooster</button>`;
     document.getElementById('addKlusBtn').style.display='none';
     document.getElementById('addKlusBtnDesk')&&(document.getElementById('addKlusBtnDesk').style.display='none');
     document.getElementById('addKlusBtnMob')&&(document.getElementById('addKlusBtnMob').style.display='none');
@@ -1024,6 +1092,10 @@ async function initApp(user){
           <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><rect class="ni" x="3" y="4" width="18" height="18" rx="2"/><line class="ni" x1="16" y1="2" x2="16" y2="6"/><line class="ni" x1="8" y1="2" x2="8" y2="6"/><line class="ni" x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <span class="bnav-label">Rooster</span>
         </button>
+        <button class="bnav-item" onclick="switchNav('uren-beheer',this)">
+          <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><circle class="ni" cx="12" cy="12" r="10"/><polyline class="ni" points="12 6 12 12 16 14"/></svg></div>
+          <span class="bnav-label">Uren</span>
+        </button>
         <button class="bnav-item" onclick="switchNav('beheer',this)">
           <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><circle class="ni" cx="12" cy="12" r="3"/><path class="ni" d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
           <span class="bnav-label">Beheer</span>
@@ -1041,6 +1113,10 @@ async function initApp(user){
         <button class="bnav-item active" onclick="switchNav('beschikbaarheid',this)">
           <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><rect class="ni" x="3" y="4" width="18" height="18" rx="2"/><line class="ni" x1="16" y1="2" x2="16" y2="6"/><line class="ni" x1="8" y1="2" x2="8" y2="6"/><line class="ni" x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <span class="bnav-label">Mijn schema</span>
+        </button>
+        <button class="bnav-item" onclick="switchNav('uren',this)">
+          <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><circle class="ni" cx="12" cy="12" r="10"/><polyline class="ni" points="12 6 12 12 16 14"/></svg></div>
+          <span class="bnav-label">Uren</span>
         </button>
         <button class="bnav-item" onclick="switchNav('rooster',this)">
           <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><rect class="ni" x="3" y="3" width="7" height="7"/><rect class="ni" x="14" y="3" width="7" height="7"/><rect class="ni" x="14" y="14" width="7" height="7"/><rect class="ni" x="3" y="14" width="7" height="7"/></svg></div>
@@ -1099,6 +1175,8 @@ function showPage(id,btn){
   if(id==='beschikbaarheid')loadPersoonlijkSchema();
   if(id==='beschikbaarheid-beheer')loadAlleBeschikbaarheid();
   if(id==='profiel')loadProfiel();
+  if(id==='uren')loadUrenPersoneel();
+  if(id==='uren-beheer')loadUrenBeheer();
   if(id==='rooster'&&CURRENT_ROL!=='beheerder')loadPersoonlijkSchemaRooster();
 }
 
@@ -1749,9 +1827,255 @@ async function saveProfielAdres(){
   const postcode=document.getElementById('profielPostcode').value.trim();
   const plaats=document.getElementById('profielPlaats').value.trim();
   await sb.from('gebruikers').update({straat,postcode,plaats}).eq('id',CURRENT_USER.id);
-  // Klein bevestigingsbericht
   const btn=document.querySelector('[onclick="saveProfielAdres()"]');
   if(btn){btn.textContent='✓ Opgeslagen';setTimeout(()=>btn.textContent='Adres opslaan',2000);}
+}
+
+// ── URENREGISTRATIE ──
+let urenTimer=null;
+let urenMaandOffset=0;
+
+function minToStr(min){
+  if(!min&&min!==0)return'–';
+  const u=Math.floor(min/60);const m=min%60;
+  return`${u}u ${m.toString().padStart(2,'0')}m`;
+}
+
+async function getLocatie(){
+  return new Promise(resolve=>{
+    if(!navigator.geolocation){resolve('Locatie niet beschikbaar');return;}
+    navigator.geolocation.getCurrentPosition(
+      pos=>resolve(`${pos.coords.latitude.toFixed(5)},${pos.coords.longitude.toFixed(5)}`),
+      ()=>resolve('Locatie geweigerd'),
+      {timeout:8000,maximumAge:60000}
+    );
+  });
+}
+
+async function loadUrenPersoneel(){
+  // Haal actieve klus van vandaag op
+  const klusCard=document.getElementById('uurKlusCard');
+  const regCard=document.getElementById('uurRegistratieCard');
+  if(!klusCard||!regCard)return;
+
+  // Klus van vandaag
+  const{data:kgData}=await sb.from('klus_gebruikers').select('klus_id').eq('gebruiker_id',CURRENT_USER.id);
+  const mijnKlusIds=(kgData||[]).map(x=>x.klus_id);
+  const vandaagKlus=KLUSSEN.find(k=>mijnKlusIds.includes(k.id)&&klusDagen(k).includes(todayStr));
+
+  if(vandaagKlus){
+    klusCard.innerHTML=`<div class="slabel" style="margin-bottom:.5rem">Mijn klus vandaag</div>
+      <div style="font-size:16px;font-weight:600;color:var(--text)">${vandaagKlus.naam||vandaagKlus.food||'Klus'}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px">${new Date(vandaagKlus.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'})}</div>
+      ${vandaagKlus.trucks.map(t=>`<span class="bdg" style="background:${t.color}18;color:${t.color};margin-top:6px;display:inline-flex">${t.label}</span>`).join(' ')}`;
+  }else{
+    klusCard.innerHTML=`<div style="font-size:13px;color:var(--muted);font-style:italic">Geen klus ingepland voor vandaag</div>`;
+  }
+
+  // Check of er al een lopende registratie is
+  const{data:lopend}=await sb.from('urenregistraties')
+    .select('*').eq('gebruiker_id',CURRENT_USER.id).eq('status','lopend').maybeSingle();
+
+  if(lopend){
+    renderIngeklokt(lopend,vandaagKlus);
+  }else{
+    renderInklokken(vandaagKlus,regCard);
+  }
+
+  // Laad registratie geschiedenis
+  const{data:hist}=await sb.from('urenregistraties')
+    .select('*').eq('gebruiker_id',CURRENT_USER.id)
+    .neq('status','lopend').order('ingeklokt_op',{ascending:false}).limit(20);
+
+  const listEl=document.getElementById('mijnUrenList');
+  if(!listEl)return;
+  if(!hist||!hist.length){listEl.innerHTML='<div class="empty">Nog geen registraties</div>';return;}
+  listEl.innerHTML=hist.map(r=>{
+    const k=KLUSSEN.find(x=>x.id===r.klus_id);
+    const datum=new Date(r.ingeklokt_op).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
+    const in_t=new Date(r.ingeklokt_op).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});
+    const uit_t=r.uitgeklokt_op?new Date(r.uitgeklokt_op).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}):'–';
+    const kleurStatus=r.status==='goedgekeurd'?'#059669':r.status==='afgewezen'?'#DC2626':'#92400E';
+    const labelStatus=r.status==='goedgekeurd'?'Goedgekeurd':r.status==='afgewezen'?'Afgewezen':'In afwachting';
+    return`<div class="uur-item">
+      <div class="uur-item-info">
+        <div class="uur-item-naam">${k?.naam||k?.food||'Klus'}</div>
+        <div class="uur-item-sub">${datum} · ${in_t} – ${uit_t}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+        <div class="uur-item-tijd">${minToStr(r.totaal_minuten)}</div>
+        <span style="font-size:10px;font-weight:600;color:${kleurStatus}">${labelStatus}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderInklokken(klus,container){
+  if(!container)return;
+  if(urenTimer){clearInterval(urenTimer);urenTimer=null;}
+  container.innerHTML=`<div class="slabel" style="margin-bottom:.5rem">Urenregistratie</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5">
+      ${klus?'Klok in zodra je begint. Je locatie wordt opgeslagen als bewijs.':'Je kunt alleen inklokken op een dag dat je een klus hebt.'}
+    </div>
+    ${klus?`<button class="uur-btn uur-btn-in" onclick="doInklokken('${klus.id}')">Inklokken</button>`:''}`;
+}
+
+function renderIngeklokt(reg,klus){
+  const regCard=document.getElementById('uurRegistratieCard');
+  if(!regCard)return;
+  const inTijd=new Date(reg.ingeklokt_op);
+
+  function updateTimer(){
+    const el=document.getElementById('urenTimerNum');
+    if(!el)return;
+    const diff=Math.floor((Date.now()-inTijd.getTime())/1000);
+    const h=Math.floor(diff/3600);const m=Math.floor((diff%3600)/60);const s=diff%60;
+    el.textContent=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  }
+
+  regCard.innerHTML=`<div class="slabel" style="margin-bottom:.5rem">Ingeklokt</div>
+    <div class="uur-timer">
+      <div class="uur-timer-num" id="urenTimerNum">00:00:00</div>
+      <div class="uur-timer-sub">aan het werk</div>
+    </div>
+    <div class="uur-loc">
+      <div class="uur-loc-dot"></div>
+      <div class="uur-loc-txt">Ingeklokt om ${inTijd.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}${reg.locatie_in&&reg.locatie_in!=='Locatie geweigerd'&&reg.locatie_in!=='Locatie niet beschikbaar'?` · ${reg.locatie_in}`:''}</div>
+    </div>
+    <button class="uur-btn uur-btn-out" style="margin-top:14px" onclick="doUitklokken('${reg.id}')">Uitklokken</button>`;
+
+  if(urenTimer)clearInterval(urenTimer);
+  urenTimer=setInterval(updateTimer,1000);
+  updateTimer();
+}
+
+async function doInklokken(klusId){
+  const btn=document.querySelector('.uur-btn-in');
+  if(btn){btn.disabled=true;btn.textContent='Locatie ophalen...';}
+  const locatie=await getLocatie();
+  await sb.from('urenregistraties').insert({
+    gebruiker_id:CURRENT_USER.id,
+    klus_id:klusId,
+    locatie_in:locatie,
+    status:'lopend'
+  });
+  loadUrenPersoneel();
+}
+
+async function doUitklokken(regId){
+  const btn=document.querySelector('.uur-btn-out');
+  if(btn){btn.disabled=true;btn.textContent='Locatie ophalen...';}
+  const locatie=await getLocatie();
+  const{data:reg}=await sb.from('urenregistraties').select('ingeklokt_op').eq('id',regId).single();
+  const totaal_minuten=reg?Math.round((Date.now()-new Date(reg.ingeklokt_op).getTime())/60000):0;
+  await sb.from('urenregistraties').update({
+    uitgeklokt_op:new Date().toISOString(),
+    locatie_uit:locatie,
+    totaal_minuten,
+    status:'wacht'
+  }).eq('id',regId);
+  if(urenTimer){clearInterval(urenTimer);urenTimer=null;}
+  loadUrenPersoneel();
+}
+
+// ── UREN BEHEER ──
+function changeUrenMaand(dir){urenMaandOffset+=dir;loadUrenBeheer();}
+
+async function loadUrenBeheer(){
+  const accordEl=document.getElementById('urenAccordeerList');
+  const maandEl=document.getElementById('urenMaandList');
+  const wachtEl=document.getElementById('urenWachtCount');
+  if(!accordEl||!maandEl)return;
+
+  // Haal alle registraties op
+  const{data:regs}=await sb.from('urenregistraties').select('*').order('ingeklokt_op',{ascending:false});
+  const{data:gebruikers}=await sb.from('gebruikers').select('id,naam').eq('rol','personeel');
+  const gMap=Object.fromEntries((gebruikers||[]).map(g=>[g.id,g.naam]));
+
+  // Te accorderen
+  const wacht=(regs||[]).filter(r=>r.status==='wacht');
+  if(wachtEl)wachtEl.textContent=wacht.length?`${wacht.length} wacht`:'';
+
+  if(!wacht.length){
+    accordEl.innerHTML='<div class="empty" style="padding:.75rem 0;font-size:12px">Geen openstaande registraties</div>';
+  }else{
+    accordEl.innerHTML=wacht.map(r=>{
+      const k=KLUSSEN.find(x=>x.id===r.klus_id);
+      const datum=new Date(r.ingeklokt_op).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
+      const in_t=new Date(r.ingeklokt_op).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});
+      const uit_t=r.uitgeklokt_op?new Date(r.uitgeklokt_op).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}):'–';
+      return`<div class="uur-item">
+        <div class="uur-item-info">
+          <div class="uur-item-naam">${gMap[r.gebruiker_id]||'Onbekend'}</div>
+          <div class="uur-item-sub">${datum} · ${in_t}–${uit_t} · ${k?.naam||'Klus'}</div>
+          ${r.locatie_in&&!r.locatie_in.includes('niet')&&!r.locatie_in.includes('geweigerd')?`<div class="uur-item-sub" style="margin-top:2px">In: ${r.locatie_in}${r.locatie_uit&&!r.locatie_uit.includes('niet')?' · Uit: '+r.locatie_uit:''}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+          <div class="uur-item-tijd">${minToStr(r.totaal_minuten)}</div>
+          <div class="uur-acc-btns">
+            <button class="btn-uur-ok" onclick="keurUren('${r.id}','goedgekeurd')">✓</button>
+            <button class="btn-uur-af" onclick="keurUren('${r.id}','afgewezen')">✗</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Maandoverzicht
+  const now=new Date();now.setMonth(now.getMonth()+urenMaandOffset);
+  const jaar=now.getFullYear();const maand=now.getMonth();
+  const maandNamen=['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
+  const maandLbl=document.getElementById('urenMaandLabel');
+  if(maandLbl)maandLbl.textContent=`${maandNamen[maand]} ${jaar}`;
+
+  const goedgekeurd=(regs||[]).filter(r=>{
+    if(r.status!=='goedgekeurd')return false;
+    const d=new Date(r.ingeklokt_op);
+    return d.getFullYear()===jaar&&d.getMonth()===maand;
+  });
+
+  // Groepeer per gebruiker
+  const perPers={};
+  goedgekeurd.forEach(r=>{
+    if(!perPers[r.gebruiker_id])perPers[r.gebruiker_id]={naam:gMap[r.gebruiker_id]||'Onbekend',minuten:0,klussen:new Set()};
+    perPers[r.gebruiker_id].minuten+=(r.totaal_minuten||0);
+    if(r.klus_id)perPers[r.gebruiker_id].klussen.add(r.klus_id);
+  });
+
+  const rijen=Object.values(perPers).sort((a,b)=>a.naam.localeCompare(b.naam));
+  const totaalMin=rijen.reduce((sum,r)=>sum+r.minuten,0);
+
+  if(!rijen.length){
+    maandEl.innerHTML='<div class="empty" style="padding:.75rem 0;font-size:12px">Geen goedgekeurde uren deze maand</div>';
+  }else{
+    maandEl.innerHTML=`<table class="uur-tbl">
+      <thead><tr><th>Naam</th><th>Klussen</th><th style="text-align:right">Uren</th></tr></thead>
+      <tbody>
+        ${rijen.map(r=>`<tr><td>${r.naam}</td><td>${r.klussen.size}</td><td style="text-align:right;font-weight:600">${minToStr(r.minuten)}</td></tr>`).join('')}
+        <tr class="totaal"><td>Totaal</td><td></td><td style="text-align:right">${minToStr(totaalMin)}</td></tr>
+      </tbody>
+    </table>`;
+  }
+}
+
+async function keurUren(id,status){
+  await sb.from('urenregistraties').update({status}).eq('id',id);
+  loadUrenBeheer();
+}
+
+function exportUrenCSV(){
+  const maandEl=document.getElementById('urenMaandLabel');
+  const maandNaam=maandEl?.textContent||'export';
+  const rows=[['Naam','Klussen','Minuten','Uren']];
+  document.querySelectorAll('.uur-tbl tbody tr:not(.totaal)').forEach(tr=>{
+    const cells=[...tr.querySelectorAll('td')].map(td=>td.textContent.trim());
+    if(cells.length>=3)rows.push([cells[0],cells[1],cells[2]]);
+  });
+  const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`uren-${maandNaam.replace(' ','-')}.csv`;
+  a.click();URL.revokeObjectURL(url);
 }
 
 // ── BESCHIKBAARHEID ──
