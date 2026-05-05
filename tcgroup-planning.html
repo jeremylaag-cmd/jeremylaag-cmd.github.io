@@ -1144,10 +1144,11 @@ sb.auth.getSession().then(({data:{session}})=>{
 });
 
 // ── UTILS ──
-function fmt(d){return d.toISOString().split('T')[0]}
+function fmt(d){const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const day=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${day}`;}
 function hbg(h){return h+'18'}
+function parseDate(s){if(!s)return new Date();return new Date(s+'T00:00:00');}
 function klusDagen(k){
-  const r=[];const s=new Date(k.datum);const e=k.datum_eind?new Date(k.datum_eind):new Date(k.datum);
+  const r=[];const s=parseDate(k.datum);const e=k.datum_eind?parseDate(k.datum_eind):parseDate(k.datum);
   for(let d=new Date(s);d<=e;d.setDate(d.getDate()+1))r.push(fmt(new Date(d)));return r;
 }
 function getWeekDates(){
@@ -1279,8 +1280,8 @@ function renderAll(){
   const isBeheerder=CURRENT_ROL==='beheerder';
 
   document.getElementById('klusList').innerHTML=sorted.length===0?'<div class="empty">Geen klussen gepland</div>':sorted.map(k=>{
-    const ds=new Date(k.datum).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
-    const dsEind=k.datum_eind?new Date(k.datum_eind).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'}):'';
+    const ds=parseDate(k.datum).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
+    const dsEind=k.datum_eind?parseDate(k.datum_eind).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'}):'';
     const datumStr=dsEind&&dsEind!==ds?`${ds} – ${dsEind}`:ds;
     const tB=k.trucks.map(t=>`<span class="bdg" style="background:${hbg(t.color)};color:${t.color}">${t.label}</span>`).join('');
     const t1=tijdFromDb(k.vertrek_tijd),t4=tijdFromDb(k.einde_feest);
@@ -1326,7 +1327,7 @@ function openPlan(type,id){
     const kw=wdays.flatMap(d=>klussen.filter(k=>klusDagen(k).includes(fmt(d))));
     if(!kw.length)return`<div class="plan-week"><div class="plan-week-label">${label}</div><div class="plan-empty">Geen klussen gepland</div></div>`;
     return`<div class="plan-week"><div class="plan-week-label">${label}</div>${kw.map(k=>{
-      const ds=new Date(k.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});
+      const ds=parseDate(k.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});
       const t1=tijdFromDb(k.vertrek_tijd),t4=tijdFromDb(k.einde_feest);
       const tijden=t1&&t4?`${t1} → ${t4}`:t1||t4||'';
       return`<div class="plan-klus" style="border-left-color:${accent}" onclick="openDetail('${k.id}')">
@@ -1392,7 +1393,7 @@ function onDateChange(){
   const{trucks,pers}=getBezette(datum);
   const tw=document.getElementById('truckWarn');const pw=document.getElementById('persWarn');
   const ct=TRUCKS.filter(t=>trucks.includes(t.id));const cp=PERSONEEL.filter(p=>pers.includes(p.id));
-  const dl=new Date(datum).toLocaleDateString('nl-NL',{day:'numeric',month:'long'});
+  const dl=parseDate(datum).toLocaleDateString('nl-NL',{day:'numeric',month:'long'});
   if(tw){tw.className=ct.length?'chip-warn show':'chip-warn';tw.textContent=ct.length?`⚠ Al ingepland op ${dl}: ${ct.map(t=>t.label).join(', ')}`:''}
   if(pw){pw.className=cp.length?'chip-warn show':'chip-warn';pw.textContent=cp.length?`⚠ Al ingepland op ${dl}: ${cp.map(p=>p.naam).join(', ')}`:''}
   renderTruckChips(trucks);renderPersChips(pers);
@@ -1583,8 +1584,8 @@ function openDetail(id){
   const k=KLUSSEN.find(x=>x.id===id);if(!k)return;
   const t1=tijdFromDb(k.vertrek_tijd),t2=tijdFromDb(k.start_opbouw),t3=tijdFromDb(k.start_feest),t4=tijdFromDb(k.einde_feest);
   const tijdLines=[t1&&`Vertrek: ${t1}`,t2&&`Opbouw: ${t2}`,t3&&`Start feest: ${t3}`,t4&&`Einde feest: ${t4}`].filter(Boolean);
-  const ds=new Date(k.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const dsEind=k.datum_eind?new Date(k.datum_eind).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
+  const ds=parseDate(k.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const dsEind=k.datum_eind?parseDate(k.datum_eind).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
   const datumStr=dsEind&&dsEind!==ds?`${ds} – ${dsEind}`:ds;
   document.getElementById('detailNaam').textContent=k.naam||k.food||'Klus';
   document.getElementById('detailTijden').innerHTML=tijdLines.map(t=>`<div style="font-size:14px;font-weight:600;color:var(--text)">${t}</div>`).join('');
@@ -1685,7 +1686,7 @@ function renderMededelingen(meds){
 function openMedDetail(id){
   const m=allMededelingen.find(x=>x.id===id);if(!m)return;
   document.getElementById('medDetailTitel').textContent=m.titel;
-  const ds=m.datum?new Date(m.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'Geen datum';
+  const ds=m.datum?parseDate(m.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'Geen datum';
   document.getElementById('medDetailDatum').textContent=ds;
   document.getElementById('medDetailBeschr').textContent=m.beschrijving||'';
   document.getElementById('medDetailBeschr').style.display=m.beschrijving?'':'none';
@@ -1866,7 +1867,7 @@ async function loadUrenPersoneel(){
   if(vandaagKlus){
     klusCard.innerHTML=`<div class="slabel" style="margin-bottom:.5rem">Mijn klus vandaag</div>
       <div style="font-size:16px;font-weight:600;color:var(--text)">${vandaagKlus.naam||vandaagKlus.food||'Klus'}</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:3px">${new Date(vandaagKlus.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'})}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px">${parseDate(vandaagKlus.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'})}</div>
       ${vandaagKlus.trucks.map(t=>`<span class="bdg" style="background:${t.color}18;color:${t.color};margin-top:6px;display:inline-flex">${t.label}</span>`).join(' ')}`;
   }else{
     klusCard.innerHTML=`<div style="font-size:13px;color:var(--muted);font-style:italic">Geen klus ingepland voor vandaag</div>`;
@@ -2081,7 +2082,7 @@ function exportUrenCSV(){
 // ── BESCHIKBAARHEID ──
 let editBeschId=null;
 
-function fmtDatum(d){if(!d)return'';return new Date(d).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short',year:'numeric'});}
+function fmtDatum(d){if(!d)return'';return parseDate(d).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short',year:'numeric'});}
 function fmtTijdRange(ts,te){
   const v=ts?ts.slice(0,5).replace(':','.'):'';
   const e=te?te.slice(0,5).replace(':','.'):'';
@@ -2338,8 +2339,8 @@ async function loadAlleBeschikbaarheid(){
 
   function renderVerzoek(b,toonKnoppen){
     const g=gMap[b.gebruiker_id];
-    const ds=new Date(b.datum_start).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
-    const de=b.datum_eind&&b.datum_eind!==b.datum_start?` – ${new Date(b.datum_eind).toLocaleDateString('nl-NL',{day:'numeric',month:'short'})}`:'';
+    const ds=parseDate(b.datum_start).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
+    const de=b.datum_eind&&b.datum_eind!==b.datum_start?` – ${parseDate(b.datum_eind).toLocaleDateString('nl-NL',{day:'numeric',month:'short'})}`:'';
     const tijdStr=b.tijd_start?` · ${b.tijd_start.slice(0,5)}–${b.tijd_eind?b.tijd_eind.slice(0,5):'?'}`:'';
     return`<div class="besch-item ${b.status}">
       <div class="besch-info">
