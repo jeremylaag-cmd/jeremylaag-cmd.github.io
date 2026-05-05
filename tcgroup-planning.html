@@ -535,7 +535,7 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
     <div class="htabs" id="headerTabs"></div>
     <div class="header-right">
       <span class="user-badge" id="userBadge"></span>
-      <div class="mob-avatar" id="mobAvatar" onclick="doLogout()" title="Uitloggen"></div>
+      <div class="mob-avatar" id="mobAvatar" title="Profiel"></div>
       <button class="logout-btn" onclick="doLogout()">Uitloggen</button>
     </div>
   </header>
@@ -647,26 +647,46 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
   <!-- ACCOUNTS (alleen beheerder) -->
   <!-- PROFIEL PAGINA -->
   <div id="page-profiel" class="page">
-    <div style="padding:1.5rem;max-width:480px;margin:0 auto">
+    <div style="padding:1.25rem;max-width:480px;margin:0 auto">
       <div class="sc">
+        <!-- Avatar + naam -->
         <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
-          <div id="profielAvatar" style="width:52px;height:52px;border-radius:50%;background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;flex-shrink:0"></div>
+          <div id="profielAvatar" style="width:56px;height:56px;border-radius:50%;background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;flex-shrink:0"></div>
           <div>
-            <div id="profielNaam" style="font-size:17px;font-weight:600;color:var(--text)"></div>
+            <div id="profielNaam" style="font-size:18px;font-weight:600;color:var(--text)"></div>
             <div id="profielRol" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
           </div>
         </div>
+
+        <!-- Info -->
         <div class="detail-section">
           <div class="detail-label">E-mailadres</div>
           <div id="profielEmail" class="detail-value"></div>
         </div>
-        <div class="detail-section" id="profielNaamSection">
-          <div class="detail-label">Naam wijzigen</div>
+
+        <!-- Naam wijzigen -->
+        <div class="detail-section">
+          <div class="detail-label">Naam</div>
           <div style="display:flex;gap:8px;margin-top:4px">
             <input type="text" id="profielNaamInput" style="flex:1;font-size:14px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);background:var(--surface);color:var(--text)">
-            <button class="btn-sm" onclick="saveProfielNaam()" style="flex-shrink:0">Opslaan</button>
+            <button class="btn-sm" onclick="saveProfielNaam()" style="flex-shrink:0;padding:8px 14px">Opslaan</button>
           </div>
         </div>
+
+        <!-- Adres -->
+        <div class="detail-section">
+          <div class="detail-label">Adres</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+            <input type="text" id="profielStraat" placeholder="Straat en huisnummer" style="font-size:14px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);background:var(--surface);color:var(--text);width:100%">
+            <div style="display:flex;gap:6px">
+              <input type="text" id="profielPostcode" placeholder="Postcode" style="font-size:14px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);background:var(--surface);color:var(--text);width:100px">
+              <input type="text" id="profielPlaats" placeholder="Plaats" style="font-size:14px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);background:var(--surface);color:var(--text);flex:1">
+            </div>
+            <button class="btn-sm" onclick="saveProfielAdres()" style="align-self:flex-end;padding:8px 14px">Adres opslaan</button>
+          </div>
+        </div>
+
+        <!-- Uitloggen -->
         <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border)">
           <button onclick="doLogout()" style="width:100%;background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;border-radius:10px;padding:13px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font)">Uitloggen</button>
         </div>
@@ -1027,13 +1047,11 @@ async function initApp(user){
   }
 
   document.getElementById('detailEditBtn').style.display=CURRENT_ROL==='beheerder'?'':'none';
-  // Mijn schema sectie alleen voor personeel
-  const schemaSection=document.getElementById('mijnSchemaSection');
-  if(schemaSection)schemaSection.style.display=CURRENT_ROL==='personeel'?'':'none';
   await loadAll();
-  // Personeel start op rooster maar laad ook schema
   if(CURRENT_ROL!=='beheerder'){
-    loadPersoonlijkSchemaRooster();
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-beschikbaarheid').classList.add('active');
+    loadPersoonlijkSchema();
   }
 }
 
@@ -1697,6 +1715,14 @@ function loadProfiel(){
   document.getElementById('profielRol').textContent=CURRENT_ROL==='beheerder'?'Beheerder':'Personeelslid';
   document.getElementById('profielEmail').textContent=CURRENT_USER.email||'–';
   document.getElementById('profielNaamInput').value=CURRENT_NAAM;
+  // Laad adresgegevens
+  sb.from('gebruikers').select('straat,postcode,plaats').eq('id',CURRENT_USER.id).single().then(({data})=>{
+    if(data){
+      document.getElementById('profielStraat').value=data.straat||'';
+      document.getElementById('profielPostcode').value=data.postcode||'';
+      document.getElementById('profielPlaats').value=data.plaats||'';
+    }
+  });
 }
 
 async function saveProfielNaam(){
@@ -1709,6 +1735,16 @@ async function saveProfielNaam(){
   const initials=naam.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
   document.getElementById('profielAvatar').textContent=initials;
   const av=document.getElementById('mobAvatar');if(av)av.textContent=initials;
+}
+
+async function saveProfielAdres(){
+  const straat=document.getElementById('profielStraat').value.trim();
+  const postcode=document.getElementById('profielPostcode').value.trim();
+  const plaats=document.getElementById('profielPlaats').value.trim();
+  await sb.from('gebruikers').update({straat,postcode,plaats}).eq('id',CURRENT_USER.id);
+  // Klein bevestigingsbericht
+  const btn=document.querySelector('[onclick="saveProfielAdres()"]');
+  if(btn){btn.textContent='✓ Opgeslagen';setTimeout(()=>btn.textContent='Adres opslaan',2000);}
 }
 
 // ── BESCHIKBAARHEID ──
