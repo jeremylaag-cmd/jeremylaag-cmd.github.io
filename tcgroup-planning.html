@@ -35,11 +35,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 /* ── APP SHELL ── */
 .app{display:none}
 @media(max-width:767px){
-  .app{display:flex;flex-direction:column;height:100svh}
+  .app{display:flex;flex-direction:column;height:100svh;overflow:hidden}
   .app > header{flex-shrink:0;position:relative;top:auto}
   .app > .bottom-nav{flex-shrink:0;z-index:60}
-  .page{display:none;flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;min-height:0}
-  .page.active{display:block}
+  .page{display:none}
+  .page.active{display:flex;flex-direction:column;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0}
   .layout{display:block;height:auto}
   .sidebar{display:none}
   .main{height:auto;overflow-y:visible;padding:1rem}
