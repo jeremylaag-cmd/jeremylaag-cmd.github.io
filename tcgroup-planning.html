@@ -1250,12 +1250,25 @@ async function saveKlus(){
     if(truckSoortRows.length)await sb.from('klus_truck_soorten').insert(truckSoortRows);
     // Upload PDFs naar Storage
     for(const p of formPdfs){
-      const ext=p.naam.split('.').pop();
-      const path=`${klusId}/${Date.now()}-${p.naam.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
-      const{data:upData,error:upErr}=await sb.storage.from('pdfs').upload(path,p.file,{contentType:'application/pdf',upsert:false});
-      if(upErr){showWarn('PDF upload mislukt: '+upErr.message);continue;}
-      const{data:{publicUrl}}=sb.storage.from('pdfs').getPublicUrl(path);
-      await sb.from('klus_pdfs').insert({klus_id:klusId,naam:p.naam,url:publicUrl});
+      try{
+        const savingEl=document.getElementById('savingMsg');
+        if(savingEl)savingEl.textContent=`PDF uploaden: ${p.naam}...`;
+        const path=`${klusId}/${Date.now()}-${p.naam.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+        const{data:upData,error:upErr}=await sb.storage.from('pdfs').upload(path,p.file,{
+          contentType:'application/pdf',
+          upsert:false,
+        });
+        if(upErr){
+          console.error('Upload fout:', upErr);
+          showWarn(`PDF '${p.naam}' upload mislukt: ${upErr.message}`);
+          continue;
+        }
+        const{data:{publicUrl}}=sb.storage.from('pdfs').getPublicUrl(path);
+        await sb.from('klus_pdfs').insert({klus_id:klusId,naam:p.naam,url:publicUrl});
+      }catch(err){
+        console.error('PDF fout:', err);
+        showWarn(`PDF '${p.naam}' kon niet worden opgeslagen.`);
+      }
     }
     closeModal();await loadAll();
   }catch(e){showWarn('Fout bij opslaan: '+e.message);}
