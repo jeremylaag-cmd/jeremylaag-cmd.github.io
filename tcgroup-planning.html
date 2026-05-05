@@ -35,11 +35,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 /* ── APP SHELL ── */
 .app{display:none}
 @media(max-width:767px){
-  .app{display:flex;flex-direction:column;height:100dvh;height:100vh}
-  .app > header{flex-shrink:0}
-  .app > .bottom-nav{flex-shrink:0;position:sticky;bottom:0;z-index:60}
-  .page{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-  .page.active{display:flex;flex-direction:column}
+  .app{display:flex;flex-direction:column;height:100svh}
+  .app > header{flex-shrink:0;position:relative;top:auto}
+  .app > .bottom-nav{flex-shrink:0}
+  .page{display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0}
+  .page.active{display:block}
+  .layout{display:block;height:auto}
+  .sidebar{display:none}
+  .main{height:auto;overflow-y:visible;padding:1rem}
 }
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.25rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:50}
 .logo{font-size:14px;font-weight:600;letter-spacing:-.02em}
