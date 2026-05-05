@@ -237,6 +237,11 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
   .besch-dag-num{font-size:14px;margin-right:auto}
   .besch-dag-items{padding:6px 10px;flex-direction:row;flex-wrap:wrap;gap:5px}
   .besch-persoon-pill{font-size:11px;padding:4px 10px}
+  /* Persoonlijk schema mobiel: 1 kolom */
+  #persWeek1 [style*="grid-template-columns:repeat(7"],
+  #persWeek2 [style*="grid-template-columns:repeat(7"]{
+    grid-template-columns:1fr !important;
+  }
 }
 .besch-item.wacht{border-left-color:#F59E0B}
 .besch-item.goedgekeurd{border-left-color:#059669}
@@ -623,11 +628,22 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50}
 
   <!-- BESCHIKBAARHEID (personeel: eigen invoer) -->
   <div id="page-beschikbaarheid" class="page">
-    <div class="beheer-wrap" style="max-width:700px">
-      <div class="bc" style="margin-bottom:1.25rem">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-          <div class="bt" style="margin:0">Mijn onbeschikbaarheid</div>
-          <button class="btn-sm" onclick="openBeschModal()">+ Toevoegen</button>
+    <div style="padding:1rem;max-width:700px;margin:0 auto">
+
+      <!-- 2-weken schema -->
+      <div class="sc" style="margin-bottom:1rem">
+        <div class="sc-header" style="margin-bottom:.875rem">
+          <div class="st">Mijn schema</div>
+          <button class="btn-sm" onclick="openBeschModal()" style="font-size:12px;padding:7px 14px">+ Onbeschikbaar</button>
+        </div>
+        <div id="persWeek1" style="margin-bottom:1rem"></div>
+        <div id="persWeek2"></div>
+      </div>
+
+      <!-- Mijn onbeschikbaarheid lijst -->
+      <div class="sc">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">
+          <div class="st">Mijn onbeschikbaarheid</div>
         </div>
         <div id="mijnBeschList"><div class="spin">Laden...</div></div>
       </div>
@@ -889,14 +905,22 @@ async function initApp(user){
     document.getElementById('addKlusBtnMob').style.display='';
     document.getElementById('addMedBtn').style.display='';
   }else{
-    tabs.innerHTML=`<button class="htab active" onclick="showPage('rooster',this)">Rooster</button>
-      <button class="htab" onclick="showPage('beschikbaarheid',this)">Mijn beschikbaarheid</button>`;
+    tabs.innerHTML=`<button class="htab active" onclick="showPage('beschikbaarheid',this)">Mijn schema</button>
+      <button class="htab" onclick="showPage('rooster',this)">Rooster</button>`;
     document.getElementById('addKlusBtn').style.display='none';
+    document.getElementById('addKlusBtnDesk')&&(document.getElementById('addKlusBtnDesk').style.display='none');
+    document.getElementById('addKlusBtnMob')&&(document.getElementById('addKlusBtnMob').style.display='none');
     document.getElementById('addMedBtn').style.display='none';
   }
   document.getElementById('userBadge').textContent=CURRENT_NAAM;
   document.getElementById('detailEditBtn').style.display=CURRENT_ROL==='beheerder'?'':'none';
   await loadAll();
+  // Personeel start op Mijn schema
+  if(CURRENT_ROL!=='beheerder'){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-beschikbaarheid').classList.add('active');
+    loadPersoonlijkSchema();
+  }
 }
 
 // Check bestaande sessie
@@ -933,7 +957,7 @@ function showPage(id,btn){
   if(btn)btn.classList.add('active');
   if(id==='beheer')renderBeheer();
   if(id==='accounts')loadAccounts();
-  if(id==='beschikbaarheid')loadMijnBeschikbaarheid();
+  if(id==='beschikbaarheid')loadPersoonlijkSchema();
   if(id==='beschikbaarheid-beheer')loadAlleBeschikbaarheid();
 }
 
@@ -1547,6 +1571,71 @@ function fmtTijdRange(ts,te){
   if(v&&e)return` · ${v} – ${e}`;
   if(v)return` · vanaf ${v}`;
   return' · Hele dag';
+}
+
+async function loadPersoonlijkSchema(){
+  // Laad 2 weken schema voor ingelogd personeelslid
+  const w1El=document.getElementById('persWeek1');
+  const w2El=document.getElementById('persWeek2');
+  if(!w1El||!w2El)return;
+
+  // Mijn klussen — via klus_gebruikers
+  const{data:kgData}=await sb.from('klus_gebruikers').select('klus_id').eq('gebruiker_id',CURRENT_USER.id);
+  const mijnKlusIds=(kgData||[]).map(x=>x.klus_id);
+
+  // Mijn goedgekeurde onbeschikbaarheid
+  const{data:mijnBesch}=await sb.from('beschikbaarheid').select('*').eq('gebruiker_id',CURRENT_USER.id).eq('status','goedgekeurd');
+
+  // 14 dagen vanaf vandaag (Ma van huidige week)
+  const start=new Date(today);start.setDate(start.getDate()-start.getDay()+1);
+  const week1=Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);return d;});
+  const week2=Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+7+i);return d;});
+
+  function renderWeek(days,weekLabel){
+    const dagNamen=['Ma','Di','Wo','Do','Vr','Za','Zo'];
+    const html=days.map((d,i)=>{
+      const ds=fmt(d);
+      const isToday=ds===todayStr;
+      const dagKlussen=KLUSSEN.filter(k=>mijnKlusIds.includes(k.id)&&klusDagen(k).includes(ds));
+      const dagBesch=(mijnBesch||[]).filter(b=>b.datum_start<=ds&&b.datum_eind>=ds);
+      const heeftItems=dagKlussen.length||dagBesch.length;
+      return`<div style="background:var(--surface);border:1px solid ${isToday?'#BFDBFE':'var(--border)'};border-radius:10px;overflow:hidden;${isToday?'box-shadow:0 0 0 2px #BFDBFE':''};min-height:80px">
+        <div style="padding:7px 10px;background:${isToday?'#EFF6FF':'var(--bg)'};border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px">
+          <span style="font-size:10px;font-weight:600;color:${isToday?'#1E40AF':'var(--muted)'};text-transform:uppercase;letter-spacing:.05em">${dagNamen[i]}</span>
+          <span style="font-size:15px;font-weight:700;color:${isToday?'#1E40AF':'var(--text)'}">${d.getDate()}</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:auto">${d.toLocaleDateString('nl-NL',{month:'short'})}</span>
+        </div>
+        <div style="padding:7px 8px;display:flex;flex-direction:column;gap:4px">
+          ${dagBesch.map(b=>`<div style="background:#FEF2F2;border-radius:6px;padding:5px 8px;border-left:3px solid #DC2626">
+            <div style="font-size:11px;font-weight:600;color:#991B1B">🚫 Niet beschikbaar</div>
+            ${b.reden?`<div style="font-size:11px;color:#DC2626;margin-top:1px">${b.reden}</div>`:''}
+            ${b.tijd_start?`<div style="font-size:10px;color:#DC2626;margin-top:1px">${b.tijd_start.slice(0,5)} – ${b.tijd_eind?b.tijd_eind.slice(0,5):'?'}</div>`:''}
+          </div>`).join('')}
+          ${dagKlussen.map(k=>{
+            const t1=tijdFromDb(k.vertrek_tijd);
+            const t4=tijdFromDb(k.einde_feest);
+            const tijdStr=t1?`${t1}${t4?' → '+t4:''}`:''  ;
+            const tB=k.trucks.map(t=>`<span style="font-size:10px;font-weight:500;background:${t.color}18;color:${t.color};border-radius:4px;padding:1px 5px">${t.label}</span>`).join(' ');
+            return`<div style="background:#F0FDF4;border-radius:6px;padding:5px 8px;border-left:3px solid #059669;cursor:pointer" onclick="openDetail('${k.id}')">
+              <div style="font-size:12px;font-weight:600;color:#065F46">${k.naam||k.food||'Klus'}</div>
+              ${tijdStr?`<div style="font-size:11px;color:#059669;margin-top:1px">${tijdStr}</div>`:''}
+              ${tB?`<div style="margin-top:3px;display:flex;gap:3px;flex-wrap:wrap">${tB}</div>`:''}
+            </div>`;
+          }).join('')}
+          ${!heeftItems?`<div style="font-size:11px;color:var(--muted);font-style:italic;padding:2px 0">Vrij</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+    return`<div style="margin-bottom:.5rem;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">${weekLabel}</div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:.25rem">${html}</div>`;
+  }
+
+  const opts={day:'numeric',month:'short'};
+  w1El.innerHTML=renderWeek(week1,`${week1[0].toLocaleDateString('nl-NL',opts)} – ${week1[6].toLocaleDateString('nl-NL',opts)}`);
+  w2El.innerHTML=renderWeek(week2,`${week2[0].toLocaleDateString('nl-NL',opts)} – ${week2[6].toLocaleDateString('nl-NL',opts)}`);
+
+  // Laad ook de lijst
+  loadMijnBeschikbaarheid();
 }
 
 async function loadMijnBeschikbaarheid(){
