@@ -1231,9 +1231,9 @@ async function saveKlus(){
       const removedPdfs=KLUSSEN.find(k=>k.id===editId)?.pdfs.filter(p=>!existingPdfs.find(e=>e.id===p.id))||[];
       for(const p of removedPdfs){
         // Verwijder uit Storage als het een Storage URL is
-        if(p.url&&p.url.includes('/storage/v1/object/public/pdfs/')){
-          const path=p.url.split('/storage/v1/object/public/pdfs/')[1];
-          await sb.storage.from('pdfs').remove([path]);
+        if(p.url&&p.url.includes('/storage/v1/object/public/pdf/')){
+          const path=p.url.split('/storage/v1/object/public/pdf/')[1];
+          await sb.storage.from('pdf').remove([path]);
         }
         await sb.from('klus_pdfs').delete().eq('id',p.id);
       }
@@ -1256,7 +1256,7 @@ async function saveKlus(){
         const path=`${klusId}/${Date.now()}-${p.naam.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
         const{data:{session}}=await sb.auth.getSession();
         const token=session?.access_token||SB_KEY;
-        const res=await fetch(`${SB_URL}/storage/v1/object/pdfs/${path}`,{
+        const res=await fetch(`${SB_URL}/storage/v1/object/pdf/${path}`,{
           method:'POST',
           headers:{
             'Authorization':`Bearer ${token}`,
@@ -1271,7 +1271,7 @@ async function saveKlus(){
           showWarn(`PDF '${p.naam}' upload mislukt: ${res.status} ${err}`);
           continue;
         }
-        const publicUrl=`${SB_URL}/storage/v1/object/public/pdfs/${path}`;
+        const publicUrl=`${SB_URL}/storage/v1/object/public/pdf/${path}`;
         await sb.from('klus_pdfs').insert({klus_id:klusId,naam:p.naam,url:publicUrl});
       }catch(err){
         console.error('PDF fout:', err);
