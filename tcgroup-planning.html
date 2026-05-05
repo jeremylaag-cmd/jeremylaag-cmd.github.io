@@ -450,11 +450,14 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
   .drawer-overlay,.drawer{display:none !important}
   .desk-only{display:block !important}
   .sidebar{display:block !important}
+  .bottom-nav{display:none !important}
   header{padding:0 2rem;height:56px}
   .logo{font-size:15px}
   .htabs{height:56px;overflow-x:visible}
   .htab{padding:0 1.25rem;font-size:13px}
-  .user-badge{display:inline}
+  .user-badge{display:none}
+  .mob-avatar{display:flex;width:32px;height:32px;border-radius:50%;background:var(--text);color:#fff;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;border:2px solid transparent;transition:.15s}
+  .mob-avatar:hover{border-color:var(--muted)}
   .layout{display:grid;grid-template-columns:240px 1fr;height:calc(100vh - 56px);flex-direction:unset}
   .sidebar{border-right:1px solid var(--border);border-bottom:none;padding:1.25rem;overflow-y:auto;height:100%}
   .main{padding:1.5rem;overflow-y:auto;height:100%;gap:1.25rem}
