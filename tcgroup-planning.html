@@ -1057,8 +1057,29 @@ async function initApp(user){
   document.getElementById('appWrap').style.display='block';
   // Tabs op basis van rol
   const tabs=document.getElementById('headerTabs');
-  if(CURRENT_ROL==='beheerder'){
-    tabs.innerHTML=`<button class="htab active" onclick="showPage('rooster',this)">Rooster</button>
+  const isBeheerder=CURRENT_ROL==='beheerder';
+  const isHal=CURRENT_ROL==='hal';
+  const isFullTimer=CURRENT_ROL==='full-timer';
+  const isPartTimer=CURRENT_ROL==='part-timer';
+  const isPersoneel=isHal||isFullTimer||isPartTimer;
+
+  // SVG iconen herbruikbaar
+  const ico={
+    rooster:`<svg width="20" height="20" viewBox="0 0 24 24"><rect class="ni" x="3" y="4" width="18" height="18" rx="2"/><line class="ni" x1="16" y1="2" x2="16" y2="6"/><line class="ni" x1="8" y1="2" x2="8" y2="6"/><line class="ni" x1="3" y1="10" x2="21" y2="10"/></svg>`,
+    uren:`<svg width="20" height="20" viewBox="0 0 24 24"><circle class="ni" cx="12" cy="12" r="10"/><polyline class="ni" points="12 6 12 12 16 14"/></svg>`,
+    schema:`<svg width="20" height="20" viewBox="0 0 24 24"><rect class="ni" x="3" y="3" width="7" height="7"/><rect class="ni" x="14" y="3" width="7" height="7"/><rect class="ni" x="14" y="14" width="7" height="7"/><rect class="ni" x="3" y="14" width="7" height="7"/></svg>`,
+    beheer:`<svg width="20" height="20" viewBox="0 0 24 24"><circle class="ni" cx="12" cy="12" r="3"/><path class="ni" d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+    beschikbaarheid:`<svg width="20" height="20" viewBox="0 0 24 24"><path class="ni" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle class="ni" cx="9" cy="7" r="4"/><path class="ni" d="M23 21v-2a4 4 0 0 0-3-3.87"/><path class="ni" d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+    accounts:`<svg width="20" height="20" viewBox="0 0 24 24"><path class="ni" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle class="ni" cx="12" cy="7" r="4"/></svg>`,
+    profiel:`<svg width="20" height="20" viewBox="0 0 24 24"><path class="ni" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle class="ni" cx="12" cy="7" r="4"/></svg>`,
+  };
+  function bnavItem(page,label,icon,active=false){
+    return`<button class="bnav-item${active?' active':''}" onclick="switchNav('${page}',this)"><div class="bnav-icon">${icon}</div><span class="bnav-label">${label}</span></button>`;
+  }
+
+  if(isBeheerder){
+    tabs.innerHTML=`
+      <button class="htab active" onclick="showPage('rooster',this)">Rooster</button>
       <button class="htab" onclick="showPage('uren-beheer',this)">Uren</button>
       <button class="htab" onclick="showPage('beheer',this)">Beheer</button>
       <button class="htab" onclick="showPage('beschikbaarheid-beheer',this)">Beschikbaarheid</button>
@@ -1067,74 +1088,69 @@ async function initApp(user){
     document.getElementById('addKlusBtnDesk').style.display='';
     document.getElementById('addKlusBtnMob').style.display='';
     document.getElementById('addMedBtn').style.display='';
-  }else{
-    tabs.innerHTML=`<button class="htab active" onclick="showPage('beschikbaarheid',this)">Mijn schema</button>
-      <button class="htab" onclick="showPage('uren',this)">Uren</button>
+  }else if(isHal){
+    // Hal: uren + rooster, geen schema
+    tabs.innerHTML=`
+      <button class="htab active" onclick="showPage('uren',this)">Uren</button>
       <button class="htab" onclick="showPage('rooster',this)">Rooster</button>`;
-    document.getElementById('addKlusBtn').style.display='none';
-    document.getElementById('addKlusBtnDesk')&&(document.getElementById('addKlusBtnDesk').style.display='none');
-    document.getElementById('addKlusBtnMob')&&(document.getElementById('addKlusBtnMob').style.display='none');
-    document.getElementById('addMedBtn').style.display='none';
+    ['addKlusBtn','addKlusBtnDesk','addKlusBtnMob','addMedBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  }else{
+    // Part-timer / Full-timer
+    const extraTab=isFullTimer?`<button class="htab" onclick="showPage('rooster',this)">Rooster</button>`:'';
+    tabs.innerHTML=`
+      <button class="htab active" onclick="showPage('beschikbaarheid',this)">Mijn schema</button>
+      <button class="htab" onclick="showPage('uren',this)">Uren</button>
+      ${extraTab}`;
+    ['addKlusBtn','addKlusBtnDesk','addKlusBtnMob','addMedBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
   }
+
+  // Bottom nav
   document.getElementById('userBadge').textContent=CURRENT_NAAM;
-  // Avatar initialen
   const initials=CURRENT_NAAM.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
   const av=document.getElementById('mobAvatar');
   if(av){av.textContent=initials;av.onclick=()=>switchNav('profiel',null);av.title='Profiel';}
 
-  // Bottom nav bouwen
   const bn=document.getElementById('bottomNav');
   if(bn){
     bn.classList.add('visible');
-    if(CURRENT_ROL==='beheerder'){
-      bn.innerHTML=`
-        <button class="bnav-item active" onclick="switchNav('rooster',this)">
-          <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><rect class="ni" x="3" y="4" width="18" height="18" rx="2"/><line class="ni" x1="16" y1="2" x2="16" y2="6"/><line class="ni" x1="8" y1="2" x2="8" y2="6"/><line class="ni" x1="3" y1="10" x2="21" y2="10"/></svg></div>
-          <span class="bnav-label">Rooster</span>
-        </button>
-        <button class="bnav-item" onclick="switchNav('uren-beheer',this)">
-          <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><circle class="ni" cx="12" cy="12" r="10"/><polyline class="ni" points="12 6 12 12 16 14"/></svg></div>
-          <span class="bnav-label">Uren</span>
-        </button>
-        <button class="bnav-item" onclick="switchNav('beheer',this)">
-          <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><circle class="ni" cx="12" cy="12" r="3"/><path class="ni" d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
-          <span class="bnav-label">Beheer</span>
-        </button>
-        <button class="bnav-item" onclick="switchNav('beschikbaarheid-beheer',this)">
-          <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><path class="ni" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle class="ni" cx="9" cy="7" r="4"/><path class="ni" d="M23 21v-2a4 4 0 0 0-3-3.87"/><path class="ni" d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-          <span class="bnav-label">Beschikbaarheid</span>
-        </button>
-        <button class="bnav-item" onclick="switchNav('accounts',this)">
-          <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><path class="ni" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle class="ni" cx="12" cy="7" r="4"/></svg></div>
-          <span class="bnav-label">Accounts</span>
-        </button>`;
+    if(isBeheerder){
+      bn.innerHTML=
+        bnavItem('rooster','Rooster',ico.rooster,true)+
+        bnavItem('uren-beheer','Uren',ico.uren)+
+        bnavItem('beheer','Beheer',ico.beheer)+
+        bnavItem('beschikbaarheid-beheer','Beschikbaarheid',ico.beschikbaarheid)+
+        bnavItem('accounts','Accounts',ico.accounts);
+    }else if(isHal){
+      bn.innerHTML=
+        bnavItem('uren','Uren',ico.uren,true)+
+        bnavItem('rooster','Rooster',ico.rooster)+
+        bnavItem('profiel','Profiel',ico.profiel);
+    }else if(isFullTimer){
+      bn.innerHTML=
+        bnavItem('beschikbaarheid','Mijn schema',ico.rooster,true)+
+        bnavItem('uren','Uren',ico.uren)+
+        bnavItem('rooster','Rooster',ico.schema)+
+        bnavItem('profiel','Profiel',ico.profiel);
     }else{
-      bn.innerHTML=`
-        <button class="bnav-item active" onclick="switchNav('beschikbaarheid',this)">
-          <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><rect class="ni" x="3" y="4" width="18" height="18" rx="2"/><line class="ni" x1="16" y1="2" x2="16" y2="6"/><line class="ni" x1="8" y1="2" x2="8" y2="6"/><line class="ni" x1="3" y1="10" x2="21" y2="10"/></svg></div>
-          <span class="bnav-label">Mijn schema</span>
-        </button>
-        <button class="bnav-item" onclick="switchNav('uren',this)">
-          <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><circle class="ni" cx="12" cy="12" r="10"/><polyline class="ni" points="12 6 12 12 16 14"/></svg></div>
-          <span class="bnav-label">Uren</span>
-        </button>
-        <button class="bnav-item" onclick="switchNav('rooster',this)">
-          <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><rect class="ni" x="3" y="3" width="7" height="7"/><rect class="ni" x="14" y="3" width="7" height="7"/><rect class="ni" x="14" y="14" width="7" height="7"/><rect class="ni" x="3" y="14" width="7" height="7"/></svg></div>
-          <span class="bnav-label">Rooster</span>
-        </button>
-        <button class="bnav-item" onclick="switchNav('profiel',this)">
-          <div class="bnav-icon"><svg width="20" height="20" viewBox="0 0 24 24"><path class="ni" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle class="ni" cx="12" cy="7" r="4"/></svg></div>
-          <span class="bnav-label">Profiel</span>
-        </button>`;
+      // Part-timer
+      bn.innerHTML=
+        bnavItem('beschikbaarheid','Mijn schema',ico.rooster,true)+
+        bnavItem('uren','Uren',ico.uren)+
+        bnavItem('profiel','Profiel',ico.profiel);
     }
   }
 
-  document.getElementById('detailEditBtn').style.display=CURRENT_ROL==='beheerder'?'':'none';
+  document.getElementById('detailEditBtn').style.display=isBeheerder?'':'none';
   await loadAll();
-  if(CURRENT_ROL!=='beheerder'){
+  if(!isBeheerder){
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.getElementById('page-beschikbaarheid').classList.add('active');
-    loadPersoonlijkSchema();
+    if(isHal){
+      document.getElementById('page-uren').classList.add('active');
+      loadUrenPersoneel();
+    }else{
+      document.getElementById('page-beschikbaarheid').classList.add('active');
+      loadPersoonlijkSchema();
+    }
   }
 }
 
@@ -1191,7 +1207,7 @@ async function loadAll(){
     {data:klusSoorten},{data:klusTruckSoorten},{data:beschData}
   ]=await Promise.all([
     sb.from('trucks').select('*').order('volgorde'),
-    sb.from('gebruikers').select('id,naam,rol').eq('rol','personeel').order('naam'),
+    sb.from('gebruikers').select('id,naam,rol').in('rol',['part-timer','full-timer']).order('naam'),
     sb.from('klussen').select('*').order('datum'),
     sb.from('klus_trucks').select('*'),
     sb.from('klus_gebruikers').select('*'),
@@ -1753,34 +1769,43 @@ async function loadAccounts(){
   const{data}=await sb.from('gebruikers').select('*').order('naam');
   const acc=document.getElementById('accList');
   if(!data||!data.length){acc.innerHTML='<div class="empty">Geen accounts gevonden</div>';return;}
+  const rolLabels={'beheerder':'Beheerder','part-timer':'Part-timer','full-timer':'Full-timer','hal':'Hal medewerker'};
   acc.innerHTML=data.map(u=>`<div class="acc-item" id="ac-${u.id}">
     <div class="acc-info">
       <div class="acc-naam">${u.naam||'–'}</div>
-      <div class="acc-email" style="font-size:10px;color:var(--muted)">${u.rol}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">${u.rol}</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
-      <span class="acc-rol ${u.rol}">${u.rol}</span>
       <button class="btn-edit" onclick="startEditAccount('${u.id}')">Bewerk</button>
-      ${u.rol==='personeel'?`<button class="btn-sm" style="padding:4px 9px;font-size:10px" onclick="maakBeheerder('${u.id}')">→ Beheerder</button>`:''}
       ${u.id!==CURRENT_USER.id?`<button class="btn-danger-sm" onclick="verwijderAccount('${u.id}')">×</button>`:''}
     </div>
   </div>`).join('');
 }
 
 function startEditAccount(id){
-  const u=document.querySelector(`#ac-${id} .acc-naam`);
-  const naam=u?.textContent||'';
-  document.getElementById('ac-'+id).innerHTML=`<div style="flex:1">
+  const el=document.getElementById('ac-'+id);
+  const naam=el?.querySelector('.acc-naam')?.textContent||'';
+  const rolLabels={'beheerder':'Beheerder','part-timer':'Part-timer','full-timer':'Full-timer','hal':'Hal medewerker'};
+  el.innerHTML=`<div style="flex:1">
     <div class="bi-edit-form">
       <input type="text" id="ean-${id}" value="${naam}" placeholder="Naam" style="font-size:12px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;font-family:var(--font)">
+      <select id="erol-${id}" style="font-size:12px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;font-family:var(--font)">
+        ${Object.entries(rolLabels).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
+      </select>
       <div class="bi-edit-row"><button class="btn-danger-sm" onclick="loadAccounts()">Annuleer</button><button class="btn-sm" onclick="saveAccount('${id}')">Opslaan</button></div>
     </div>
   </div>`;
+  // Huidige rol selecteren
+  sb.from('gebruikers').select('rol').eq('id',id).single().then(({data})=>{
+    if(data)document.getElementById('erol-'+id).value=data.rol;
+  });
 }
+
 async function saveAccount(id){
   const naam=document.getElementById('ean-'+id).value.trim();
+  const rol=document.getElementById('erol-'+id).value;
   if(!naam)return;
-  await sb.from('gebruikers').update({naam}).eq('id',id);
+  await sb.from('gebruikers').update({naam,rol}).eq('id',id);
   await loadAll();loadAccounts();
 }
 async function maakBeheerder(id){
@@ -1874,16 +1899,25 @@ async function loadUrenPersoneel(){
   const regCard=document.getElementById('uurRegistratieCard');
   if(!klusCard||!regCard)return;
 
-  // Klus van vandaag
-  const{data:kgData}=await sb.from('klus_gebruikers').select('klus_id').eq('gebruiker_id',CURRENT_USER.id);
-  const mijnKlusIds=(kgData||[]).map(x=>x.klus_id);
-  const vandaagKlus=KLUSSEN.find(k=>mijnKlusIds.includes(k.id)&&klusDagen(k).includes(todayStr));
+  const isHal=CURRENT_ROL==='hal';
 
-  if(vandaagKlus){
+  // Klus van vandaag (niet voor hal)
+  let vandaagKlus=null;
+  if(!isHal){
+    const{data:kgData}=await sb.from('klus_gebruikers').select('klus_id').eq('gebruiker_id',CURRENT_USER.id);
+    const mijnKlusIds=(kgData||[]).map(x=>x.klus_id);
+    vandaagKlus=KLUSSEN.find(k=>mijnKlusIds.includes(k.id)&&klusDagen(k).includes(todayStr));
+  }
+
+  if(!isHal&&vandaagKlus){
     klusCard.innerHTML=`<div class="slabel" style="margin-bottom:.5rem">Mijn klus vandaag</div>
       <div style="font-size:16px;font-weight:600;color:var(--text)">${vandaagKlus.naam||vandaagKlus.food||'Klus'}</div>
       <div style="font-size:12px;color:var(--muted);margin-top:3px">${parseDate(vandaagKlus.datum).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'})}</div>
       ${vandaagKlus.trucks.map(t=>`<span class="bdg" style="background:${t.color}18;color:${t.color};margin-top:6px;display:inline-flex">${t.label}</span>`).join(' ')}`;
+  }else if(isHal){
+    klusCard.innerHTML=`<div class="slabel" style="margin-bottom:.5rem">Vandaag</div>
+      <div style="font-size:16px;font-weight:600;color:var(--text)">${new Date().toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'})}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px">Hal medewerker — je kunt altijd inklokken</div>`;
   }else{
     klusCard.innerHTML=`<div style="font-size:13px;color:var(--muted);font-style:italic">Geen klus ingepland voor vandaag</div>`;
   }
@@ -1892,10 +1926,12 @@ async function loadUrenPersoneel(){
   const{data:lopend}=await sb.from('urenregistraties')
     .select('*').eq('gebruiker_id',CURRENT_USER.id).eq('status','lopend').maybeSingle();
 
+  // Check inklokken mogelijk
+  const kanInklokken=isHal||(vandaagKlus!=null);
   if(lopend){
     renderIngeklokt(lopend,vandaagKlus);
   }else{
-    renderInklokken(vandaagKlus,regCard);
+    renderInklokken(vandaagKlus,regCard,kanInklokken);
   }
 
   // Laad registratie geschiedenis
@@ -1926,14 +1962,14 @@ async function loadUrenPersoneel(){
   }).join('');
 }
 
-function renderInklokken(klus,container){
+function renderInklokken(klus,container,kanInklokken){
   if(!container)return;
   if(urenTimer){clearInterval(urenTimer);urenTimer=null;}
   container.innerHTML=`<div class="slabel" style="margin-bottom:.5rem">Urenregistratie</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5">
-      ${klus?'Klok in zodra je begint. Je locatie wordt opgeslagen als bewijs.':'Je kunt alleen inklokken op een dag dat je een klus hebt.'}
+      ${kanInklokken?'Klok in zodra je begint. Je locatie wordt opgeslagen als bewijs.':'Je kunt alleen inklokken op een dag dat je een klus hebt.'}
     </div>
-    ${klus?`<button class="uur-btn uur-btn-in" onclick="doInklokken('${klus.id}')">Inklokken</button>`:''}`;
+    ${kanInklokken?`<button class="uur-btn uur-btn-in" onclick="doInklokken('${klus?.id||''}')">Inklokken</button>`:''}`;
 }
 
 function renderIngeklokt(reg,klus){
