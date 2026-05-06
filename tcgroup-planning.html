@@ -398,6 +398,11 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
 .uur-tbl td{padding:9px 8px;border-bottom:1px solid var(--border);color:var(--text)}
 .uur-tbl tr:last-child td{border-bottom:none}
 .uur-tbl .totaal{font-weight:600;background:var(--bg)}
+@media(max-width:767px){
+  #urenBeheerGrid{grid-template-columns:1fr !important}
+  .uur-item{flex-wrap:wrap}
+  .uur-acc-btns{flex-wrap:wrap}
+}
 
 /* Beschikbaarheid */
 .besch-item{padding:.875rem 1rem}
@@ -797,7 +802,7 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
   <!-- UREN — BEHEERDER -->
   <div id="page-uren-beheer" class="page">
     <div style="padding:1.25rem;max-width:900px;margin:0 auto">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+      <div id="urenBeheerGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
         <div class="sc">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">
             <div class="st">Te accorderen</div>
@@ -2007,7 +2012,7 @@ async function doInklokken(klusId){
   const locatie=await getLocatie();
   await sb.from('urenregistraties').insert({
     gebruiker_id:CURRENT_USER.id,
-    klus_id:klusId,
+    klus_id:klusId||null,
     locatie_in:locatie,
     status:'lopend'
   });
