@@ -1846,7 +1846,22 @@ async function getLocatie(){
   return new Promise(resolve=>{
     if(!navigator.geolocation){resolve('Locatie niet beschikbaar');return;}
     navigator.geolocation.getCurrentPosition(
-      pos=>resolve(`${pos.coords.latitude.toFixed(5)},${pos.coords.longitude.toFixed(5)}`),
+      async pos=>{
+        const lat=pos.coords.latitude;const lng=pos.coords.longitude;
+        try{
+          const res=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`,{
+            headers:{'Accept-Language':'nl'}
+          });
+          const data=await res.json();
+          const a=data.address||{};
+          const straat=[a.road,a.house_number].filter(Boolean).join(' ');
+          const plaats=a.city||a.town||a.village||a.municipality||'';
+          const adres=[straat,plaats].filter(Boolean).join(', ');
+          resolve(adres||`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+        }catch{
+          resolve(`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+        }
+      },
       ()=>resolve('Locatie geweigerd'),
       {timeout:8000,maximumAge:60000}
     );
@@ -2005,7 +2020,7 @@ async function loadUrenBeheer(){
       const datum=new Date(r.ingeklokt_op).toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
       const in_t=new Date(r.ingeklokt_op).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});
       const uit_t=r.uitgeklokt_op?new Date(r.uitgeklokt_op).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}):'–';
-      return`<div class="uur-item">
+      return`<div class="uur-item" id="uur-${r.id}">
         <div class="uur-item-info">
           <div class="uur-item-naam">${gMap[r.gebruiker_id]||'Onbekend'}</div>
           <div class="uur-item-sub">${datum} · ${in_t}–${uit_t} · ${k?.naam||'Klus'}</div>
@@ -2016,6 +2031,7 @@ async function loadUrenBeheer(){
           <div class="uur-acc-btns">
             <button class="btn-uur-ok" onclick="keurUren('${r.id}','goedgekeurd')">✓</button>
             <button class="btn-uur-af" onclick="keurUren('${r.id}','afgewezen')">✗</button>
+            <button class="btn-sm" style="padding:5px 10px;font-size:11px" onclick="startEditUren('${r.id}')">Bewerk</button>
           </div>
         </div>
       </div>`;
@@ -2061,6 +2077,70 @@ async function loadUrenBeheer(){
 
 async function keurUren(id,status){
   await sb.from('urenregistraties').update({status}).eq('id',id);
+  loadUrenBeheer();
+}
+
+async function startEditUren(id){
+  const{data:r}=await sb.from('urenregistraties').select('*').eq('id',id).single();
+  if(!r)return;
+  const in_t=new Date(r.ingeklokt_op).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}).replace(':','');
+  const uit_t=r.uitgeklokt_op?new Date(r.uitgeklokt_op).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}).replace(':',''):'';
+  const datum=fmt(new Date(r.ingeklokt_op));
+  const el=document.getElementById(`uur-${id}`);
+  if(!el)return;
+  el.innerHTML=`<div style="width:100%">
+    <div class="uur-item-naam" style="margin-bottom:10px">Uren bewerken</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--muted);margin-bottom:4px">INKLOK TIJD</div>
+        <input type="text" id="edit-in-${id}" value="${in_t}" placeholder="0900" maxlength="4"
+          style="width:100%;font-size:15px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);background:var(--surface);color:var(--text);text-align:center">
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--muted);margin-bottom:4px">UITKLOK TIJD</div>
+        <input type="text" id="edit-uit-${id}" value="${uit_t}" placeholder="2300" maxlength="4"
+          style="width:100%;font-size:15px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);background:var(--surface);color:var(--text);text-align:center">
+      </div>
+    </div>
+    <div style="font-size:10px;font-weight:600;color:var(--muted);margin-bottom:4px">NOTITIE (optioneel)</div>
+    <input type="text" id="edit-notitie-${id}" value="${r.notitie_beh||''}" placeholder="Toelichting bij wijziging..."
+      style="width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);background:var(--surface);color:var(--text);margin-bottom:10px">
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn-ghost" onclick="loadUrenBeheer()" style="font-size:12px;padding:7px 14px">Annuleer</button>
+      <button class="btn-uur-af" onclick="saveEditUren('${id}','afgewezen')" style="font-size:12px;padding:7px 14px">✗ Afwijzen</button>
+      <button class="btn-uur-ok" onclick="saveEditUren('${id}','goedgekeurd')" style="font-size:12px;padding:7px 14px">✓ Opslaan & goedkeuren</button>
+    </div>
+  </div>`;
+  // Datum bewaren voor hergebruik
+  el.dataset.datum=datum;
+}
+
+async function saveEditUren(id,status){
+  const el=document.getElementById(`uur-${id}`);
+  const datum=el?.dataset.datum||fmt(new Date());
+  const inVal=document.getElementById(`edit-in-${id}`)?.value.trim().replace(':','').padStart(4,'0');
+  const uitVal=document.getElementById(`edit-uit-${id}`)?.value.trim().replace(':','').padStart(4,'0');
+  const notitie=document.getElementById(`edit-notitie-${id}`)?.value.trim();
+
+  const parseTime=(d,t)=>{
+    if(!t||t.length<4)return null;
+    return new Date(`${d}T${t.slice(0,2)}:${t.slice(2,4)}:00`).toISOString();
+  };
+
+  const ingeklokt_op=parseTime(datum,inVal);
+  const uitgeklokt_op=parseTime(datum,uitVal);
+  let totaal_minuten=null;
+  if(ingeklokt_op&&uitgeklokt_op){
+    totaal_minuten=Math.round((new Date(uitgeklokt_op)-new Date(ingeklokt_op))/60000);
+    if(totaal_minuten<0)totaal_minuten+=24*60; // over middernacht
+  }
+
+  const update={status,notitie_beh:notitie};
+  if(ingeklokt_op)update.ingeklokt_op=ingeklokt_op;
+  if(uitgeklokt_op)update.uitgeklokt_op=uitgeklokt_op;
+  if(totaal_minuten!==null)update.totaal_minuten=totaal_minuten;
+
+  await sb.from('urenregistraties').update(update).eq('id',id);
   loadUrenBeheer();
 }
 
