@@ -905,7 +905,8 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
       </div>
       <div id="persDetailBody"></div>
       <div class="mfooter" style="margin-top:1rem">
-        <button class="btn-ghost" onclick="closePersDetail()">Sluiten</button>
+        <button class="btn-ghost" onclick="closePersDetail()">Annuleren</button>
+        <button class="btn-sm" onclick="savePersDetail()">Opslaan</button>
       </div>
     </div>
   </div>
@@ -1497,6 +1498,97 @@ async function toggleUserSkill(userId,skillId,btn){
   if(skills.includes(skillId)){skills=skills.filter(s=>s!==skillId);btn.classList.remove('on');}
   else{skills.push(skillId);btn.classList.add('on');}
   await sb.from('gebruikers').update({skills:JSON.stringify(skills)}).eq('id',userId);
+}
+
+// ── PERSONEEL DETAIL ──
+let persDetailId=null;
+
+async function openPersDetail(uid){
+  persDetailId=uid;
+  const[{data:u},{data:skillsData}]=await Promise.all([
+    sb.from('gebruikers').select('*').eq('id',uid).single(),
+    sb.from('skills').select('*').order('naam'),
+  ]);
+  SKILLS=skillsData||[];
+  if(!u)return;
+
+  document.getElementById('persDetailNaam').textContent=u.naam||'Onbekend';
+
+  let userSkills=[];
+  try{userSkills=u.skills?JSON.parse(typeof u.skills==='string'?u.skills:'[]'):[];}catch(e){}
+
+  const skillPills=SKILLS.length
+    ?SKILLS.map(s=>`<button type="button" class="chip${userSkills.includes(s.id)?' on':''}" style="font-size:11px;padding:4px 11px" onclick="pdToggleSkill('${uid}','${s.id}',this)">${s.naam}</button>`).join('')
+    :'<span style="font-size:12px;color:var(--muted)">Nog geen skills aangemaakt — ga naar Beheer → Skills.</span>';
+
+  document.getElementById('persDetailBody').innerHTML=`
+    <div class="fr"><span class="fl">Naam</span>
+      <input type="text" id="pdNaam" value="${u.naam||''}" style="font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);width:100%">
+    </div>
+    <div class="fr"><span class="fl">Rol</span>
+      <select id="pdRol" style="font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);background:var(--surface);color:var(--text);width:100%">
+        <option value="personeel"${u.rol==='personeel'?' selected':''}>Personeel</option>
+        <option value="part-timer"${u.rol==='part-timer'?' selected':''}>Part-timer</option>
+        <option value="full-timer"${u.rol==='full-timer'?' selected':''}>Full-timer</option>
+        <option value="hal"${u.rol==='hal'?' selected':''}>Hal medewerker</option>
+        <option value="beheerder"${u.rol==='beheerder'?' selected':''}>Beheerder</option>
+      </select>
+    </div>
+    <div class="two">
+      <div class="fr"><span class="fl">E-mailadres</span>
+        <input type="email" id="pdEmail" value="${u.email||''}" style="font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);width:100%">
+      </div>
+      <div class="fr"><span class="fl">Telefoonnummer</span>
+        <input type="tel" id="pdTel" value="${u.telefoon||''}" style="font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);width:100%">
+      </div>
+    </div>
+    <div class="two">
+      <div class="fr"><span class="fl">Shirtmaat</span>
+        <select id="pdMaat" style="font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);background:var(--surface);color:var(--text);width:100%">
+          <option value="">—</option>
+          ${['XS','S','M','L','XL','XXL','XXXL','XXXXL'].map(m=>`<option value="${m}"${u.shirtmaat===m?' selected':''}>${m}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fr"><span class="fl">Rijbewijs</span>
+        <input type="text" id="pdRijbewijs" value="${u.rijbewijs||''}" placeholder="bv. Auto, Aanhanger" style="font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);width:100%">
+      </div>
+    </div>
+    <div class="fr"><span class="fl">Skills</span>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:2px">${skillPills}</div>
+    </div>
+    <div class="warn-box" id="pdWarn"></div>`;
+
+  document.getElementById('persDetailOverlay').classList.add('open');
+}
+
+async function savePersDetail(){
+  const uid=persDetailId;if(!uid)return;
+  const naam=document.getElementById('pdNaam').value.trim();
+  const rol=document.getElementById('pdRol').value;
+  const email=document.getElementById('pdEmail').value.trim();
+  const telefoon=document.getElementById('pdTel').value.trim();
+  const shirtmaat=document.getElementById('pdMaat').value;
+  const rijbewijs=document.getElementById('pdRijbewijs').value.trim();
+  const wb=document.getElementById('pdWarn');
+  if(!naam){wb.textContent='Naam is verplicht.';wb.className='warn-box show';return;}
+  wb.className='warn-box';
+  await sb.from('gebruikers').update({naam,rol,email,telefoon,shirtmaat,rijbewijs}).eq('id',uid);
+  document.getElementById('persDetailNaam').textContent=naam;
+  closePersDetail();
+}
+
+async function pdToggleSkill(userId,skillId,btn){
+  const{data:u}=await sb.from('gebruikers').select('skills').eq('id',userId).single();
+  let skills=[];
+  try{skills=u?.skills?JSON.parse(typeof u.skills==='string'?u.skills:'[]'):[];}catch(e){}
+  if(skills.includes(skillId)){skills=skills.filter(s=>s!==skillId);btn.classList.remove('on');}
+  else{skills.push(skillId);btn.classList.add('on');}
+  await sb.from('gebruikers').update({skills:JSON.stringify(skills)}).eq('id',userId);
+}
+
+function closePersDetail(){
+  document.getElementById('persDetailOverlay').classList.remove('open');
+  loadAccounts();
 }
 
 
