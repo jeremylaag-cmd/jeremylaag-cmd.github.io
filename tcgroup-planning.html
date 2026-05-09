@@ -130,81 +130,6 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .med-zonder-datum{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)}
 .med-zonder-titel{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem}
 
-/* ── PLANNING BEHEERDER ── */
-.pb-wrap{display:grid;grid-template-columns:260px 1fr;height:calc(100vh - 56px);gap:0}
-.pb-sidebar{background:var(--surface);border-right:1px solid var(--border);padding:1.25rem;overflow-y:auto;display:flex;flex-direction:column;gap:1rem}
-.pb-main{padding:1.25rem;overflow-y:auto;display:flex;flex-direction:column;gap:1rem}
-.pb-admin-pill{display:flex;align-items:center;gap:6px;background:#FFFBEB;color:#92400E;border:1px solid #FED7AA;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:500;width:fit-content}
-.pb-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.pb-cal-btn{background:none;border:1px solid var(--border);border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:15px;line-height:1}
-.pb-cal-btn:hover{background:var(--bg)}
-.pb-cal-month{font-size:13px;font-weight:600;color:var(--text)}
-.pb-cal-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px}
-.pb-dow{font-size:9px;color:var(--muted);text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:3px 0}
-.pb-cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.pb-day{text-align:center;padding:4px 1px;border-radius:6px;cursor:pointer;font-size:11px;min-height:34px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--text);transition:background .1s}
-.pb-day:hover{background:var(--bg)}
-.pb-day.pb-past{color:var(--muted);background:#F4F3F1;opacity:.65}
-.pb-day.pb-past:hover{opacity:.85}
-.pb-day.pb-today{font-weight:700}
-.pb-day.pb-today .pb-dn{background:#1E40AF;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px}
-.pb-day.pb-sel{background:#EFF6FF}
-.pb-day.pb-sel .pb-dn{color:#1E40AF;font-weight:700}
-.pb-day.pb-other{opacity:.2;pointer-events:none}
-.pb-dn{font-size:11px;line-height:1.2}
-.pb-dot-row{display:flex;gap:2px;justify-content:center}
-.pb-dot{width:4px;height:4px;border-radius:50%}
-.pb-dot.leeg{background:#DC2626}.pb-dot.deel{background:#D97706}.pb-dot.vol{background:#059669}.pb-dot.grijs{background:#B0ABA5}
-.pb-legenda{display:flex;flex-direction:column;gap:5px}
-.pb-lgr{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}
-.pb-ls{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.pb-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.pb-sum-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px}
-.pb-sum-num{font-size:24px;font-weight:600;line-height:1;margin-bottom:3px}
-.pb-sum-lbl{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
-.pb-sum-num.leeg{color:#DC2626}.pb-sum-num.deel{color:#D97706}.pb-sum-num.vol{color:#059669}
-.pb-filter{display:flex;gap:5px;flex-wrap:wrap}
-.pb-fbtn{font-size:12px;padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-family:var(--font);transition:all .15s}
-.pb-fbtn:hover{border-color:#888;color:var(--text)}
-.pb-fbtn.on{background:var(--text);color:#fff;border-color:var(--text)}
-.pb-dag-hdr{display:flex;align-items:center;justify-content:space-between;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:8px}
-.pb-dag-lbl{font-size:14px;font-weight:600;color:var(--text)}
-.pb-dag-stats{font-size:12px;color:var(--muted)}
-.pb-klus{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--border)}
-.pb-klus.leeg{border-left-color:#DC2626}.pb-klus.deel{border-left-color:#D97706}.pb-klus.vol{border-left-color:#059669}
-.pb-klus-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
-.pb-knaam{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
-.pb-kloc{font-size:11px;color:var(--muted)}
-.pb-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;white-space:nowrap}
-.pb-badge.leeg{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA}
-.pb-badge.deel{background:#FFFBEB;color:#92400E;border:1px solid #FED7AA}
-.pb-badge.vol{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0}
-.pb-bdot{width:5px;height:5px;border-radius:50%}
-.pb-badge.leeg .pb-bdot{background:#DC2626}.pb-badge.deel .pb-bdot{background:#D97706}.pb-badge.vol .pb-bdot{background:#059669}
-.pb-shift{display:flex;align-items:center;gap:6px;padding:6px 0;border-top:1px solid var(--border);flex-wrap:wrap}
-.pb-stijd{font-size:11px;color:var(--muted);min-width:108px;font-variant-numeric:tabular-nums}
-.pb-steam{font-size:11px;color:var(--muted);flex:1}
-.pb-sright{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.pb-wijs{font-size:11px;font-family:var(--font);padding:3px 9px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
-.pb-wijs:hover{border-color:#2563EB;color:#2563EB;background:#EFF6FF}
-.pb-wijs.open{background:#EFF6FF;color:#1E40AF;border-color:#BFDBFE}
-.pb-namen{display:flex;flex-wrap:wrap;gap:4px;padding:5px 0 2px}
-.pb-naam-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:#166534;background:#F0FDF4;border:1px solid #BBF7D0;padding:2px 5px 2px 9px;border-radius:20px}
-.pb-remove{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:none;background:transparent;cursor:pointer;color:#166534;font-size:13px;padding:0;line-height:1}
-.pb-remove:hover{background:#BBF7D0}
-.pb-dd{margin-top:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.pb-mw{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;transition:background .12s;font-size:12px;color:var(--text)}
-.pb-mw:hover{background:var(--bg)}
-.pb-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
-.pb-mwnaam{flex:1;font-weight:500}
-.pb-mwrol{font-size:10px;color:var(--muted);background:var(--bg);padding:2px 6px;border-radius:20px}
-.pb-empty{text-align:center;padding:2.5rem;color:var(--muted);font-size:13px}
-#pb-toast{position:fixed;top:66px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;z-index:999;pointer-events:none}
-.pb-toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:12px;color:var(--text);max-width:380px;animation:pbIn .2s ease}
-.pb-toast-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-@keyframes pbIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:767px){.pb-wrap{grid-template-columns:1fr;height:auto}.pb-sidebar{display:none}}
-
 /* Beheer */
 .beheer-wrap{padding:2rem;max-width:1000px;margin:0 auto}
 .beheer-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
@@ -639,9 +564,27 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
       <button class="auth-btn" onclick="doLogin()">Inloggen</button>
     </div>
     <div id="registerForm" style="display:none">
-      <div class="auth-field"><label class="auth-label">Jouw naam</label><input type="text" id="regNaam" placeholder="Voornaam Achternaam"></div>
-      <div class="auth-field"><label class="auth-label">E-mailadres</label><input type="email" id="regEmail" placeholder="naam@email.com"></div>
-      <div class="auth-field"><label class="auth-label">Wachtwoord</label><input type="password" id="regPw" placeholder="Minimaal 6 tekens"></div>
+      <div class="auth-field"><label class="auth-label">Volledige naam <span style="color:#DC2626">*</span></label><input type="text" id="regNaam" placeholder="Voornaam Achternaam"></div>
+      <div class="auth-field"><label class="auth-label">Telefoonnummer <span style="color:#DC2626">*</span></label><input type="tel" id="regTel" placeholder="06-12345678"></div>
+      <div class="auth-field"><label class="auth-label">E-mailadres <span style="color:#DC2626">*</span></label><input type="email" id="regEmail" placeholder="naam@email.com"></div>
+      <div class="auth-field"><label class="auth-label">Wachtwoord <span style="color:#DC2626">*</span></label><input type="password" id="regPw" placeholder="Minimaal 6 tekens"></div>
+      <div class="auth-field">
+        <label class="auth-label">Shirtmaat <span style="color:#DC2626">*</span></label>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:2px" id="regShirtWrap">
+          <span style="font-size:11px;color:var(--muted)">Selecteer maat:</span>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;width:100%;margin-top:4px">
+            ${['XS','S','M','L','XL','XXL','XXXL','XXXXL'].map(m=>`<button type="button" class="chip" data-maat="${m}" onclick="selectMaat(this)">${m}</button>`).join('')}
+          </div>
+        </div>
+        <input type="hidden" id="regMaat">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Rijbewijs <span style="color:#DC2626">*</span> <span style="color:var(--muted);font-weight:400">(meerdere mogelijk)</span></label>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+          ${['Geen','Scooter','Auto','Aanhanger','Vrachtwagen','Vrachtwagen met aanhanger'].map(r=>`<button type="button" class="chip" data-rb="${r}" onclick="toggleRijbewijs(this)">${r}</button>`).join('')}
+        </div>
+        <input type="hidden" id="regRijbewijs">
+      </div>
       <button class="auth-btn" onclick="doRegister()">Account aanmaken</button>
     </div>
     <div class="auth-err" id="authErr"></div>
@@ -748,48 +691,6 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
     </div>
   </div>
 
-  <!-- PLANNING BEHEERDER -->
-  <div id="page-planning-beheer" class="page">
-    <div id="pb-toast"></div>
-    <div class="pb-wrap">
-      <aside class="pb-sidebar">
-        <div class="pb-admin-pill">
-          <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M12 7H4V5a4 4 0 0 1 8 0v2zm1 0V5A5 5 0 0 0 3 5v2H2a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm-5 4.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
-          Alleen beheerder
-        </div>
-        <div>
-          <div class="pb-cal-nav">
-            <button class="pb-cal-btn" onclick="pbChangeMonth(-1)">&#8249;</button>
-            <span class="pb-cal-month" id="pbCalTitle"></span>
-            <button class="pb-cal-btn" onclick="pbChangeMonth(1)">&#8250;</button>
-          </div>
-          <div class="pb-cal-dow" id="pbCalDow"></div>
-          <div class="pb-cal-days" id="pbCalDays"></div>
-        </div>
-        <div class="pb-legenda">
-          <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Legenda</div>
-          <div class="pb-lgr"><div class="pb-ls" style="background:#DC2626"></div>Shift(s) leeg</div>
-          <div class="pb-lgr"><div class="pb-ls" style="background:#D97706"></div>Deels ingevuld</div>
-          <div class="pb-lgr"><div class="pb-ls" style="background:#059669"></div>Volledig bezet</div>
-          <div class="pb-lgr"><div class="pb-ls" style="background:#B0ABA5"></div>Verleden dag</div>
-        </div>
-      </aside>
-      <div class="pb-main">
-        <div class="pb-sum" id="pbSum"></div>
-        <div class="pb-filter">
-          <button class="pb-fbtn on" onclick="pbSetFilter('alle',this)">Alle klussen</button>
-          <button class="pb-fbtn" onclick="pbSetFilter('incompleet',this)">Incompleet</button>
-          <button class="pb-fbtn" onclick="pbSetFilter('compleet',this)">Compleet</button>
-        </div>
-        <div class="pb-dag-hdr">
-          <span class="pb-dag-lbl" id="pbDagLbl"></span>
-          <span class="pb-dag-stats" id="pbDagStats"></span>
-        </div>
-        <div id="pbKlusList"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- BEHEER (alleen beheerder) -->
   <div id="page-beheer" class="page">
     <div class="beheer-wrap">
@@ -797,8 +698,11 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
         <div class="bc"><div class="bt">Trucks</div><div class="bl" id="truckBeheer"></div>
           <div class="add-form"><div class="add-form-row"><input type="color" id="newTruckColor" value="#2563EB"><input type="text" id="newTruckName" placeholder="Naam truck" style="flex:1"></div><button class="btn-sm" onclick="addTruck()">Toevoegen</button></div>
         </div>
-      <div class="bc"><div class="bt">Soorten</div><div class="bl" id="soortenBeheer"></div>
+        <div class="bc"><div class="bt">Soorten</div><div class="bl" id="soortenBeheer"></div>
           <div class="add-form"><input type="text" id="newSoortTitel" placeholder="Titel (bv. BBQ)"><textarea id="newSoortBeschr" placeholder="Beschrijving (optioneel)"></textarea><button class="btn-sm" onclick="addSoort()">Toevoegen</button></div>
+        </div>
+        <div class="bc"><div class="bt">Skills personeel</div><div class="bl" id="skillsBeheer"><div class="spin">Laden...</div></div>
+          <div class="add-form"><input type="text" id="newSkillNaam" placeholder="bv. Bar ervaring, Poffers bakken"><button class="btn-sm" onclick="addSkill()">Toevoegen</button></div>
         </div>
       </div>
     </div>
@@ -855,7 +759,7 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
   </div>
 
   <div id="page-accounts" class="page">
-    <div class="beheer-wrap" style="max-width:600px">
+    <div class="beheer-wrap" style="max-width:700px">
       <div class="bc">
         <div class="bt">Personeelsaccounts</div>
         <div class="acc-list" id="accList"><div class="spin">Laden...</div></div>
@@ -962,38 +866,45 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-drag"></div>
-    <div class="modal-title" id="modalTitle">Nieuwe klus</div>
-    <div class="fr"><span class="fl">Naam klus</span><input type="text" id="fNaam" placeholder="bv. Bruiloft Janssen"></div>
-    <div class="fr"><span class="fl">Trucks (meerdere mogelijk)</span><div class="chips" id="truckChips"></div><div class="chip-warn" id="truckWarn"></div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;gap:10px">
+      <div class="modal-title" id="modalTitle" style="margin-bottom:0">Nieuwe klus</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span class="saving-msg" id="savingMsg" style="display:none">Opslaan...</span>
+        <button class="btn-ghost" onclick="closeModal()">Annuleren</button>
+        <button class="btn-sm" onclick="saveKlus()">Opslaan</button>
+      </div>
+    </div>
+    <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)">Verplichte velden</div>
+    <div class="fr"><span class="fl">Naam klus <span style="color:#DC2626">*</span></span><input type="text" id="fNaam" placeholder="bv. Bruiloft Janssen"></div>
     <div class="two">
-      <div class="fr"><span class="fl">Startdatum</span><input type="date" id="fDatum" onchange="onDateChange()"></div>
+      <div class="fr"><span class="fl">Startdatum <span style="color:#DC2626">*</span></span><input type="date" id="fDatum" onchange="onDateChange()"></div>
       <div class="fr"><span class="fl">Einddatum <span style="color:var(--muted);font-weight:400">(optioneel)</span></span><input type="date" id="fDatumEind"></div>
     </div>
-    <div class="fr"><span class="fl">Tijden</span>
+    <div class="fr"><span class="fl">Trucks <span style="color:#DC2626">*</span> <span style="color:var(--muted);font-weight:400">(min. 1)</span></span><div class="chips" id="truckChips"></div><div class="chip-warn" id="truckWarn"></div></div>
+    <div class="fr"><span class="fl">Tijden <span style="color:#DC2626">*</span></span>
       <div class="four">
         <div><span class="fl" style="font-size:10px">Vertrektijd</span><input type="text" class="tijd-input" id="fVertrek" placeholder="08.30" maxlength="5" oninput="formatTijd(this)"></div>
         <div><span class="fl" style="font-size:10px">Start opbouw</span><input type="text" class="tijd-input" id="fOpbouw" placeholder="10.00" maxlength="5" oninput="formatTijd(this)"></div>
         <div><span class="fl" style="font-size:10px">Start feest</span><input type="text" class="tijd-input" id="fFeest" placeholder="14.00" maxlength="5" oninput="formatTijd(this)"></div>
-        <div><span class="fl" style="font-size:10px">Einde feest</span><input type="text" class="tijd-input" id="fEinde" placeholder="23.00" maxlength="5" oninput="formatTijd(this)"></div>
+        <div><span class="fl" style="font-size:10px">Einde feest <span style="color:#DC2626">*</span></span><input type="text" class="tijd-input" id="fEinde" placeholder="23.00" maxlength="5" oninput="formatTijd(this)"></div>
       </div>
     </div>
-    <div class="two">
-      <div class="fr"><span class="fl">Gasten (totaal)</span><input type="number" id="fPersonen" min="1" placeholder="bv. 200"></div>
-      <div class="fr"><span class="fl">Personeel nodig</span><input type="number" id="fPersoneelNodig" min="0" placeholder="bv. 5"></div>
-    </div>
+    <div class="fr"><span class="fl">Personeel nodig <span style="color:#DC2626">*</span></span><input type="number" id="fPersoneelNodig" min="0" placeholder="bv. 5" style="max-width:120px"></div>
+    <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:1rem 0 .75rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)">Optionele velden</div>
     <div class="fr"><span class="fl">Food per truck</span><div id="truckSoortBlocks"></div></div>
+    <div class="fr"><span class="fl">Gasten (totaal)</span><input type="number" id="fPersonen" min="1" placeholder="bv. 200" style="max-width:120px"></div>
     <div class="fr"><span class="fl">Personeel (meerdere mogelijk)</span><div class="chips" id="persChips"></div><div class="chip-warn" id="persWarn"></div></div>
-    <div class="fr"><span class="fl">PDF bijlagen</span>
-      <div class="bij" id="bijZone" onclick="document.getElementById('fPdf').click()">Klik om PDF toe te voegen</div>
-      <input type="file" id="fPdf" accept=".pdf,application/pdf" multiple style="display:none" onchange="handlePdf()">
-      <div class="pdf-list" id="pdfList"></div>
-    </div>
     <div class="fr"><span class="fl">Adres</span><input type="text" id="fAdres" placeholder="Locatie of adres"></div>
     <div class="two">
       <div class="fr"><span class="fl">Contactpersoon</span><input type="text" id="fContact" placeholder="Naam"></div>
       <div class="fr"><span class="fl">Telefoonnummer</span><input type="text" id="fTelefoon" placeholder="06-12345678"></div>
     </div>
     <div class="fr"><span class="fl">Notities</span><textarea id="fNotitie" placeholder="Extra info..."></textarea></div>
+    <div class="fr"><span class="fl">PDF bijlagen</span>
+      <div class="bij" id="bijZone" onclick="document.getElementById('fPdf').click()">Klik om PDF toe te voegen</div>
+      <input type="file" id="fPdf" accept=".pdf,application/pdf" multiple style="display:none" onchange="handlePdf()">
+      <div class="pdf-list" id="pdfList"></div>
+    </div>
     <!-- Herhaling -->
     <div class="fr" id="herhalingSection">
       <span class="fl">Herhaling</span>
@@ -1012,7 +923,7 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
     </div>
     <div class="warn-box" id="warnBox"></div>
     <div class="mfooter">
-      <span class="saving-msg" id="savingMsg" style="display:none">Opslaan...</span>
+      <span class="saving-msg" id="savingMsg2" style="display:none">Opslaan...</span>
       <button class="btn-ghost" onclick="closeModal()">Annuleren</button>
       <button class="btn-sm" onclick="saveKlus()">Opslaan</button>
     </div>
@@ -1160,21 +1071,26 @@ async function doLogin(){
 
 async function doRegister(){
   const naam=document.getElementById('regNaam').value.trim();
+  const telefoon=document.getElementById('regTel').value.trim();
   const email=document.getElementById('regEmail').value.trim();
   const pw=document.getElementById('regPw').value;
+  const maat=document.getElementById('regMaat').value;
+  const rijbewijs=document.getElementById('regRijbewijs').value;
   const err=document.getElementById('authErr');
   const msg=document.getElementById('authMsg');
   err.style.display='none';msg.style.display='none';
-  if(!naam){err.textContent='Vul je naam in.';err.style.display='block';return;}
+  if(!naam){err.textContent='Vul je volledige naam in.';err.style.display='block';return;}
+  if(!telefoon){err.textContent='Vul je telefoonnummer in.';err.style.display='block';return;}
+  if(!email){err.textContent='Vul je e-mailadres in.';err.style.display='block';return;}
   if(pw.length<6){err.textContent='Wachtwoord moet minimaal 6 tekens zijn.';err.style.display='block';return;}
+  if(!maat){err.textContent='Selecteer je shirtmaat.';err.style.display='block';return;}
+  if(!rijbewijs){err.textContent='Selecteer je rijbewijs (kies "Geen" als je geen rijbewijs hebt).';err.style.display='block';return;}
   const{data,error}=await sb.auth.signUp({email,password:pw,options:{data:{naam}}});
   if(error){err.textContent=error.message;err.style.display='block';return;}
-  // Sla gebruiker op in gebruikers tabel en koppel aan personeelslijst
   if(data.user){
-    // Zoek of er een personeelslid is met dezelfde naam
     const{data:persData}=await sb.from('personeel').select('id').ilike('naam',naam);
     const personeel_id=persData&&persData.length?persData[0].id:null;
-    await sb.from('gebruikers').insert({id:data.user.id,rol:'personeel',naam,personeel_id});
+    await sb.from('gebruikers').insert({id:data.user.id,rol:'personeel',naam,telefoon,shirtmaat:maat,rijbewijs,personeel_id});
   }
   msg.textContent='Account aangemaakt! Je kunt nu inloggen.';
   msg.style.display='block';
@@ -1230,7 +1146,6 @@ async function initApp(user){
   if(isBeheerder){
     tabs.innerHTML=`
       <button class="htab active" onclick="showPage('rooster',this)">Rooster</button>
-      <button class="htab" onclick="showPage('planning-beheer',this)">Planning</button>
       <button class="htab" onclick="showPage('uren-beheer',this)">Uren</button>
       <button class="htab" onclick="showPage('beheer',this)">Beheer</button>
       <button class="htab" onclick="showPage('beschikbaarheid-beheer',this)">Beschikbaarheid</button>
@@ -1267,7 +1182,6 @@ async function initApp(user){
     if(isBeheerder){
       bn.innerHTML=
         bnavItem('rooster','Rooster',ico.rooster,true)+
-        bnavItem('planning-beheer','Planning',ico.schema)+
         bnavItem('uren-beheer','Uren',ico.uren)+
         bnavItem('beheer','Beheer',ico.beheer)+
         bnavItem('beschikbaarheid-beheer','Beschikbaarheid',ico.beschikbaarheid)+
@@ -1347,10 +1261,115 @@ function showPage(id,btn){
   if(id==='uren')loadUrenPersoneel();
   if(id==='uren-beheer')loadUrenBeheer();
   if(id==='rooster'&&CURRENT_ROL!=='beheerder')loadPersoonlijkSchemaRooster();
-  if(id==='planning-beheer')pbInit();
 }
 
-// ── API via Supabase JS SDK ──
+
+// ── REGISTRATIE HELPERS ──
+function selectMaat(btn){
+  document.querySelectorAll('#regShirtWrap .chip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('regMaat').value=btn.dataset.maat;
+}
+let regRijbewijsSet=new Set();
+function toggleRijbewijs(btn){
+  const val=btn.dataset.rb;
+  if(val==='Geen'){
+    // Geen wist alle andere
+    regRijbewijsSet.clear();
+    document.querySelectorAll('[data-rb]').forEach(b=>b.classList.remove('on'));
+    if(!btn.classList.contains('on')){regRijbewijsSet.add('Geen');btn.classList.add('on');}
+  }else{
+    document.querySelector('[data-rb="Geen"]')?.classList.remove('on');
+    regRijbewijsSet.delete('Geen');
+    if(regRijbewijsSet.has(val)){regRijbewijsSet.delete(val);btn.classList.remove('on');}
+    else{regRijbewijsSet.add(val);btn.classList.add('on');}
+  }
+  document.getElementById('regRijbewijs').value=[...regRijbewijsSet].join(', ');
+}
+
+// ── SKILLS BEHEER ──
+let SKILLS=[];
+
+async function loadSkills(){
+  const{data}=await sb.from('skills').select('*').order('naam');
+  SKILLS=data||[];
+  renderSkillsBeheer();
+}
+
+function renderSkillsBeheer(){
+  const el=document.getElementById('skillsBeheer');
+  if(!el)return;
+  if(!SKILLS.length){el.innerHTML='<div class="empty" style="padding:.5rem 0;font-size:12px">Nog geen skills toegevoegd</div>';return;}
+  el.innerHTML=SKILLS.map(s=>`<div class="bi">
+    <div class="bi-left"><div class="bi-name">${s.naam}</div></div>
+    <div class="bi-actions"><button class="btn-danger-sm" onclick="deleteSkill('${s.id}')">×</button></div>
+  </div>`).join('');
+}
+
+async function addSkill(){
+  const naam=document.getElementById('newSkillNaam').value.trim();
+  if(!naam)return;
+  await sb.from('skills').insert({naam});
+  document.getElementById('newSkillNaam').value='';
+  await loadSkills();
+}
+
+async function deleteSkill(id){
+  if(!confirm('Skill verwijderen?'))return;
+  await sb.from('skills').delete().eq('id',id);
+  await loadSkills();
+}
+
+// ── ACCOUNTS (uitgebreid) ──
+async function loadAccounts(){
+  const[{data},{data:skillsData}]=await Promise.all([
+    sb.from('gebruikers').select('*').order('naam'),
+    sb.from('skills').select('*').order('naam'),
+  ]);
+  SKILLS=skillsData||[];
+  const acc=document.getElementById('accList');
+  if(!data||!data.length){acc.innerHTML='<div class="empty">Geen accounts gevonden</div>';return;}
+  const rolLabels={'beheerder':'Beheerder','part-timer':'Part-timer','full-timer':'Full-timer','hal':'Hal medewerker','personeel':'Personeel'};
+  acc.innerHTML=data.map(u=>{
+    const userSkills=u.skills?JSON.parse(typeof u.skills==='string'?u.skills:'[]'):[];
+    const skillPills=SKILLS.map(s=>{
+      const on=userSkills.includes(s.id);
+      return`<button class="chip${on?' on':''}" style="font-size:10px;padding:3px 9px" onclick="toggleUserSkill('${u.id}','${s.id}',this)">${s.naam}</button>`;
+    }).join('');
+    return`<div class="acc-item" id="ac-${u.id}" style="flex-direction:column;align-items:stretch;gap:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div class="acc-info">
+          <div class="acc-naam">${u.naam||'–'}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:1px;display:flex;gap:8px;flex-wrap:wrap">
+            <span>${rolLabels[u.rol]||u.rol}</span>
+            ${u.telefoon?`<span>📞 ${u.telefoon}</span>`:''}
+            ${u.shirtmaat?`<span>👕 ${u.shirtmaat}</span>`:''}
+            ${u.rijbewijs?`<span>🚗 ${u.rijbewijs}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <button class="btn-edit" onclick="startEditAccount('${u.id}')">Bewerk</button>
+          ${u.id!==CURRENT_USER.id?`<button class="btn-danger-sm" onclick="verwijderAccount('${u.id}')">×</button>`:''}
+        </div>
+      </div>
+      ${SKILLS.length?`<div>
+        <div style="font-size:10px;font-weight:600;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em">Skills</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">${skillPills||'<span style="font-size:11px;color:var(--muted)">Geen skills beschikbaar</span>'}</div>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+async function toggleUserSkill(userId,skillId,btn){
+  const{data:u}=await sb.from('gebruikers').select('skills').eq('id',userId).single();
+  let skills=[];
+  try{skills=u?.skills?JSON.parse(typeof u.skills==='string'?u.skills:'[]'):[];}catch(e){skills=[];}
+  if(skills.includes(skillId)){skills=skills.filter(s=>s!==skillId);btn.classList.remove('on');}
+  else{skills.push(skillId);btn.classList.add('on');}
+  await sb.from('gebruikers').update({skills:JSON.stringify(skills)}).eq('id',userId);
+}
+
+
 let BESCHIKBAARHEID=[];
 
 async function loadAll(){
@@ -1727,7 +1746,11 @@ async function saveKlus(){
   const telefoon=document.getElementById('fTelefoon').value.trim();
   const herhalingPatroon=document.getElementById('fHerhaling').value;
   const herhalingEind=document.getElementById('fHerhalingEind').value;
+  if(!naam){showWarn('Vul een naam in voor de klus.');return;}
   if(!datum){showWarn('Vul een datum in.');return;}
+  if(!formTrucks.length){showWarn('Selecteer minimaal 1 truck.');return;}
+  if(!einde_feest){showWarn('Vul een eindtijd in.');return;}
+  if(!personeel_nodig&&personeel_nodig!==0){showWarn('Vul het aantal benodigde personeelsleden in.');return;}
   const allSoortIds=[...new Set(Object.values(formTruckSoorten).flat())];
   const foodLabel=allSoortIds.length?SOORTEN.find(s=>s.id===allSoortIds[0])?.titel||'':'';
   document.getElementById('savingMsg').style.display='inline';
@@ -1955,6 +1978,7 @@ async function deleteMed(id){
 function renderBeheer(){
   document.getElementById('truckBeheer').innerHTML=TRUCKS.map(t=>`<div class="bi" id="tb-${t.id}"><div class="bi-left"><div class="bi-name"><div class="cswatch" style="background:${t.color}"></div>${t.label}</div></div><div class="bi-actions"><button class="btn-edit" onclick="startEditTruck('${t.id}')">Bewerk</button><button class="btn-danger-sm" onclick="deleteTruck('${t.id}')">×</button></div></div>`).join('');
   document.getElementById('soortenBeheer').innerHTML=SOORTEN.map(s=>`<div class="bi" id="sb-${s.id}"><div class="bi-left"><div class="bi-name">${s.titel}</div>${s.beschrijving?`<div class="bi-desc">${s.beschrijving}</div>`:''}</div><div class="bi-actions"><button class="btn-edit" onclick="startEditSoort('${s.id}')">Bewerk</button><button class="btn-danger-sm" onclick="deleteSoort('${s.id}')">×</button></div></div>`).join('');
+  loadSkills();
 }
 function startEditTruck(id){
   const t=TRUCKS.find(x=>x.id===id);
@@ -1979,22 +2003,6 @@ async function addSoort(){const titel=document.getElementById('newSoortTitel').v
 async function deleteSoort(id){if(!confirm('Soort verwijderen?'))return;await sb.from('klus_soorten').delete().eq('soort_id',id);await sb.from('klus_truck_soorten').delete().eq('soort_id',id);await sb.from('soorten').delete().eq('id',id);await loadAll();renderBeheer();}
 
 // ── ACCOUNTS ──
-async function loadAccounts(){
-  const{data}=await sb.from('gebruikers').select('*').order('naam');
-  const acc=document.getElementById('accList');
-  if(!data||!data.length){acc.innerHTML='<div class="empty">Geen accounts gevonden</div>';return;}
-  const rolLabels={'beheerder':'Beheerder','part-timer':'Part-timer','full-timer':'Full-timer','hal':'Hal medewerker'};
-  acc.innerHTML=data.map(u=>`<div class="acc-item" id="ac-${u.id}">
-    <div class="acc-info">
-      <div class="acc-naam">${u.naam||'–'}</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:2px">${u.rol}</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button class="btn-edit" onclick="startEditAccount('${u.id}')">Bewerk</button>
-      ${u.id!==CURRENT_USER.id?`<button class="btn-danger-sm" onclick="verwijderAccount('${u.id}')">×</button>`:''}
-    </div>
-  </div>`).join('');
-}
 
 function startEditAccount(id){
   const el=document.getElementById('ac-'+id);
@@ -2756,275 +2764,6 @@ async function keurBeschikbaarheid(id,status){
   await sb.from('beschikbaarheid').update({status}).eq('id',id);
   loadAlleBeschikbaarheid();
 }
-// ── PLANNING BEHEERDER ────────────────────────────────────────────────────────
-let pbViewYear=new Date().getFullYear();
-let pbViewMonth=new Date().getMonth();
-let pbSelDate=new Date();
-let pbFilter='alle';
-let pbOpenDrop=null;
-
-const PB_MAANDEN=['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
-const PB_DAGEN_KORT=['MA','DI','WO','DO','VR','ZA','ZO'];
-const PB_DAGEN_LANG=['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
-
-function pbInit(){
-  pbViewYear=new Date().getFullYear();
-  pbViewMonth=new Date().getMonth();
-  pbSelDate=new Date();
-  pbFilter='alle';
-  pbOpenDrop=null;
-  pbRenderKal();
-  pbRenderContent();
-}
-
-function pbSameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
-function pbIsPast(d){const t=new Date();t.setHours(0,0,0,0);const x=new Date(d);x.setHours(0,0,0,0);return x<t;}
-function pbIsToday(d){const t=new Date();t.setHours(0,0,0,0);const x=new Date(d);x.setHours(0,0,0,0);return x.getTime()===t.getTime();}
-function pbFmt(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-
-function pbGetKlussenVoorDag(d){
-  const ds=pbFmt(d);
-  return KLUSSEN.filter(k=>{
-    const start=k.datum;
-    const end=k.datum_eind||k.datum;
-    return ds>=start&&ds<=end;
-  });
-}
-
-function pbGetShifts(k){
-  // Bouw shifts op uit personeel + personeel_nodig veld
-  const bezet=k.personeel?k.personeel.length:0;
-  const nodig=k.personeel_nodig||0;
-  if(nodig===0&&bezet===0)return[];
-  return[{
-    id:'shift-'+k.id,
-    tijd:(k.tijden&&(k.tijden.opbouw||k.tijden.feest))?`${k.tijden.opbouw||k.tijden.vertrek||'?'} → ${k.tijden.einde||'?'}`:'Hele dag',
-    team:(k.trucks&&k.trucks.length)?k.trucks.map(t=>t.naam).join(', '):'Onbekend',
-    bezet:bezet,
-    totaal:Math.max(nodig,bezet),
-    namen:k.personeel?k.personeel.map(p=>p.naam):[]
-  }];
-}
-
-function pbGetStatus(k){
-  const shifts=pbGetShifts(k);
-  if(!shifts.length){
-    const nodig=k.personeel_nodig||0;
-    if(nodig===0)return'vol';
-    return'leeg';
-  }
-  const b=shifts.reduce((s,sh)=>s+sh.bezet,0);
-  const t=shifts.reduce((s,sh)=>s+sh.totaal,0);
-  if(b>=t)return'vol';
-  if(b===0)return'leeg';
-  return'deel';
-}
-
-function pbChangeMonth(d){
-  pbViewMonth+=d;
-  if(pbViewMonth<0){pbViewMonth=11;pbViewYear--;}
-  if(pbViewMonth>11){pbViewMonth=0;pbViewYear++;}
-  pbRenderKal();pbRenderContent();
-}
-
-function pbSelectDay(y,m,d){
-  pbSelDate=new Date(y,m,d);pbOpenDrop=null;
-  pbRenderKal();pbRenderContent();
-}
-
-function pbSetFilter(f,btn){
-  pbFilter=f;
-  document.querySelectorAll('.pb-fbtn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  pbRenderContent();
-}
-
-function pbToggleDrop(id){pbOpenDrop=pbOpenDrop===id?null:id;pbRenderContent();}
-
-function pbWijsToe(klusId,mwId){
-  const klus=KLUSSEN.find(k=>k.id===klusId);
-  const mw=PERSONEEL.find(p=>p.id===mwId);
-  if(!klus||!mw)return;
-  if(!klus.personeel)klus.personeel=[];
-  if(klus.personeel.find(p=>p.id===mwId))return;
-  const nodig=klus.personeel_nodig||0;
-  if(klus.personeel.length>=nodig&&nodig>0)return;
-  klus.personeel.push({id:mw.id,naam:mw.naam});
-  pbOpenDrop=null;
-  pbShowToast('toe',mw.naam,klus.naam);
-  // Sla op in Supabase
-  sb.from('klus_gebruikers').insert({klus_id:klusId,gebruiker_id:mwId}).then(()=>{});
-  pbRenderKal();pbRenderContent();
-}
-
-function pbVerwijder(klusId,mwId,naam){
-  const klus=KLUSSEN.find(k=>k.id===klusId);
-  if(!klus||!klus.personeel)return;
-  klus.personeel=klus.personeel.filter(p=>p.id!==mwId);
-  pbShowToast('af',naam,klus.naam);
-  sb.from('klus_gebruikers').delete().eq('klus_id',klusId).eq('gebruiker_id',mwId).then(()=>{});
-  pbRenderKal();pbRenderContent();
-}
-
-function pbShowToast(type,naam,klusnaam){
-  const c=document.getElementById('pb-toast');
-  if(!c)return;
-  const isAdd=type==='toe';
-  const t=document.createElement('div');
-  t.className='pb-toast';
-  t.innerHTML=`<div class="pb-toast-icon" style="background:${isAdd?'#F0FDF4':'#FEF2F2'}">
-    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="${isAdd?'M2 6l3 3 5-5':'M3 3l6 6M9 3l-6 6'}" stroke="${isAdd?'#059669':'#DC2626'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-  <div><strong>${naam}</strong> ${isAdd?'toegewezen aan':'verwijderd van'} <em>${klusnaam}</em>${isAdd?' — notificatie verstuurd ✓':''}</div>`;
-  c.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3500);
-}
-
-function pbRenderKal(){
-  const titleEl=document.getElementById('pbCalTitle');
-  const dowEl=document.getElementById('pbCalDow');
-  const daysEl=document.getElementById('pbCalDays');
-  if(!titleEl)return;
-  titleEl.textContent=PB_MAANDEN[pbViewMonth]+' '+pbViewYear;
-  dowEl.innerHTML=PB_DAGEN_KORT.map(d=>`<div class="pb-dow">${d}</div>`).join('');
-
-  const first=new Date(pbViewYear,pbViewMonth,1);
-  let sd=first.getDay();sd=sd===0?6:sd-1;
-  const dim=new Date(pbViewYear,pbViewMonth+1,0).getDate();
-  const pd=new Date(pbViewYear,pbViewMonth,0).getDate();
-
-  // Bouw dag-statusmap
-  const dm={};
-  for(let d=1;d<=dim;d++){
-    const dt=new Date(pbViewYear,pbViewMonth,d);
-    const dagK=pbGetKlussenVoorDag(dt);
-    if(dagK.length){
-      const sts=[...new Set(dagK.map(k=>pbGetStatus(k)))];
-      dm[d]=sts;
-    }
-  }
-
-  let html='';
-  for(let i=0;i<sd;i++) html+=`<div class="pb-day pb-other"><span class="pb-dn">${pd-sd+1+i}</span></div>`;
-  for(let d=1;d<=dim;d++){
-    const dt=new Date(pbViewYear,pbViewMonth,d);
-    const past=pbIsPast(dt),tod=pbIsToday(dt),sel=pbSameDay(dt,pbSelDate);
-    let cls='pb-day'+(past&&!tod?' pb-past':'')+(tod?' pb-today':'')+(sel?' pb-sel':'');
-    const sts=dm[d]||[];
-    const dots=sts.length?`<div class="pb-dot-row">${sts.map(s=>`<div class="pb-dot ${past&&!tod?'grijs':s}"></div>`).join('')}</div>`:'';
-    html+=`<div class="${cls}" onclick="pbSelectDay(${pbViewYear},${pbViewMonth},${d})"><span class="pb-dn">${d}</span>${dots}</div>`;
-  }
-  const trail=(sd+dim)%7===0?0:7-(sd+dim)%7;
-  for(let i=1;i<=trail;i++) html+=`<div class="pb-day pb-other"><span class="pb-dn">${i}</span></div>`;
-  daysEl.innerHTML=html;
-}
-
-function pbRenderContent(){
-  const dagK=pbGetKlussenVoorDag(pbSelDate);
-  const withStatus=dagK.map(k=>({...k,_status:pbGetStatus(k)}));
-  const leeg=withStatus.filter(k=>k._status==='leeg').length;
-  const deel=withStatus.filter(k=>k._status==='deel').length;
-  const vol=withStatus.filter(k=>k._status==='vol').length;
-
-  const sumEl=document.getElementById('pbSum');
-  if(sumEl)sumEl.innerHTML=`
-    <div class="pb-sum-card"><div class="pb-sum-num leeg">${leeg}</div><div class="pb-sum-lbl">Helemaal leeg</div></div>
-    <div class="pb-sum-card"><div class="pb-sum-num deel">${deel}</div><div class="pb-sum-lbl">Deels ingevuld</div></div>
-    <div class="pb-sum-card"><div class="pb-sum-num vol">${vol}</div><div class="pb-sum-lbl">Volledig bezet</div></div>`;
-
-  const filtered=withStatus.filter(k=>
-    pbFilter==='alle'||
-    (pbFilter==='incompleet'&&(k._status==='leeg'||k._status==='deel'))||
-    (pbFilter==='compleet'&&k._status==='vol')
-  );
-
-  const dow=PB_DAGEN_LANG[pbSelDate.getDay()];
-  const dateStr=dow+' '+pbSelDate.getDate()+' '+PB_MAANDEN[pbSelDate.getMonth()].toLowerCase()+' '+pbSelDate.getFullYear();
-
-  const lblEl=document.getElementById('pbDagLbl');
-  const statsEl=document.getElementById('pbDagStats');
-  if(lblEl)lblEl.textContent=dateStr;
-
-  // Stats tellen
-  let totBezet=0,totNodig=0;
-  filtered.forEach(k=>{
-    const sh=pbGetShifts(k);
-    totBezet+=sh.reduce((s,x)=>s+x.bezet,0);
-    totNodig+=sh.reduce((s,x)=>s+x.totaal,0);
-  });
-  if(statsEl)statsEl.textContent=`${totBezet}/${totNodig} shifts ingevuld`;
-
-  const listEl=document.getElementById('pbKlusList');
-  if(!listEl)return;
-
-  if(!filtered.length){
-    listEl.innerHTML=`<div class="pb-empty">Geen klussen${pbFilter!=='alle'?' voor dit filter':''} op deze dag.</div>`;
-    return;
-  }
-
-  let html='';
-  filtered.forEach(k=>{
-    const st=k._status;
-    const stLabel=st==='leeg'?'Leeg':st==='vol'?'Vol':'Deels';
-    const shifts=pbGetShifts(k);
-    const openSlots=shifts.reduce((s,sh)=>s+(sh.totaal-sh.bezet),0);
-    const beschikbaar=PERSONEEL.filter(p=>!k.personeel||!k.personeel.find(x=>x.id===p.id));
-    const isOpen=pbOpenDrop===k.id;
-
-    // Truck-kleur voor avatar fallback
-    const truckKleur=(k.trucks&&k.trucks.length)?k.trucks[0].kleur:'#6366F1';
-
-    html+=`<div class="pb-klus ${st}">
-      <div class="pb-klus-hdr">
-        <div>
-          <div class="pb-knaam">${k.naam}</div>
-          <div class="pb-kloc">${k.adres||'Locatie onbekend'}</div>
-        </div>
-        <span class="pb-badge ${st}"><span class="pb-bdot"></span>${stLabel}</span>
-      </div>`;
-
-    shifts.forEach(sh=>{
-      const shSt=sh.bezet>=sh.totaal?'vol':sh.bezet===0?'leeg':'deel';
-      html+=`<div class="pb-shift">
-        <span class="pb-stijd">${sh.tijd}</span>
-        <span class="pb-steam">${sh.team}</span>
-        <div class="pb-sright">
-          <span class="pb-badge ${shSt}">${sh.bezet}/${sh.totaal}</span>
-          ${openSlots>0?`<button class="pb-wijs${isOpen?' open':''}" onclick="pbToggleDrop('${k.id}')">${isOpen?'&#x2715; Sluiten':'+ Toewijzen'}</button>`:''}
-        </div>
-      </div>`;
-      if(sh.namen&&sh.namen.length){
-        html+=`<div class="pb-namen">${sh.namen.map(naam=>{
-          const mwObj=PERSONEEL.find(p=>p.naam===naam);
-          const mwId=mwObj?mwObj.id:'';
-          return`<span class="pb-naam-pill">${naam}<button class="pb-remove" onclick="pbVerwijder('${k.id}','${mwId}','${naam}')" title="Verwijder">&#x2715;</button></span>`;
-        }).join('')}</div>`;
-      }
-    });
-
-    if(isOpen){
-      html+=`<div class="pb-dd">`;
-      if(!beschikbaar.length){
-        html+=`<div class="pb-mw" style="color:var(--muted);cursor:default">Alle medewerkers al ingepland</div>`;
-      } else {
-        beschikbaar.forEach(mw=>{
-          const initials=mw.naam.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-          const bgColor=truckKleur+'30';
-          html+=`<div class="pb-mw" onclick="pbWijsToe('${k.id}','${mw.id}')">
-            <div class="pb-av" style="background:${bgColor};color:${truckKleur}">${initials}</div>
-            <span class="pb-mwnaam">${mw.naam}</span>
-            <span class="pb-mwrol">${mw.rol}</span>
-          </div>`;
-        });
-      }
-      html+=`</div>`;
-    }
-    html+=`</div>`;
-  });
-  listEl.innerHTML=html;
-}
-// ── EINDE PLANNING BEHEERDER ──────────────────────────────────────────────────
-
 </script>
 </body>
 </html>
