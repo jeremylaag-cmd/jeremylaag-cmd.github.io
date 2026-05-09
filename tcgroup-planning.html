@@ -665,6 +665,15 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
       <div class="auth-field"><label class="auth-label">E-mailadres</label><input type="email" id="loginEmail" placeholder="naam@email.com"></div>
       <div class="auth-field"><label class="auth-label">Wachtwoord</label><input type="password" id="loginPw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="auth-btn" onclick="doLogin()">Inloggen</button>
+      <button type="button" onclick="showForgotPw()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:.5rem;font-family:var(--font);text-decoration:underline;display:block;width:100%;text-align:center">Wachtwoord vergeten?</button>
+    </div>
+    <div id="forgotForm" style="display:none">
+      <div class="auth-field">
+        <label class="auth-label">E-mailadres</label>
+        <input type="email" id="forgotEmail" placeholder="naam@email.com">
+      </div>
+      <button class="auth-btn" onclick="doForgotPw()">Reset link versturen</button>
+      <button type="button" onclick="showForgotPw(false)" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:.5rem;font-family:var(--font);text-decoration:underline;display:block;width:100%;text-align:center">Terug naar inloggen</button>
     </div>
     <div id="registerForm" style="display:none">
       <div class="auth-field"><label class="auth-label">Volledige naam <span style="color:#DC2626">*</span></label><input type="text" id="regNaam" placeholder="Voornaam Achternaam"></div>
@@ -1230,9 +1239,35 @@ function closeDrawer(){
 function switchAuthTab(tab){
   document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',i===(tab==='login'?0:1)));
   document.getElementById('loginForm').style.display=tab==='login'?'':'none';
+  document.getElementById('forgotForm').style.display='none';
   document.getElementById('registerForm').style.display=tab==='register'?'':'none';
   document.getElementById('authErr').style.display='none';
   document.getElementById('authMsg').style.display='none';
+}
+
+function showForgotPw(show=true){
+  document.getElementById('loginForm').style.display=show?'none':'';
+  document.getElementById('forgotForm').style.display=show?'':'none';
+  if(show){
+    const email=document.getElementById('loginEmail').value;
+    if(email)document.getElementById('forgotEmail').value=email;
+  }
+  document.getElementById('authErr').style.display='none';
+  document.getElementById('authMsg').style.display='none';
+}
+
+async function doForgotPw(){
+  const email=document.getElementById('forgotEmail').value.trim();
+  const err=document.getElementById('authErr');
+  const msg=document.getElementById('authMsg');
+  err.style.display='none';msg.style.display='none';
+  if(!email){err.textContent='Vul je e-mailadres in.';err.style.display='block';return;}
+  const{error}=await sb.auth.resetPasswordForEmail(email,{
+    redirectTo:window.location.href
+  });
+  if(error){err.textContent=error.message;err.style.display='block';return;}
+  msg.textContent='Reset link verstuurd! Controleer je e-mail.';
+  msg.style.display='block';
 }
 
 async function doLogin(){
