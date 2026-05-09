@@ -644,18 +644,27 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
       <div class="auth-field"><label class="auth-label">Wachtwoord <span style="color:#DC2626">*</span></label><input type="password" id="regPw" placeholder="Minimaal 6 tekens"></div>
       <div class="auth-field">
         <label class="auth-label">Shirtmaat <span style="color:#DC2626">*</span></label>
-        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:2px" id="regShirtWrap">
-          <span style="font-size:11px;color:var(--muted)">Selecteer maat:</span>
-          <div style="display:flex;flex-wrap:wrap;gap:4px;width:100%;margin-top:4px">
-            ${['XS','S','M','L','XL','XXL','XXXL','XXXXL'].map(m=>`<button type="button" class="chip" data-maat="${m}" onclick="selectMaat(this)">${m}</button>`).join('')}
-          </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px" id="regShirtWrap">
+          <button type="button" class="chip" data-maat="XS" onclick="selectMaat(this)">XS</button>
+          <button type="button" class="chip" data-maat="S" onclick="selectMaat(this)">S</button>
+          <button type="button" class="chip" data-maat="M" onclick="selectMaat(this)">M</button>
+          <button type="button" class="chip" data-maat="L" onclick="selectMaat(this)">L</button>
+          <button type="button" class="chip" data-maat="XL" onclick="selectMaat(this)">XL</button>
+          <button type="button" class="chip" data-maat="XXL" onclick="selectMaat(this)">XXL</button>
+          <button type="button" class="chip" data-maat="XXXL" onclick="selectMaat(this)">XXXL</button>
+          <button type="button" class="chip" data-maat="XXXXL" onclick="selectMaat(this)">XXXXL</button>
         </div>
         <input type="hidden" id="regMaat">
       </div>
       <div class="auth-field">
         <label class="auth-label">Rijbewijs <span style="color:#DC2626">*</span> <span style="color:var(--muted);font-weight:400">(meerdere mogelijk)</span></label>
-        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
-          ${['Geen','Scooter','Auto','Aanhanger','Vrachtwagen','Vrachtwagen met aanhanger'].map(r=>`<button type="button" class="chip" data-rb="${r}" onclick="toggleRijbewijs(this)">${r}</button>`).join('')}
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px" id="regRijbewijsWrap">
+          <button type="button" class="chip" data-rb="Geen" onclick="toggleRijbewijs(this)">Geen</button>
+          <button type="button" class="chip" data-rb="Scooter" onclick="toggleRijbewijs(this)">Scooter</button>
+          <button type="button" class="chip" data-rb="Auto" onclick="toggleRijbewijs(this)">Auto</button>
+          <button type="button" class="chip" data-rb="Aanhanger" onclick="toggleRijbewijs(this)">Aanhanger</button>
+          <button type="button" class="chip" data-rb="Vrachtwagen" onclick="toggleRijbewijs(this)">Vrachtwagen</button>
+          <button type="button" class="chip" data-rb="Vrachtwagen met aanhanger" onclick="toggleRijbewijs(this)">Vrachtwagen met aanhanger</button>
         </div>
         <input type="hidden" id="regRijbewijs">
       </div>
@@ -673,6 +682,7 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
     <div class="htabs" id="headerTabs"></div>
     <div class="header-right">
       <span class="user-badge" id="userBadge"></span>
+      <button id="addKlusBtnTop" style="display:none" class="btn-sm" onclick="openModal()" style="font-size:12px;padding:6px 14px">+ Klus aanmaken</button>
       <div class="mob-avatar" id="mobAvatar" title="Profiel"></div>
       <button class="logout-btn" onclick="doLogout()">Uitloggen</button>
     </div>
@@ -875,10 +885,27 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
   </div>
 
   <div id="page-accounts" class="page">
-    <div class="beheer-wrap" style="max-width:700px">
+    <div class="beheer-wrap" style="max-width:800px">
       <div class="bc">
-        <div class="bt">Personeelsaccounts</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+          <div class="bt" style="margin-bottom:0">Personeelsaccounts</div>
+          <button class="btn-sm" onclick="exportPersoneelCSV()" style="font-size:11px;padding:5px 14px">&#x21E9; Export CSV</button>
+        </div>
         <div class="acc-list" id="accList"><div class="spin">Laden...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERSONEEL DETAIL MODAL -->
+  <div class="modal-overlay" id="persDetailOverlay" onclick="if(event.target===this)closePersDetail()">
+    <div class="modal" style="max-width:520px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+        <div style="font-size:15px;font-weight:600" id="persDetailNaam">—</div>
+        <button class="btn-ghost" onclick="closePersDetail()" style="padding:5px 10px">&#x2715;</button>
+      </div>
+      <div id="persDetailBody"></div>
+      <div class="mfooter" style="margin-top:1rem">
+        <button class="btn-ghost" onclick="closePersDetail()">Sluiten</button>
       </div>
     </div>
   </div>
@@ -982,14 +1009,7 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-drag"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;gap:10px">
-      <div class="modal-title" id="modalTitle" style="margin-bottom:0">Nieuwe klus</div>
-      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-        <span class="saving-msg" id="savingMsg" style="display:none">Opslaan...</span>
-        <button class="btn-ghost" onclick="closeModal()">Annuleren</button>
-        <button class="btn-sm" onclick="saveKlus()">Opslaan</button>
-      </div>
-    </div>
+    <div class="modal-title" id="modalTitle">Nieuwe klus</div>
     <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)">Verplichte velden</div>
     <div class="fr"><span class="fl">Naam klus <span style="color:#DC2626">*</span></span><input type="text" id="fNaam" placeholder="bv. Bruiloft Janssen"></div>
     <div class="two">
@@ -1039,7 +1059,7 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
     </div>
     <div class="warn-box" id="warnBox"></div>
     <div class="mfooter">
-      <span class="saving-msg" id="savingMsg2" style="display:none">Opslaan...</span>
+      <span class="saving-msg" id="savingMsg" style="display:none">Opslaan...</span>
       <button class="btn-ghost" onclick="closeModal()">Annuleren</button>
       <button class="btn-sm" onclick="saveKlus()">Opslaan</button>
     </div>
@@ -1206,7 +1226,7 @@ async function doRegister(){
   if(data.user){
     const{data:persData}=await sb.from('personeel').select('id').ilike('naam',naam);
     const personeel_id=persData&&persData.length?persData[0].id:null;
-    await sb.from('gebruikers').insert({id:data.user.id,rol:'personeel',naam,telefoon,shirtmaat:maat,rijbewijs,personeel_id});
+    await sb.from('gebruikers').insert({id:data.user.id,rol:'personeel',naam,telefoon,shirtmaat:maat,rijbewijs,email,personeel_id});
   }
   msg.textContent='Account aangemaakt! Je kunt nu inloggen.';
   msg.style.display='block';
@@ -1267,24 +1287,20 @@ async function initApp(user){
       <button class="htab" onclick="showPage('beheer',this)">Beheer</button>
       <button class="htab" onclick="showPage('beschikbaarheid-beheer',this)">Beschikbaarheid</button>
       <button class="htab" onclick="showPage('accounts',this)">Accounts</button>`;
-    document.getElementById('addKlusBtn').style.display='';
-    document.getElementById('addKlusBtnDesk').style.display='';
-    document.getElementById('addKlusBtnMob').style.display='';
+    const topBtn=document.getElementById('addKlusBtnTop');if(topBtn)topBtn.style.display='';
     document.getElementById('addMedBtn').style.display='';
   }else if(isHal){
-    // Hal: uren + rooster, geen schema
     tabs.innerHTML=`
       <button class="htab active" onclick="showPage('uren',this)">Uren</button>
       <button class="htab" onclick="showPage('rooster',this)">Rooster</button>`;
-    ['addKlusBtn','addKlusBtnDesk','addKlusBtnMob','addMedBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    ['addKlusBtnTop','addMedBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
   }else{
-    // Part-timer / Full-timer
     const extraTab=isFullTimer?`<button class="htab" onclick="showPage('rooster',this)">Rooster</button>`:'';
     tabs.innerHTML=`
       <button class="htab active" onclick="showPage('beschikbaarheid',this)">Mijn schema</button>
       <button class="htab" onclick="showPage('uren',this)">Uren</button>
       ${extraTab}`;
-    ['addKlusBtn','addKlusBtnDesk','addKlusBtnMob','addMedBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    ['addKlusBtnTop','addMedBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
   }
 
   // Bottom nav
@@ -2122,6 +2138,128 @@ async function addSoort(){const titel=document.getElementById('newSoortTitel').v
 async function deleteSoort(id){if(!confirm('Soort verwijderen?'))return;await sb.from('klus_soorten').delete().eq('soort_id',id);await sb.from('klus_truck_soorten').delete().eq('soort_id',id);await sb.from('soorten').delete().eq('id',id);await loadAll();renderBeheer();}
 
 // ── ACCOUNTS ──
+async function loadAccounts(){
+  const[{data},{data:skillsData}]=await Promise.all([
+    sb.from('gebruikers').select('*').order('naam'),
+    sb.from('skills').select('*').order('naam'),
+  ]);
+  SKILLS=skillsData||[];
+  const acc=document.getElementById('accList');
+  if(!data||!data.length){acc.innerHTML='<div class="empty">Geen accounts gevonden</div>';return;}
+  const rolLabels={'beheerder':'Beheerder','part-timer':'Part-timer','full-timer':'Full-timer','hal':'Hal medewerker','personeel':'Personeel'};
+  acc.innerHTML=data.map(u=>{
+    let userSkills=[];
+    try{userSkills=u.skills?JSON.parse(typeof u.skills==='string'?u.skills:'[]'):[];}catch(e){}
+    const skillNames=userSkills.map(sid=>{const s=SKILLS.find(x=>x.id===sid);return s?s.naam:null;}).filter(Boolean);
+    return`<div class="acc-item" id="ac-${u.id}" style="cursor:pointer" onclick="openPersDetail('${u.id}')">
+      <div class="acc-info" style="flex:1;min-width:0">
+        <div class="acc-naam">${u.naam||'–'}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap">
+          <span>${rolLabels[u.rol]||u.rol}</span>
+          ${u.telefoon?`<span>${u.telefoon}</span>`:''}
+          ${u.shirtmaat?`<span>👕 ${u.shirtmaat}</span>`:''}
+          ${u.rijbewijs?`<span>🚗 ${u.rijbewijs}</span>`:''}
+        </div>
+        ${skillNames.length?`<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">${skillNames.map(n=>`<span style="font-size:10px;background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;border-radius:20px;padding:1px 7px;font-weight:500">${n}</span>`).join('')}</div>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0" onclick="event.stopPropagation()">
+        <button class="btn-edit" onclick="openPersDetail('${u.id}')">Details</button>
+        ${u.id!==CURRENT_USER.id?`<button class="btn-danger-sm" onclick="verwijderAccount('${u.id}')">×</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let persDetailId=null;
+async function openPersDetail(uid){
+  persDetailId=uid;
+  const[{data:u},{data:skillsData}]=await Promise.all([
+    sb.from('gebruikers').select('*').eq('id',uid).single(),
+    sb.from('skills').select('*').order('naam'),
+  ]);
+  SKILLS=skillsData||[];
+  if(!u)return;
+  document.getElementById('persDetailNaam').textContent=u.naam||'Onbekend';
+  let userSkills=[];
+  try{userSkills=u.skills?JSON.parse(typeof u.skills==='string'?u.skills:'[]'):[];}catch(e){}
+  const rolLabels={'beheerder':'Beheerder','part-timer':'Part-timer','full-timer':'Full-timer','hal':'Hal medewerker','personeel':'Personeel'};
+  const skillPills=SKILLS.map(s=>{
+    const on=userSkills.includes(s.id);
+    return`<button class="chip${on?' on':''}" style="font-size:11px;padding:4px 11px" onclick="toggleUserSkill('${uid}','${s.id}',this)">${s.naam}</button>`;
+  }).join('');
+
+  document.getElementById('persDetailBody').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem">
+      <div class="detail-section"><div class="detail-label">Rol</div><div class="detail-value">
+        <select id="pdRol" style="font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:var(--font);background:var(--surface);color:var(--text);width:100%" onchange="savePdRol('${uid}')">
+          <option value="personeel"${u.rol==='personeel'?' selected':''}>Personeel</option>
+          <option value="part-timer"${u.rol==='part-timer'?' selected':''}>Part-timer</option>
+          <option value="full-timer"${u.rol==='full-timer'?' selected':''}>Full-timer</option>
+          <option value="hal"${u.rol==='hal'?' selected':''}>Hal medewerker</option>
+          <option value="beheerder"${u.rol==='beheerder'?' selected':''}>Beheerder</option>
+        </select>
+      </div></div>
+      <div class="detail-section"><div class="detail-label">Naam</div><div class="detail-value" style="display:flex;gap:5px">
+        <input type="text" id="pdNaam" value="${u.naam||''}" style="flex:1;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:7px;font-family:var(--font)">
+        <button class="btn-sm" style="padding:5px 10px;font-size:11px" onclick="savePdNaam('${uid}')">✓</button>
+      </div></div>
+      <div class="detail-section"><div class="detail-label">E-mailadres</div><div class="detail-value" style="font-size:13px">${u.email||'—'}</div></div>
+      <div class="detail-section"><div class="detail-label">Telefoonnummer</div><div class="detail-value" style="font-size:13px">${u.telefoon||'—'}</div></div>
+      <div class="detail-section"><div class="detail-label">Shirtmaat</div><div class="detail-value" style="font-size:13px">${u.shirtmaat||'—'}</div></div>
+      <div class="detail-section"><div class="detail-label">Rijbewijs</div><div class="detail-value" style="font-size:13px">${u.rijbewijs||'—'}</div></div>
+      ${u.straat?`<div class="detail-section" style="grid-column:1/-1"><div class="detail-label">Adres</div><div class="detail-value" style="font-size:13px">${[u.straat,u.postcode,u.plaats].filter(Boolean).join(', ')}</div></div>`:''}
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:.875rem">
+      <div class="detail-label" style="margin-bottom:.5rem">Skills</div>
+      ${SKILLS.length?`<div style="display:flex;flex-wrap:wrap;gap:5px">${skillPills}</div>`:'<div style="font-size:12px;color:var(--muted)">Geen skills aangemaakt. Ga naar Beheer → Skills om skills toe te voegen.</div>'}
+    </div>`;
+  document.getElementById('persDetailOverlay').classList.add('open');
+}
+
+function closePersDetail(){
+  document.getElementById('persDetailOverlay').classList.remove('open');
+  loadAccounts();
+}
+
+async function savePdNaam(uid){
+  const naam=document.getElementById('pdNaam').value.trim();
+  if(!naam)return;
+  await sb.from('gebruikers').update({naam}).eq('id',uid);
+  document.getElementById('persDetailNaam').textContent=naam;
+}
+
+async function savePdRol(uid){
+  const rol=document.getElementById('pdRol').value;
+  await sb.from('gebruikers').update({rol}).eq('id',uid);
+}
+
+async function toggleUserSkill(userId,skillId,btn){
+  const{data:u}=await sb.from('gebruikers').select('skills').eq('id',userId).single();
+  let skills=[];
+  try{skills=u?.skills?JSON.parse(typeof u.skills==='string'?u.skills:'[]'):[];}catch(e){skills=[];}
+  if(skills.includes(skillId)){skills=skills.filter(s=>s!==skillId);btn.classList.remove('on');}
+  else{skills.push(skillId);btn.classList.add('on');}
+  await sb.from('gebruikers').update({skills:JSON.stringify(skills)}).eq('id',userId);
+}
+
+function exportPersoneelCSV(){
+  sb.from('gebruikers').select('*').order('naam').then(({data})=>{
+    if(!data||!data.length)return;
+    const skillMap=Object.fromEntries(SKILLS.map(s=>[s.id,s.naam]));
+    const headers=['Naam','E-mail','Rol','Telefoon','Shirtmaat','Rijbewijs','Straat','Postcode','Plaats','Skills'];
+    const rows=data.map(u=>{
+      let skills=[];
+      try{skills=u.skills?JSON.parse(typeof u.skills==='string'?u.skills:'[]'):[];}catch(e){}
+      const skillNames=skills.map(sid=>skillMap[sid]||'').filter(Boolean).join('; ');
+      return[u.naam||'',u.email||'',u.rol||'',u.telefoon||'',u.shirtmaat||'',u.rijbewijs||'',u.straat||'',u.postcode||'',u.plaats||'',skillNames].map(v=>`"${String(v).replace(/"/g,'""')}"`);
+    });
+    const csv=[headers.map(h=>`"${h}"`).join(','),...rows.map(r=>r.join(','))].join('\n');
+    const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=`personeel_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();URL.revokeObjectURL(a.href);
+  });
+}
 
 function startEditAccount(id){
   const el=document.getElementById('ac-'+id);
