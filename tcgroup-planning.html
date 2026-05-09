@@ -130,6 +130,81 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .med-zonder-datum{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)}
 .med-zonder-titel{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem}
 
+/* ── PLANNING BEHEERDER ── */
+.pb-wrap{display:grid;grid-template-columns:260px 1fr;height:calc(100vh - 56px);gap:0}
+.pb-sidebar{background:var(--surface);border-right:1px solid var(--border);padding:1.25rem;overflow-y:auto;display:flex;flex-direction:column;gap:1rem}
+.pb-main{padding:1.25rem;overflow-y:auto;display:flex;flex-direction:column;gap:1rem}
+.pb-admin-pill{display:flex;align-items:center;gap:6px;background:#FFFBEB;color:#92400E;border:1px solid #FED7AA;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:500;width:fit-content}
+.pb-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pb-cal-btn{background:none;border:1px solid var(--border);border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:15px;line-height:1}
+.pb-cal-btn:hover{background:var(--bg)}
+.pb-cal-month{font-size:13px;font-weight:600;color:var(--text)}
+.pb-cal-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px}
+.pb-dow{font-size:9px;color:var(--muted);text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:3px 0}
+.pb-cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.pb-day{text-align:center;padding:4px 1px;border-radius:6px;cursor:pointer;font-size:11px;min-height:34px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--text);transition:background .1s}
+.pb-day:hover{background:var(--bg)}
+.pb-day.pb-past{color:var(--muted);background:#F4F3F1;opacity:.65}
+.pb-day.pb-past:hover{opacity:.85}
+.pb-day.pb-today{font-weight:700}
+.pb-day.pb-today .pb-dn{background:#1E40AF;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px}
+.pb-day.pb-sel{background:#EFF6FF}
+.pb-day.pb-sel .pb-dn{color:#1E40AF;font-weight:700}
+.pb-day.pb-other{opacity:.2;pointer-events:none}
+.pb-dn{font-size:11px;line-height:1.2}
+.pb-dot-row{display:flex;gap:2px;justify-content:center}
+.pb-dot{width:4px;height:4px;border-radius:50%}
+.pb-dot.leeg{background:#DC2626}.pb-dot.deel{background:#D97706}.pb-dot.vol{background:#059669}.pb-dot.grijs{background:#B0ABA5}
+.pb-legenda{display:flex;flex-direction:column;gap:5px}
+.pb-lgr{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}
+.pb-ls{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pb-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pb-sum-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+.pb-sum-num{font-size:24px;font-weight:600;line-height:1;margin-bottom:3px}
+.pb-sum-lbl{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.pb-sum-num.leeg{color:#DC2626}.pb-sum-num.deel{color:#D97706}.pb-sum-num.vol{color:#059669}
+.pb-filter{display:flex;gap:5px;flex-wrap:wrap}
+.pb-fbtn{font-size:12px;padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-family:var(--font);transition:all .15s}
+.pb-fbtn:hover{border-color:#888;color:var(--text)}
+.pb-fbtn.on{background:var(--text);color:#fff;border-color:var(--text)}
+.pb-dag-hdr{display:flex;align-items:center;justify-content:space-between;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.pb-dag-lbl{font-size:14px;font-weight:600;color:var(--text)}
+.pb-dag-stats{font-size:12px;color:var(--muted)}
+.pb-klus{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--border)}
+.pb-klus.leeg{border-left-color:#DC2626}.pb-klus.deel{border-left-color:#D97706}.pb-klus.vol{border-left-color:#059669}
+.pb-klus-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.pb-knaam{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.pb-kloc{font-size:11px;color:var(--muted)}
+.pb-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.pb-badge.leeg{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA}
+.pb-badge.deel{background:#FFFBEB;color:#92400E;border:1px solid #FED7AA}
+.pb-badge.vol{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0}
+.pb-bdot{width:5px;height:5px;border-radius:50%}
+.pb-badge.leeg .pb-bdot{background:#DC2626}.pb-badge.deel .pb-bdot{background:#D97706}.pb-badge.vol .pb-bdot{background:#059669}
+.pb-shift{display:flex;align-items:center;gap:6px;padding:6px 0;border-top:1px solid var(--border);flex-wrap:wrap}
+.pb-stijd{font-size:11px;color:var(--muted);min-width:108px;font-variant-numeric:tabular-nums}
+.pb-steam{font-size:11px;color:var(--muted);flex:1}
+.pb-sright{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.pb-wijs{font-size:11px;font-family:var(--font);padding:3px 9px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.pb-wijs:hover{border-color:#2563EB;color:#2563EB;background:#EFF6FF}
+.pb-wijs.open{background:#EFF6FF;color:#1E40AF;border-color:#BFDBFE}
+.pb-namen{display:flex;flex-wrap:wrap;gap:4px;padding:5px 0 2px}
+.pb-naam-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:#166534;background:#F0FDF4;border:1px solid #BBF7D0;padding:2px 5px 2px 9px;border-radius:20px}
+.pb-remove{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:none;background:transparent;cursor:pointer;color:#166534;font-size:13px;padding:0;line-height:1}
+.pb-remove:hover{background:#BBF7D0}
+.pb-dd{margin-top:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.pb-mw{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;transition:background .12s;font-size:12px;color:var(--text)}
+.pb-mw:hover{background:var(--bg)}
+.pb-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.pb-mwnaam{flex:1;font-weight:500}
+.pb-mwrol{font-size:10px;color:var(--muted);background:var(--bg);padding:2px 6px;border-radius:20px}
+.pb-empty{text-align:center;padding:2.5rem;color:var(--muted);font-size:13px}
+#pb-toast{position:fixed;top:66px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;z-index:999;pointer-events:none}
+.pb-toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:12px;color:var(--text);max-width:380px;animation:pbIn .2s ease}
+.pb-toast-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+@keyframes pbIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:767px){.pb-wrap{grid-template-columns:1fr;height:auto}.pb-sidebar{display:none}}
+
 /* Beheer */
 .beheer-wrap{padding:2rem;max-width:1000px;margin:0 auto}
 .beheer-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
@@ -673,6 +748,48 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
     </div>
   </div>
 
+  <!-- PLANNING BEHEERDER -->
+  <div id="page-planning-beheer" class="page">
+    <div id="pb-toast"></div>
+    <div class="pb-wrap">
+      <aside class="pb-sidebar">
+        <div class="pb-admin-pill">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M12 7H4V5a4 4 0 0 1 8 0v2zm1 0V5A5 5 0 0 0 3 5v2H2a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm-5 4.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
+          Alleen beheerder
+        </div>
+        <div>
+          <div class="pb-cal-nav">
+            <button class="pb-cal-btn" onclick="pbChangeMonth(-1)">&#8249;</button>
+            <span class="pb-cal-month" id="pbCalTitle"></span>
+            <button class="pb-cal-btn" onclick="pbChangeMonth(1)">&#8250;</button>
+          </div>
+          <div class="pb-cal-dow" id="pbCalDow"></div>
+          <div class="pb-cal-days" id="pbCalDays"></div>
+        </div>
+        <div class="pb-legenda">
+          <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Legenda</div>
+          <div class="pb-lgr"><div class="pb-ls" style="background:#DC2626"></div>Shift(s) leeg</div>
+          <div class="pb-lgr"><div class="pb-ls" style="background:#D97706"></div>Deels ingevuld</div>
+          <div class="pb-lgr"><div class="pb-ls" style="background:#059669"></div>Volledig bezet</div>
+          <div class="pb-lgr"><div class="pb-ls" style="background:#B0ABA5"></div>Verleden dag</div>
+        </div>
+      </aside>
+      <div class="pb-main">
+        <div class="pb-sum" id="pbSum"></div>
+        <div class="pb-filter">
+          <button class="pb-fbtn on" onclick="pbSetFilter('alle',this)">Alle klussen</button>
+          <button class="pb-fbtn" onclick="pbSetFilter('incompleet',this)">Incompleet</button>
+          <button class="pb-fbtn" onclick="pbSetFilter('compleet',this)">Compleet</button>
+        </div>
+        <div class="pb-dag-hdr">
+          <span class="pb-dag-lbl" id="pbDagLbl"></span>
+          <span class="pb-dag-stats" id="pbDagStats"></span>
+        </div>
+        <div id="pbKlusList"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- BEHEER (alleen beheerder) -->
   <div id="page-beheer" class="page">
     <div class="beheer-wrap">
@@ -1113,6 +1230,7 @@ async function initApp(user){
   if(isBeheerder){
     tabs.innerHTML=`
       <button class="htab active" onclick="showPage('rooster',this)">Rooster</button>
+      <button class="htab" onclick="showPage('planning-beheer',this)">Planning</button>
       <button class="htab" onclick="showPage('uren-beheer',this)">Uren</button>
       <button class="htab" onclick="showPage('beheer',this)">Beheer</button>
       <button class="htab" onclick="showPage('beschikbaarheid-beheer',this)">Beschikbaarheid</button>
@@ -1149,6 +1267,7 @@ async function initApp(user){
     if(isBeheerder){
       bn.innerHTML=
         bnavItem('rooster','Rooster',ico.rooster,true)+
+        bnavItem('planning-beheer','Planning',ico.schema)+
         bnavItem('uren-beheer','Uren',ico.uren)+
         bnavItem('beheer','Beheer',ico.beheer)+
         bnavItem('beschikbaarheid-beheer','Beschikbaarheid',ico.beschikbaarheid)+
@@ -1228,6 +1347,7 @@ function showPage(id,btn){
   if(id==='uren')loadUrenPersoneel();
   if(id==='uren-beheer')loadUrenBeheer();
   if(id==='rooster'&&CURRENT_ROL!=='beheerder')loadPersoonlijkSchemaRooster();
+  if(id==='planning-beheer')pbInit();
 }
 
 // ── API via Supabase JS SDK ──
@@ -2636,6 +2756,275 @@ async function keurBeschikbaarheid(id,status){
   await sb.from('beschikbaarheid').update({status}).eq('id',id);
   loadAlleBeschikbaarheid();
 }
+// ── PLANNING BEHEERDER ────────────────────────────────────────────────────────
+let pbViewYear=new Date().getFullYear();
+let pbViewMonth=new Date().getMonth();
+let pbSelDate=new Date();
+let pbFilter='alle';
+let pbOpenDrop=null;
+
+const PB_MAANDEN=['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
+const PB_DAGEN_KORT=['MA','DI','WO','DO','VR','ZA','ZO'];
+const PB_DAGEN_LANG=['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+
+function pbInit(){
+  pbViewYear=new Date().getFullYear();
+  pbViewMonth=new Date().getMonth();
+  pbSelDate=new Date();
+  pbFilter='alle';
+  pbOpenDrop=null;
+  pbRenderKal();
+  pbRenderContent();
+}
+
+function pbSameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+function pbIsPast(d){const t=new Date();t.setHours(0,0,0,0);const x=new Date(d);x.setHours(0,0,0,0);return x<t;}
+function pbIsToday(d){const t=new Date();t.setHours(0,0,0,0);const x=new Date(d);x.setHours(0,0,0,0);return x.getTime()===t.getTime();}
+function pbFmt(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+
+function pbGetKlussenVoorDag(d){
+  const ds=pbFmt(d);
+  return KLUSSEN.filter(k=>{
+    const start=k.datum;
+    const end=k.datum_eind||k.datum;
+    return ds>=start&&ds<=end;
+  });
+}
+
+function pbGetShifts(k){
+  // Bouw shifts op uit personeel + personeel_nodig veld
+  const bezet=k.personeel?k.personeel.length:0;
+  const nodig=k.personeel_nodig||0;
+  if(nodig===0&&bezet===0)return[];
+  return[{
+    id:'shift-'+k.id,
+    tijd:(k.tijden&&(k.tijden.opbouw||k.tijden.feest))?`${k.tijden.opbouw||k.tijden.vertrek||'?'} → ${k.tijden.einde||'?'}`:'Hele dag',
+    team:(k.trucks&&k.trucks.length)?k.trucks.map(t=>t.naam).join(', '):'Onbekend',
+    bezet:bezet,
+    totaal:Math.max(nodig,bezet),
+    namen:k.personeel?k.personeel.map(p=>p.naam):[]
+  }];
+}
+
+function pbGetStatus(k){
+  const shifts=pbGetShifts(k);
+  if(!shifts.length){
+    const nodig=k.personeel_nodig||0;
+    if(nodig===0)return'vol';
+    return'leeg';
+  }
+  const b=shifts.reduce((s,sh)=>s+sh.bezet,0);
+  const t=shifts.reduce((s,sh)=>s+sh.totaal,0);
+  if(b>=t)return'vol';
+  if(b===0)return'leeg';
+  return'deel';
+}
+
+function pbChangeMonth(d){
+  pbViewMonth+=d;
+  if(pbViewMonth<0){pbViewMonth=11;pbViewYear--;}
+  if(pbViewMonth>11){pbViewMonth=0;pbViewYear++;}
+  pbRenderKal();pbRenderContent();
+}
+
+function pbSelectDay(y,m,d){
+  pbSelDate=new Date(y,m,d);pbOpenDrop=null;
+  pbRenderKal();pbRenderContent();
+}
+
+function pbSetFilter(f,btn){
+  pbFilter=f;
+  document.querySelectorAll('.pb-fbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  pbRenderContent();
+}
+
+function pbToggleDrop(id){pbOpenDrop=pbOpenDrop===id?null:id;pbRenderContent();}
+
+function pbWijsToe(klusId,mwId){
+  const klus=KLUSSEN.find(k=>k.id===klusId);
+  const mw=PERSONEEL.find(p=>p.id===mwId);
+  if(!klus||!mw)return;
+  if(!klus.personeel)klus.personeel=[];
+  if(klus.personeel.find(p=>p.id===mwId))return;
+  const nodig=klus.personeel_nodig||0;
+  if(klus.personeel.length>=nodig&&nodig>0)return;
+  klus.personeel.push({id:mw.id,naam:mw.naam});
+  pbOpenDrop=null;
+  pbShowToast('toe',mw.naam,klus.naam);
+  // Sla op in Supabase
+  sb.from('klus_gebruikers').insert({klus_id:klusId,gebruiker_id:mwId}).then(()=>{});
+  pbRenderKal();pbRenderContent();
+}
+
+function pbVerwijder(klusId,mwId,naam){
+  const klus=KLUSSEN.find(k=>k.id===klusId);
+  if(!klus||!klus.personeel)return;
+  klus.personeel=klus.personeel.filter(p=>p.id!==mwId);
+  pbShowToast('af',naam,klus.naam);
+  sb.from('klus_gebruikers').delete().eq('klus_id',klusId).eq('gebruiker_id',mwId).then(()=>{});
+  pbRenderKal();pbRenderContent();
+}
+
+function pbShowToast(type,naam,klusnaam){
+  const c=document.getElementById('pb-toast');
+  if(!c)return;
+  const isAdd=type==='toe';
+  const t=document.createElement('div');
+  t.className='pb-toast';
+  t.innerHTML=`<div class="pb-toast-icon" style="background:${isAdd?'#F0FDF4':'#FEF2F2'}">
+    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="${isAdd?'M2 6l3 3 5-5':'M3 3l6 6M9 3l-6 6'}" stroke="${isAdd?'#059669':'#DC2626'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div><strong>${naam}</strong> ${isAdd?'toegewezen aan':'verwijderd van'} <em>${klusnaam}</em>${isAdd?' — notificatie verstuurd ✓':''}</div>`;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3500);
+}
+
+function pbRenderKal(){
+  const titleEl=document.getElementById('pbCalTitle');
+  const dowEl=document.getElementById('pbCalDow');
+  const daysEl=document.getElementById('pbCalDays');
+  if(!titleEl)return;
+  titleEl.textContent=PB_MAANDEN[pbViewMonth]+' '+pbViewYear;
+  dowEl.innerHTML=PB_DAGEN_KORT.map(d=>`<div class="pb-dow">${d}</div>`).join('');
+
+  const first=new Date(pbViewYear,pbViewMonth,1);
+  let sd=first.getDay();sd=sd===0?6:sd-1;
+  const dim=new Date(pbViewYear,pbViewMonth+1,0).getDate();
+  const pd=new Date(pbViewYear,pbViewMonth,0).getDate();
+
+  // Bouw dag-statusmap
+  const dm={};
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(pbViewYear,pbViewMonth,d);
+    const dagK=pbGetKlussenVoorDag(dt);
+    if(dagK.length){
+      const sts=[...new Set(dagK.map(k=>pbGetStatus(k)))];
+      dm[d]=sts;
+    }
+  }
+
+  let html='';
+  for(let i=0;i<sd;i++) html+=`<div class="pb-day pb-other"><span class="pb-dn">${pd-sd+1+i}</span></div>`;
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(pbViewYear,pbViewMonth,d);
+    const past=pbIsPast(dt),tod=pbIsToday(dt),sel=pbSameDay(dt,pbSelDate);
+    let cls='pb-day'+(past&&!tod?' pb-past':'')+(tod?' pb-today':'')+(sel?' pb-sel':'');
+    const sts=dm[d]||[];
+    const dots=sts.length?`<div class="pb-dot-row">${sts.map(s=>`<div class="pb-dot ${past&&!tod?'grijs':s}"></div>`).join('')}</div>`:'';
+    html+=`<div class="${cls}" onclick="pbSelectDay(${pbViewYear},${pbViewMonth},${d})"><span class="pb-dn">${d}</span>${dots}</div>`;
+  }
+  const trail=(sd+dim)%7===0?0:7-(sd+dim)%7;
+  for(let i=1;i<=trail;i++) html+=`<div class="pb-day pb-other"><span class="pb-dn">${i}</span></div>`;
+  daysEl.innerHTML=html;
+}
+
+function pbRenderContent(){
+  const dagK=pbGetKlussenVoorDag(pbSelDate);
+  const withStatus=dagK.map(k=>({...k,_status:pbGetStatus(k)}));
+  const leeg=withStatus.filter(k=>k._status==='leeg').length;
+  const deel=withStatus.filter(k=>k._status==='deel').length;
+  const vol=withStatus.filter(k=>k._status==='vol').length;
+
+  const sumEl=document.getElementById('pbSum');
+  if(sumEl)sumEl.innerHTML=`
+    <div class="pb-sum-card"><div class="pb-sum-num leeg">${leeg}</div><div class="pb-sum-lbl">Helemaal leeg</div></div>
+    <div class="pb-sum-card"><div class="pb-sum-num deel">${deel}</div><div class="pb-sum-lbl">Deels ingevuld</div></div>
+    <div class="pb-sum-card"><div class="pb-sum-num vol">${vol}</div><div class="pb-sum-lbl">Volledig bezet</div></div>`;
+
+  const filtered=withStatus.filter(k=>
+    pbFilter==='alle'||
+    (pbFilter==='incompleet'&&(k._status==='leeg'||k._status==='deel'))||
+    (pbFilter==='compleet'&&k._status==='vol')
+  );
+
+  const dow=PB_DAGEN_LANG[pbSelDate.getDay()];
+  const dateStr=dow+' '+pbSelDate.getDate()+' '+PB_MAANDEN[pbSelDate.getMonth()].toLowerCase()+' '+pbSelDate.getFullYear();
+
+  const lblEl=document.getElementById('pbDagLbl');
+  const statsEl=document.getElementById('pbDagStats');
+  if(lblEl)lblEl.textContent=dateStr;
+
+  // Stats tellen
+  let totBezet=0,totNodig=0;
+  filtered.forEach(k=>{
+    const sh=pbGetShifts(k);
+    totBezet+=sh.reduce((s,x)=>s+x.bezet,0);
+    totNodig+=sh.reduce((s,x)=>s+x.totaal,0);
+  });
+  if(statsEl)statsEl.textContent=`${totBezet}/${totNodig} shifts ingevuld`;
+
+  const listEl=document.getElementById('pbKlusList');
+  if(!listEl)return;
+
+  if(!filtered.length){
+    listEl.innerHTML=`<div class="pb-empty">Geen klussen${pbFilter!=='alle'?' voor dit filter':''} op deze dag.</div>`;
+    return;
+  }
+
+  let html='';
+  filtered.forEach(k=>{
+    const st=k._status;
+    const stLabel=st==='leeg'?'Leeg':st==='vol'?'Vol':'Deels';
+    const shifts=pbGetShifts(k);
+    const openSlots=shifts.reduce((s,sh)=>s+(sh.totaal-sh.bezet),0);
+    const beschikbaar=PERSONEEL.filter(p=>!k.personeel||!k.personeel.find(x=>x.id===p.id));
+    const isOpen=pbOpenDrop===k.id;
+
+    // Truck-kleur voor avatar fallback
+    const truckKleur=(k.trucks&&k.trucks.length)?k.trucks[0].kleur:'#6366F1';
+
+    html+=`<div class="pb-klus ${st}">
+      <div class="pb-klus-hdr">
+        <div>
+          <div class="pb-knaam">${k.naam}</div>
+          <div class="pb-kloc">${k.adres||'Locatie onbekend'}</div>
+        </div>
+        <span class="pb-badge ${st}"><span class="pb-bdot"></span>${stLabel}</span>
+      </div>`;
+
+    shifts.forEach(sh=>{
+      const shSt=sh.bezet>=sh.totaal?'vol':sh.bezet===0?'leeg':'deel';
+      html+=`<div class="pb-shift">
+        <span class="pb-stijd">${sh.tijd}</span>
+        <span class="pb-steam">${sh.team}</span>
+        <div class="pb-sright">
+          <span class="pb-badge ${shSt}">${sh.bezet}/${sh.totaal}</span>
+          ${openSlots>0?`<button class="pb-wijs${isOpen?' open':''}" onclick="pbToggleDrop('${k.id}')">${isOpen?'&#x2715; Sluiten':'+ Toewijzen'}</button>`:''}
+        </div>
+      </div>`;
+      if(sh.namen&&sh.namen.length){
+        html+=`<div class="pb-namen">${sh.namen.map(naam=>{
+          const mwObj=PERSONEEL.find(p=>p.naam===naam);
+          const mwId=mwObj?mwObj.id:'';
+          return`<span class="pb-naam-pill">${naam}<button class="pb-remove" onclick="pbVerwijder('${k.id}','${mwId}','${naam}')" title="Verwijder">&#x2715;</button></span>`;
+        }).join('')}</div>`;
+      }
+    });
+
+    if(isOpen){
+      html+=`<div class="pb-dd">`;
+      if(!beschikbaar.length){
+        html+=`<div class="pb-mw" style="color:var(--muted);cursor:default">Alle medewerkers al ingepland</div>`;
+      } else {
+        beschikbaar.forEach(mw=>{
+          const initials=mw.naam.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+          const bgColor=truckKleur+'30';
+          html+=`<div class="pb-mw" onclick="pbWijsToe('${k.id}','${mw.id}')">
+            <div class="pb-av" style="background:${bgColor};color:${truckKleur}">${initials}</div>
+            <span class="pb-mwnaam">${mw.naam}</span>
+            <span class="pb-mwrol">${mw.rol}</span>
+          </div>`;
+        });
+      }
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+  });
+  listEl.innerHTML=html;
+}
+// ── EINDE PLANNING BEHEERDER ──────────────────────────────────────────────────
+
 </script>
 </body>
 </html>
