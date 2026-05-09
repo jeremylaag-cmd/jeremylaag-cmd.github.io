@@ -1271,7 +1271,7 @@ async function doAppleLogin(){
   const{error}=await sb.auth.signInWithOAuth({
     provider:'apple',
     options:{
-      redirectTo:window.location.href,
+      redirectTo:'https://jeremylaag-cmd.github.io',
       scopes:'name email',
     }
   });
@@ -1285,7 +1285,7 @@ async function doForgotPw(){
   err.style.display='none';msg.style.display='none';
   if(!email){err.textContent='Vul je e-mailadres in.';err.style.display='block';return;}
   const{error}=await sb.auth.resetPasswordForEmail(email,{
-    redirectTo:window.location.href
+    redirectTo:'https://jeremylaag-cmd.github.io'
   });
   if(error){err.textContent=error.message;err.style.display='block';return;}
   msg.textContent='Reset link verstuurd! Controleer je e-mail.';
