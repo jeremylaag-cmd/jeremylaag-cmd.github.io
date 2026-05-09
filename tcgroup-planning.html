@@ -618,7 +618,37 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
 .pb-toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:12px;color:var(--text);max-width:380px;animation:pbIn .2s ease}
 .pb-toast-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 @keyframes pbIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:767px){.pb-wrap{grid-template-columns:1fr;height:auto}.pb-sidebar{display:none}}
+@media(max-width:767px){
+  .pb-wrap{grid-template-columns:1fr;height:auto;flex-direction:column}
+  .pb-sidebar{display:none}
+  .pb-mob-cal{display:block}
+}
+@media(min-width:768px){
+  .pb-mob-cal{display:none}
+}
+.pb-mob-cal{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:.75rem 1rem;
+}
+.pb-mob-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.pb-mob-cal-month{font-size:13px;font-weight:600;color:var(--text)}
+.pb-mob-cal-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.pb-mob-cal-row{display:flex;gap:4px;min-width:max-content}
+.pb-mob-day{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  min-width:38px;padding:5px 4px;border-radius:8px;cursor:pointer;
+  flex-shrink:0;transition:background .1s;
+}
+.pb-mob-day:hover{background:var(--bg)}
+.pb-mob-day.pb-mob-past{opacity:.45}
+.pb-mob-day.pb-mob-today .pb-mob-dn{background:var(--text);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.pb-mob-day.pb-mob-sel{background:#EFF6FF}
+.pb-mob-day.pb-mob-sel .pb-mob-dn{color:#1E40AF;font-weight:700}
+.pb-mob-dow{font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase}
+.pb-mob-dn{font-size:13px;color:var(--text);line-height:1}
+.pb-mob-dots{display:flex;gap:2px;justify-content:center;min-height:5px}
+.pb-mob-dot{width:5px;height:5px;border-radius:50%}
+.pb-mob-dot.leeg{background:#DC2626}.pb-mob-dot.deel{background:#D97706}.pb-mob-dot.vol{background:#059669}.pb-mob-dot.grijs{background:#B0ABA5}
 </style>
 </head>
 <body>
@@ -801,6 +831,18 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
           <div class="pb-lgr"><div class="pb-ls" style="background:#B0ABA5"></div>Verleden dag</div>
         </div>
       </aside>
+      <!-- Mobiele kalender (horizontaal scrollbaar) -->
+      <div class="pb-mob-cal">
+        <div class="pb-mob-cal-nav">
+          <button class="pb-cal-btn" onclick="pbChangeMonth(-1)">&#8249;</button>
+          <span class="pb-mob-cal-month" id="pbMobCalTitle"></span>
+          <button class="pb-cal-btn" onclick="pbChangeMonth(1)">&#8250;</button>
+        </div>
+        <div class="pb-mob-cal-scroll">
+          <div class="pb-mob-cal-row" id="pbMobCalDays"></div>
+        </div>
+      </div>
+
       <div class="pb-main">
         <div class="pb-sum" id="pbSum"></div>
         <div class="pb-filter">
@@ -3023,12 +3065,19 @@ function pbShowToast(type,naam,klusnaam){
 function pbRenderKal(){
   const titleEl=document.getElementById('pbCalTitle'),dowEl=document.getElementById('pbCalDow'),daysEl=document.getElementById('pbCalDays');
   if(!titleEl)return;
-  titleEl.textContent=PB_MAANDEN[pbViewMonth]+' '+pbViewYear;
+  const maandTitel=PB_MAANDEN[pbViewMonth]+' '+pbViewYear;
+  titleEl.textContent=maandTitel;
+  // Mobiele kalender titel ook bijwerken
+  const mobTitle=document.getElementById('pbMobCalTitle');
+  if(mobTitle)mobTitle.textContent=maandTitel;
+
   dowEl.innerHTML=PB_DAGEN_KORT.map(d=>`<div class="pb-dow">${d}</div>`).join('');
   const first=new Date(pbViewYear,pbViewMonth,1);let sd=first.getDay();sd=sd===0?6:sd-1;
   const dim=new Date(pbViewYear,pbViewMonth+1,0).getDate(),pd=new Date(pbViewYear,pbViewMonth,0).getDate();
   const dm={};
   for(let d=1;d<=dim;d++){const dt=new Date(pbViewYear,pbViewMonth,d);const dagK=pbGetKlussenVoorDag(dt);if(dagK.length)dm[d]=[...new Set(dagK.map(k=>pbGetStatus(k)))];}
+
+  // Desktop kalender
   let html='';
   for(let i=0;i<sd;i++)html+=`<div class="pb-day pb-other"><span class="pb-dn">${pd-sd+1+i}</span></div>`;
   for(let d=1;d<=dim;d++){
@@ -3042,6 +3091,32 @@ function pbRenderKal(){
   const trail=(sd+dim)%7===0?0:7-(sd+dim)%7;
   for(let i=1;i<=trail;i++)html+=`<div class="pb-day pb-other"><span class="pb-dn">${i}</span></div>`;
   daysEl.innerHTML=html;
+
+  // Mobiele kalender (horizontale rij van alle dagen)
+  const mobEl=document.getElementById('pbMobCalDays');
+  if(!mobEl)return;
+  const DAGEN_MOB=['Zo','Ma','Di','Wo','Do','Vr','Za'];
+  let mobHtml='';
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(pbViewYear,pbViewMonth,d);
+    const past=pbIsPast(dt),tod=pbIsToday(dt),sel=pbSameDay(dt,pbSelDate);
+    const dowIdx=dt.getDay();
+    const sts=dm[d]||[];
+    let cls='pb-mob-day'+(past&&!tod?' pb-mob-past':'')+(tod?' pb-mob-today':'')+(sel?' pb-mob-sel':'');
+    const dots=sts.length?sts.map(s=>`<div class="pb-mob-dot ${past&&!tod?'grijs':s}"></div>`).join(''):'';
+    mobHtml+=`<div class="${cls}" onclick="pbSelectDay(${pbViewYear},${pbViewMonth},${d})">
+      <span class="pb-mob-dow">${DAGEN_MOB[dowIdx]}</span>
+      <span class="pb-mob-dn">${d}</span>
+      <div class="pb-mob-dots">${dots}</div>
+    </div>`;
+  }
+  mobEl.innerHTML=mobHtml;
+
+  // Scroll geselecteerde dag in beeld op mobiel
+  setTimeout(()=>{
+    const sel=mobEl.querySelector('.pb-mob-sel');
+    if(sel)sel.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  },50);
 }
 function pbRenderContent(){
   const dagK=pbGetKlussenVoorDag(pbSelDate).map(k=>({...k,_status:pbGetStatus(k)}));
