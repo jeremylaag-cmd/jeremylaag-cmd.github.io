@@ -80,17 +80,17 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .btn-ghost{background:transparent;border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:var(--font);color:var(--text)}
 .tl-dates{display:grid;grid-template-columns:repeat(14,1fr);gap:3px}
 .td{font-size:9px;color:var(--muted);text-align:center;font-weight:500}
-.td.tod{color:#1E40AF}
+.td.tod{color:#1E40AF;font-weight:700;background:#EFF6FF;border-radius:4px;padding:1px 2px}
+.td.past-date{color:#C5C1BB}
 .tl-rows{display:flex;flex-direction:column;gap:4px}
 .tl-row{display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center}
 .tl-name{font-size:11px;color:var(--muted);text-align:right;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tl-cells{display:grid;grid-template-columns:repeat(14,1fr);gap:3px}
 .tc{height:24px;border-radius:4px;border:1px solid var(--border);background:var(--bg);cursor:pointer}
 .tc.busy{border-width:1px}
-.tc.tod-col{outline:2px solid rgba(37,99,235,.25);outline-offset:-1px}
+.tc.tod-col{outline:2.5px solid #2563EB;outline-offset:-1px}
 .tc.sel-col{outline:2px solid var(--text);outline-offset:-1px}
-.tc.past-col{background:#F0EFED !important;border-color:#E0DED9 !important;opacity:.5}
-.td.past-date{color:#B0ABA5}
+.tc.past-col{background:#EDECEA !important;border-color:#DEDAD5 !important;opacity:.45;cursor:default}
 .kl{display:flex;flex-direction:column;gap:8px}
 .kc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.875rem 1rem;cursor:pointer}
 .kc:hover{box-shadow:0 1px 4px rgba(0,0,0,.06)}
@@ -116,7 +116,13 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .med-dag-hdr{padding:5px 7px;border-bottom:1px solid var(--border);background:var(--bg)}
 .med-dag-naam{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 .med-dag-num{font-size:13px;font-weight:600;color:var(--text);line-height:1.2}
-.med-dag-hdr.vandaag{background:#EFF6FF}.med-dag-hdr.vandaag .med-dag-num{color:#1E40AF}
+/* Vandaag — dikke blauwe rand + blauwe achtergrond */
+.med-dag.vandaag-dag{border:2.5px solid #2563EB}
+.med-dag-hdr.vandaag{background:#EFF6FF}.med-dag-hdr.vandaag .med-dag-num{color:#1E40AF;font-weight:700}.med-dag-hdr.vandaag .med-dag-naam{color:#2563EB}
+/* Verleden — grijs en uitgevaagd */
+.med-dag.verleden{opacity:.45}
+.med-dag.verleden .med-dag-num{color:#B0ABA5}
+.med-dag.verleden .med-dag-naam{color:#C5C1BB}
 .med-dag-items{padding:5px 6px;display:flex;flex-direction:column;gap:3px}
 .med-pill{font-size:10px;font-weight:500;background:#EFF6FF;color:#1E40AF;border-radius:4px;padding:2px 5px;line-height:1.4;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:3px}
 .med-pill-del{background:none;border:none;color:#93C5FD;cursor:pointer;font-size:12px;line-height:1;padding:0}
@@ -1764,9 +1770,9 @@ function renderMededelingen(meds){
   }else{
     // Desktop weergave: 7-kolommen grid
     const weekGrid=days.map((d,i)=>{
-      const ds=fmt(d);const isToday=ds===todayStr;
+      const ds=fmt(d);const isToday=ds===todayStr;const isPast=ds<todayStr;
       const dagMeds=medsMetDatum.filter(m=>m.datum===ds);
-      return`<div class="med-dag"><div class="med-dag-hdr${isToday?' vandaag':''}"><div class="med-dag-naam">${dagNamen[i]}</div><div class="med-dag-num">${d.getDate()}</div></div>
+      return`<div class="med-dag${isToday?' vandaag-dag':''}${isPast?' verleden':''}"><div class="med-dag-hdr${isToday?' vandaag':''}"><div class="med-dag-naam">${dagNamen[i]}</div><div class="med-dag-num">${d.getDate()}</div></div>
         <div class="med-dag-items">${dagMeds.length?dagMeds.map(m=>`<div class="med-pill" onclick="${isBeheerder?`openMedModal('${m.id}')`:`openMedDetail('${m.id}')`}"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.titel}</span>${isBeheerder?`<button class="med-pill-del" onclick="event.stopPropagation();deleteMed('${m.id}')">×</button>`:''}</div>`).join(''):'<div class="med-geen">–</div>'}</div>
       </div>`;
     }).join('');
