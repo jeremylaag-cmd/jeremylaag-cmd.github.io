@@ -2457,7 +2457,7 @@ async function loadUrenBeheer(){
 
   // Haal alle registraties op
   const{data:regs}=await sb.from('urenregistraties').select('*').order('ingeklokt_op',{ascending:false});
-  const{data:gebruikers}=await sb.from('gebruikers').select('id,naam').eq('rol','personeel');
+  const{data:gebruikers}=await sb.from('gebruikers').select('id,naam');
   const gMap=Object.fromEntries((gebruikers||[]).map(g=>[g.id,g.naam]));
 
   // Te accorderen
