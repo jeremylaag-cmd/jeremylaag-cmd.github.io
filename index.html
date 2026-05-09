@@ -1339,6 +1339,8 @@ async function doLogout(){
 
 async function initApp(user){
   CURRENT_USER=user;
+  // Koppel gebruiker aan OneSignal
+  koppelOneSignalUser(user.id);
   // Haal rol op — probeer meerdere keren als nodig
   let rol='personeel',naam=user.email;
   try{
@@ -3107,6 +3109,7 @@ function pbWijsToe(klusId,mwId){
   klus.personeel.push({id:mw.id,naam:mw.naam});pbOpenDrop=null;
   pbShowToast('toe',mw.naam,klus.naam);
   sb.from('klus_gebruikers').insert({klus_id:klusId,gebruiker_id:mwId}).then(()=>{});
+  sendPushNotificatie(mwId, 'Je bent ingepland!', `Je bent toegewezen aan ${klus.naam}.`);
   pbRenderKal();pbRenderContent();
 }
 function pbVerwijder(klusId,mwId,naam){
@@ -3234,7 +3237,25 @@ function pbRenderContent(){
   });
   listEl.innerHTML=html;
 }
-// ── EINDE PLANNING BEHEERDER ──────────────────────────────────────────────────
+// ── ONESIGNAL PUSHNOTIFICATIES ──
+function initOneSignal(){
+  if(!window.plugins||!window.plugins.OneSignal)return;
+  window.plugins.OneSignal.initialize('d5f6ac5c-4c66-406c-8386-70423c040f9a');
+  window.plugins.OneSignal.Notifications.requestPermission(true);
+}
+
+function koppelOneSignalUser(userId){
+  if(!window.plugins||!window.plugins.OneSignal)return;
+  window.plugins.OneSignal.login(userId);
+}
+
+function sendPushNotificatie(userId, titel, bericht){
+  sb.functions.invoke('stuur-notificatie',{
+    body:{userId, titel, bericht}
+  });
+}
+
+document.addEventListener('deviceready', initOneSignal, false);
 </script>
 </body>
 </html>
