@@ -3274,7 +3274,7 @@ async function initPushNotifications(){
 }
 
 function sendPushNotificatie(userId, titel, bericht){
-  const SUPABASE_URL='https://rxfrdocioodfxrnjt.supabase.co';
+  const SUPABASE_URL='https://rxfrdocioodfxrnjtipa.supabase.co';
   const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4ZnJkb2Npb29kZnhybmp0aXBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MjM1MDQsImV4cCI6MjA5MzM5OTUwNH0.dvTDgvVSQQILHdgm0FI_FW8WmALTZI06VTqabLrwu1E';
   fetch(`${SUPABASE_URL}/functions/v1/stuur-notificatie`,{
     method:'POST',
