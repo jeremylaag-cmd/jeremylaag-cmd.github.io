@@ -3299,15 +3299,41 @@ window.addEventListener('load', ()=>{
   if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App){
     window.Capacitor.Plugins.App.addListener('appUrlOpen', async (data)=>{
       const url=data.url;
-      if(url&&(url.includes('access_token')||url.includes('code='))){
-        const urlObj=new URL(url.replace('tcgroup://','https://tcgroup.app/'));
-        const code=urlObj.searchParams.get('code');
-        if(code){
-          const{data:sessionData}=await sb.auth.exchangeCodeForSession(code);
-          if(sessionData?.session)initApp(sessionData.session.user);
-        } else {
-          const{data:sessionData}=await sb.auth.getSession();
-          if(sessionData?.session)initApp(sessionData.session.user);
+      console.log('Deep link ontvangen:', url);
+      if(!url)return;
+
+      // Haal hash fragment op (access_token zit na #)
+      const hashIndex=url.indexOf('#');
+      const queryIndex=url.indexOf('?');
+      
+      let params;
+      if(hashIndex>-1){
+        params=new URLSearchParams(url.substring(hashIndex+1));
+      } else if(queryIndex>-1){
+        params=new URLSearchParams(url.substring(queryIndex+1));
+      } else {
+        return;
+      }
+
+      const accessToken=params.get('access_token');
+      const refreshToken=params.get('refresh_token');
+      const code=params.get('code');
+
+      console.log('Access token gevonden:', !!accessToken);
+
+      if(accessToken&&refreshToken){
+        const{data:sessionData,error}=await sb.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+        console.log('Sessie result:', sessionData?.session?.user?.email, error);
+        if(sessionData?.session){
+          initApp(sessionData.session.user);
+        }
+      } else if(code){
+        const{data:sessionData,error}=await sb.auth.exchangeCodeForSession(code);
+        if(sessionData?.session){
+          initApp(sessionData.session.user);
         }
       }
     });
