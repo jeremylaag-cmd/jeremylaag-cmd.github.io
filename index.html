@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="TC Planning">
 <meta name="theme-color" content="#1A1917">
 <title>TC Group — Planning</title>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -1339,8 +1340,12 @@ async function doLogout(){
 
 async function initApp(user){
   CURRENT_USER=user;
-  // Koppel gebruiker aan OneSignal
-  koppelOneSignalUser(user.id);
+  // Initialiseer push notificaties na inloggen
+  setTimeout(()=>{
+    if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.PushNotifications){
+      initPushNotifications();
+    }
+  }, 1000);
   // Haal rol op — probeer meerdere keren als nodig
   let rol='personeel',naam=user.email;
   try{
@@ -3237,25 +3242,56 @@ function pbRenderContent(){
   });
   listEl.innerHTML=html;
 }
-// ── ONESIGNAL PUSHNOTIFICATIES ──
-function initOneSignal(){
-  if(!window.plugins||!window.plugins.OneSignal)return;
-  window.plugins.OneSignal.initialize('d5f6ac5c-4c66-406c-8386-70423c040f9a');
-  window.plugins.OneSignal.Notifications.requestPermission(true);
-}
+// ── PUSH NOTIFICATIES ──
+async function initPushNotifications(){
+  try {
+    const Push=window.Capacitor.Plugins.PushNotifications;
+    if(!Push)return;
 
-function koppelOneSignalUser(userId){
-  if(!window.plugins||!window.plugins.OneSignal)return;
-  window.plugins.OneSignal.login(userId);
+    const permResult=await Push.requestPermissions();
+    if(permResult.receive==='granted'){
+      await Push.register();
+    }
+
+    await Push.addListener('registration', async token=>{
+      console.log('Push token:', token.value);
+      if(!CURRENT_USER)return;
+      await sb.from('gebruikers').update({push_token:token.value}).eq('id',CURRENT_USER.id);
+      console.log('Push token opgeslagen');
+    });
+
+    await Push.addListener('registrationError', err=>{
+      console.error('Push registratie fout:', err);
+    });
+
+    await Push.addListener('pushNotificationReceived', notification=>{
+      console.log('Notificatie ontvangen:', notification);
+    });
+
+  } catch(e){
+    console.error('Push init fout:', e);
+  }
 }
 
 function sendPushNotificatie(userId, titel, bericht){
-  sb.functions.invoke('stuur-notificatie',{
-    body:{userId, titel, bericht}
-  });
+  const SUPABASE_URL='https://rxfrdocioodfxrnjt.supabase.co';
+  const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4ZnJkb2Npb29kZnhybmp0aXBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MjM1MDQsImV4cCI6MjA5MzM5OTUwNH0.dvTDgvVSQQILHdgm0FI_FW8WmALTZI06VTqabLrwu1E';
+  fetch(`${SUPABASE_URL}/functions/v1/stuur-notificatie`,{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,
+      'apikey': SUPABASE_ANON_KEY
+    },
+    body:JSON.stringify({userId, titel, bericht})
+  }).then(r=>r.json()).then(d=>console.log('Notificatie result:',d)).catch(e=>console.error('Notificatie fout:',e));
 }
 
-document.addEventListener('deviceready', initOneSignal, false);
+document.addEventListener('deviceready', ()=>{
+  if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.PushNotifications){
+    initPushNotifications();
+  }
+}, false);
 </script>
 </body>
 </html>
