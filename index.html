@@ -1269,10 +1269,11 @@ function showForgotPw(show=true){
 async function doAppleLogin(){
   const err=document.getElementById('authErr');
   err.style.display='none';
+  const isNative=window.Capacitor&&window.Capacitor.isNativePlatform();
   const{error}=await sb.auth.signInWithOAuth({
     provider:'apple',
     options:{
-      redirectTo:'https://jeremylaag-cmd.github.io',
+      redirectTo: isNative ? 'tcgroup://login' : 'https://jeremylaag-cmd.github.io',
       scopes:'name email',
     }
   });
@@ -3292,6 +3293,26 @@ document.addEventListener('deviceready', ()=>{
     initPushNotifications();
   }
 }, false);
+
+// ── DEEP LINK HANDLER (Apple login callback) ──
+window.addEventListener('load', ()=>{
+  if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App){
+    window.Capacitor.Plugins.App.addListener('appUrlOpen', async (data)=>{
+      const url=data.url;
+      if(url&&(url.includes('access_token')||url.includes('code='))){
+        const urlObj=new URL(url.replace('tcgroup://','https://tcgroup.app/'));
+        const code=urlObj.searchParams.get('code');
+        if(code){
+          const{data:sessionData}=await sb.auth.exchangeCodeForSession(code);
+          if(sessionData?.session)initApp(sessionData.session.user);
+        } else {
+          const{data:sessionData}=await sb.auth.getSession();
+          if(sessionData?.session)initApp(sessionData.session.user);
+        }
+      }
+    });
+  }
+});
 </script>
 </body>
 </html>
