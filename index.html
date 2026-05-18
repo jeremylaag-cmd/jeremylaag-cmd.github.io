@@ -938,6 +938,28 @@ header{padding:0 1rem;height:52px;position:sticky;top:0;z-index:50;padding-top:e
         <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border)">
           <button onclick="doLogout()" style="width:100%;background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;border-radius:10px;padding:13px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font)">Uitloggen</button>
         </div>
+
+        <!-- Account verwijderen -->
+        <div style="margin-top:1rem">
+          <button onclick="openVerwijderAccount()" style="width:100%;background:transparent;color:#991B1B;border:none;padding:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);text-decoration:underline">Account verwijderen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCOUNT VERWIJDEREN DIALOOG -->
+  <div id="verwijderAccountOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;padding:1.25rem">
+    <div style="background:var(--surface);border-radius:14px;max-width:380px;width:100%;padding:1.5rem;box-shadow:0 10px 40px rgba(0,0,0,.3)">
+      <div style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:8px">Account permanent verwijderen</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:14px">
+        Hiermee worden je account en alle bijbehorende gegevens (beschikbaarheid, schema's, urenregistraties) <strong>permanent verwijderd</strong>. Dit kan niet ongedaan worden gemaakt.
+      </div>
+      <div style="font-size:13px;color:var(--text);margin-bottom:6px">Typ <strong>VERWIJDER</strong> om te bevestigen:</div>
+      <input type="text" id="verwijderBevestigInput" autocomplete="off" autocapitalize="characters" placeholder="VERWIJDER" style="width:100%;font-size:14px;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box">
+      <div id="verwijderAccountErr" style="display:none;color:#991B1B;font-size:12px;margin-top:8px"></div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button onclick="closeVerwijderAccount()" style="flex:1;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:11px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font)">Annuleren</button>
+        <button id="verwijderAccountBtn" onclick="bevestigVerwijderAccount()" style="flex:1;background:#991B1B;color:#fff;border:none;border-radius:9px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font)">Verwijderen</button>
       </div>
     </div>
   </div>
@@ -1337,6 +1359,62 @@ async function doLogout(){
   CURRENT_USER=null;CURRENT_ROL=null;
   document.getElementById('appWrap').style.display='none';
   document.getElementById('authWrap').style.display='flex';
+}
+
+function openVerwijderAccount(){
+  const inp=document.getElementById('verwijderBevestigInput');
+  const err=document.getElementById('verwijderAccountErr');
+  if(inp)inp.value='';
+  if(err)err.style.display='none';
+  document.getElementById('verwijderAccountOverlay').style.display='flex';
+}
+
+function closeVerwijderAccount(){
+  document.getElementById('verwijderAccountOverlay').style.display='none';
+}
+
+async function bevestigVerwijderAccount(){
+  const inp=document.getElementById('verwijderBevestigInput');
+  const err=document.getElementById('verwijderAccountErr');
+  const btn=document.getElementById('verwijderAccountBtn');
+  err.style.display='none';
+  if(!inp||inp.value.trim().toUpperCase()!=='VERWIJDER'){
+    err.textContent='Typ VERWIJDER (in hoofdletters) om te bevestigen.';
+    err.style.display='block';return;
+  }
+  btn.disabled=true;btn.textContent='Bezig...';
+  try{
+    const{data:{session}}=await sb.auth.getSession();
+    if(!session){throw new Error('Geen actieve sessie. Log opnieuw in.');}
+    // Roep de server-side Edge Function aan die account + gegevens verwijdert
+    const resp=await fetch(SB_URL+'/functions/v1/delete-account',{
+      method:'POST',
+      headers:{
+        'Authorization':'Bearer '+session.access_token,
+        'Content-Type':'application/json'
+      }
+    });
+    const result=await resp.json().catch(()=>({}));
+    if(!resp.ok||result.error){
+      throw new Error(result.error||('Verwijderen mislukt (status '+resp.status+').'));
+    }
+    // Account is verwijderd — uitloggen en terug naar inlogscherm
+    await sb.auth.signOut();
+    CURRENT_USER=null;CURRENT_ROL=null;
+    closeVerwijderAccount();
+    document.getElementById('appWrap').style.display='none';
+    document.getElementById('authWrap').style.display='flex';
+    const authMsg=document.getElementById('authMsg');
+    if(authMsg){
+      authMsg.textContent='Je account is permanent verwijderd.';
+      authMsg.style.display='block';
+    }
+  }catch(e){
+    err.textContent=e.message||'Er ging iets mis. Probeer het opnieuw.';
+    err.style.display='block';
+  }finally{
+    btn.disabled=false;btn.textContent='Verwijderen';
+  }
 }
 
 async function initApp(user){
