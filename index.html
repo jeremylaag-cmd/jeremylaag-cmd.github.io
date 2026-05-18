@@ -1347,7 +1347,7 @@ async function doRegister(){
   if(data.user){
     const{data:persData}=await sb.from('personeel').select('id').ilike('naam',naam);
     const personeel_id=persData&&persData.length?persData[0].id:null;
-    await sb.from('gebruikers').insert({id:data.user.id,rol:'personeel',naam,telefoon,shirtmaat:maat,rijbewijs,email,personeel_id});
+    await sb.from('gebruikers').insert({id:data.user.id,rol:'part-timer',naam,telefoon,shirtmaat:maat,rijbewijs,email,personeel_id});
   }
   msg.textContent='Account aangemaakt! Je kunt nu inloggen.';
   msg.style.display='block';
@@ -1417,8 +1417,31 @@ async function bevestigVerwijderAccount(){
   }
 }
 
+async function zorgVoorGebruikersRij(user){
+  // Controleer of er al een gebruikers-rij bestaat voor dit account.
+  try{
+    const{data:bestaand}=await sb.from('gebruikers').select('id').eq('id',user.id);
+    if(bestaand&&bestaand.length>0)return; // rij bestaat al
+    // Geen rij — maak er een aan (bijv. na Sign in with Apple).
+    const meta=user.user_metadata||{};
+    const naam=meta.naam||meta.full_name||meta.name||(user.email?user.email.split('@')[0]:'Nieuwe gebruiker');
+    await sb.from('gebruikers').insert({
+      id:user.id,
+      rol:'part-timer',
+      naam,
+      email:user.email||null,
+      telefoon:null,
+      shirtmaat:null,
+      rijbewijs:null,
+      personeel_id:null
+    });
+  }catch(e){console.error('Aanmaken gebruikers-rij mislukt:',e);}
+}
+
 async function initApp(user){
   CURRENT_USER=user;
+  // Zorg dat er een gebruikers-rij bestaat (vangnet voor o.a. Apple login)
+  await zorgVoorGebruikersRij(user);
   // Initialiseer push notificaties na inloggen
   setTimeout(()=>{
     if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.PushNotifications){
@@ -1426,14 +1449,14 @@ async function initApp(user){
     }
   }, 1000);
   // Haal rol op — probeer meerdere keren als nodig
-  let rol='personeel',naam=user.email;
+  let rol='part-timer',naam=user.email;
   try{
     const{data,error}=await sb.from('gebruikers').select('rol,naam').eq('id',user.id).single();
-    if(data){rol=data.rol||'personeel';naam=data.naam||user.email;}
+    if(data){rol=data.rol||'part-timer';naam=data.naam||user.email;}
     else if(error){
       // Probeer opnieuw zonder single()
       const{data:rows}=await sb.from('gebruikers').select('rol,naam').eq('id',user.id);
-      if(rows&&rows.length>0){rol=rows[0].rol||'personeel';naam=rows[0].naam||user.email;}
+      if(rows&&rows.length>0){rol=rows[0].rol||'part-timer';naam=rows[0].naam||user.email;}
     }
   }catch(e){console.error('Rol ophalen mislukt:',e);}
   CURRENT_ROL=rol;
@@ -1709,7 +1732,7 @@ async function openPersDetail(uid){
     </div>
     <div class="fr"><span class="fl">Rol</span>
       <select id="pdRol" style="font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);background:var(--surface);color:var(--text);width:100%">
-        <option value="personeel"${u.rol==='personeel'?' selected':''}>Personeel</option>
+        ${u.rol==='personeel'?'<option value="personeel" selected>Personeel (verouderd)</option>':''}
         <option value="part-timer"${u.rol==='part-timer'?' selected':''}>Part-timer</option>
         <option value="full-timer"${u.rol==='full-timer'?' selected':''}>Full-timer</option>
         <option value="hal"${u.rol==='hal'?' selected':''}>Hal medewerker</option>
@@ -3008,7 +3031,7 @@ async function loadAlleBeschikbaarheid(){
   if(!agendaEl||!lijstEl)return;
 
   const{data:beschData}=await sb.from('beschikbaarheid').select('*').order('datum_start',{ascending:true});
-  const{data:gebruikers}=await sb.from('gebruikers').select('id,naam').eq('rol','personeel');
+  const{data:gebruikers}=await sb.from('gebruikers').select('id,naam').in('rol',['part-timer','full-timer','hal']);
   const gMap=Object.fromEntries((gebruikers||[]).map(g=>[g.id,g]));
 
   const{days,month,year}=getBeschMonthDates();
